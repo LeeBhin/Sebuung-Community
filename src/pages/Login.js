@@ -1,17 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { auth, googleProvider, githubProvider } from '../firebase';
+import { auth, googleProvider, githubProvider, db } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { signInWithPopup, signOut } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 const Login = () => {
     const [user, loading, error] = useAuthState(auth);
     const [loginMethod, setLoginMethod] = useState(null);
 
+    useEffect(() => {
+        // 로컬 스토리지에서 사용자 정보를 가져옵니다.
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            setLoginMethod(savedUser);
+        }
+    }, []);
+
     const loginWithGoogle = async () => {
         try {
             await signInWithPopup(auth, googleProvider);
             setLoginMethod('구글');
+
+            // 사용자 정보를 Firestore에 저장합니다.
+            const user = auth.currentUser;
+            const userDoc = doc(db, 'users', user.uid);
+            const userData = {
+                displayName: user.displayName,
+                email: user.email,
+            };
+            await setDoc(userDoc, userData);
+
+            // 로컬 스토리지에 사용자 정보를 저장합니다.
+            localStorage.setItem('user', '구글');
         } catch (error) {
             console.error("로그인 실패:", error);
         }
@@ -21,11 +42,22 @@ const Login = () => {
         try {
             await signInWithPopup(auth, githubProvider);
             setLoginMethod('깃허브');
+
+            // 사용자 정보를 Firestore에 저장합니다.
+            const user = auth.currentUser;
+            const userDoc = doc(db, 'users', user.uid);
+            const userData = {
+                displayName: user.displayName,
+                email: user.email,
+            };
+            await setDoc(userDoc, userData);
+
+            // 로컬 스토리지에 사용자 정보를 저장합니다.
+            localStorage.setItem('user', '깃허브');
         } catch (error) {
             console.error("로그인 실패:", error);
         }
     };
-
     const loginWithEmail = async () => {
         alert('이메일 로그인 준비중')
     };
@@ -34,10 +66,18 @@ const Login = () => {
         alert('네이버 로그인 준비중')
     };
 
-
     const logout = async () => {
         try {
+            // Firebase Authentication에서 로그아웃
             await signOut(auth);
+
+            // 브라우저 캐시 삭제 (LocalStorage)
+            localStorage.removeItem('user');
+
+            // Firebase Authentication 세션 정보 삭제 (세션 쿠키 삭제)
+            document.cookie = 'firebaseAuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+            // 로그인 상태 초기화
             setLoginMethod(null);
         } catch (error) {
             console.error("로그아웃 실패:", error);

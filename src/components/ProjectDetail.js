@@ -39,6 +39,9 @@ function ProjectDetail({ projectId, setShowPopup }) {
                             if (authorDocSnapshot.exists()) {
                                 const authorInfo = authorDocSnapshot.data();
                                 setAuthorName(authorInfo.displayName);
+                            } else {
+                                // 사용자 정보가 없는 경우, UID를 표시
+                                setAuthorName(authorUid);
                             }
                         }
                     }
@@ -76,7 +79,6 @@ function ProjectDetail({ projectId, setShowPopup }) {
                         <div className="project-detail-item">
                             <strong>링크:</strong> <a href={projectData.link} target="_blank" rel="noopener noreferrer">{projectData.link}</a>
                         </div>
-                        {/* 다른 정보들도 유사한 방식으로 표시할 수 있습니다 */}
                     </div>
                 )}
             </div>
