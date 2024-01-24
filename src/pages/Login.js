@@ -17,10 +17,10 @@ const Login = () => {
         }
     }, []);
 
-    const loginWithGoogle = async () => {
+    const loginWithProvider = async (provider, providerName) => {
         try {
-            await signInWithPopup(auth, googleProvider);
-            setLoginMethod('구글');
+            await signInWithPopup(auth, provider);
+            setLoginMethod(providerName);
 
             // 사용자 정보를 Firestore에 저장합니다.
             const user = auth.currentUser;
@@ -32,32 +32,20 @@ const Login = () => {
             await setDoc(userDoc, userData);
 
             // 로컬 스토리지에 사용자 정보를 저장합니다.
-            localStorage.setItem('user', '구글');
+            localStorage.setItem('user', providerName);
         } catch (error) {
             console.error("로그인 실패:", error);
         }
     };
 
-    const loginWithGitHub = async () => {
-        try {
-            await signInWithPopup(auth, githubProvider);
-            setLoginMethod('깃허브');
-
-            // 사용자 정보를 Firestore에 저장합니다.
-            const user = auth.currentUser;
-            const userDoc = doc(db, 'users', user.uid);
-            const userData = {
-                displayName: user.displayName,
-                email: user.email,
-            };
-            await setDoc(userDoc, userData);
-
-            // 로컬 스토리지에 사용자 정보를 저장합니다.
-            localStorage.setItem('user', '깃허브');
-        } catch (error) {
-            console.error("로그인 실패:", error);
-        }
+    const loginWithGoogle = () => {
+        loginWithProvider(googleProvider, '구글');
     };
+
+    const loginWithGitHub = () => {
+        loginWithProvider(githubProvider, '깃허브');
+    };
+
     const loginWithEmail = async () => {
         alert('이메일 로그인 준비중')
     };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../firebase'; // Firebase 설정 파일을 불러옵니다
+import { db } from '../firebase'; // Firebase 설정 파일을 불러옵니다
 import { doc, getDoc } from 'firebase/firestore'; // Firestore 함수를 임포트합니다
 import '../styles/ProjectDetail.css'; // 스타일 파일을 임포트합니다
 
@@ -8,7 +8,7 @@ function ProjectDetail({ projectId, setShowPopup }) {
     const [authorName, setAuthorName] = useState(null); // 작성자 이름 상태 추가
 
     useEffect(() => {
-        // Firestore에서 특정 프로젝트 문서의 데이터를 가져오는 함수
+        // Firestore에서 특정 프로젝트 문서의 데이터와 작성자 UID를 가져오는 함수
         const fetchProjectData = async () => {
             const projectDocRef = doc(db, "projects", projectId); // "projects"는 컬렉션 이름, projectId는 문서의 ID
             const projectDocSnapshot = await getDoc(projectDocRef);
@@ -24,27 +24,15 @@ function ProjectDetail({ projectId, setShowPopup }) {
                 // 작성자의 UID를 가져옵니다.
                 const authorUid = projectInfo.userId;
 
-                // UID를 사용하여 작성자 이름을 가져옵니다.
-                if (authorUid) {
-                    const user = auth.currentUser;
-                    if (user) {
-                        const currentUid = user.uid;
-                        if (authorUid === currentUid) {
-                            // 작성자가 현재 사용자인 경우, "나"로 표시
-                            setAuthorName("나");
-                        } else {
-                            // 작성자가 다른 사용자인 경우, 작성자의 이름 가져오기
-                            const authorRef = doc(db, "users", authorUid); // "users"는 사용자 컬렉션 이름
-                            const authorDocSnapshot = await getDoc(authorRef);
-                            if (authorDocSnapshot.exists()) {
-                                const authorInfo = authorDocSnapshot.data();
-                                setAuthorName(authorInfo.displayName);
-                            } else {
-                                // 사용자 정보가 없는 경우, UID를 표시
-                                setAuthorName(authorUid);
-                            }
-                        }
-                    }
+                // UID를 사용하여 작성자 정보를 Firestore에서 가져옵니다.
+                const authorRef = doc(db, "users", authorUid); // "users"는 사용자 컬렉션 이름
+                const authorDocSnapshot = await getDoc(authorRef);
+                if (authorDocSnapshot.exists()) {
+                    const authorInfo = authorDocSnapshot.data();
+                    setAuthorName(authorInfo.displayName);
+                } else {
+                    // 사용자 정보가 없는 경우, UID를 표시
+                    setAuthorName(authorUid);
                 }
             } else {
                 console.log("해당 문서가 존재하지 않습니다.");
