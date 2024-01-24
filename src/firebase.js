@@ -1,8 +1,8 @@
-// Firebase 앱과 필요한 서비스들을 개별적으로 import합니다.
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+import { getFirestore } from 'firebase/firestore';
 
-// Firebase 프로젝트 설정
 const firebaseConfig = {
     apiKey: "AIzaSyCfxXv1KgujYLD5B5nZSIBjaTLtytgwEyc",
     authDomain: "boasting-778b9.firebaseapp.com",
@@ -13,12 +13,10 @@ const firebaseConfig = {
     measurementId: "G-BB9JRRQJMG"
 };
 
-// Firebase 앱 초기화
 const app = initializeApp(firebaseConfig);
 
-// Auth 서비스를 초기화하고 export합니다.
 export const auth = getAuth(app);
-
-// Google과 GitHub 인증 제공자를 export합니다.
 export const googleProvider = new GoogleAuthProvider();
 export const githubProvider = new GithubAuthProvider();
+export const storage = getStorage(app);
+export const db = getFirestore(app);
