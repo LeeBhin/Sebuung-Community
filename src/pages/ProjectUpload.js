@@ -6,6 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 function ProjectUpload() {
     const [image, setImage] = useState(null);
     const [file, setFile] = useState(null);
+    const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [link, setLink] = useState('');
 
@@ -27,10 +28,11 @@ function ProjectUpload() {
         return getDownloadURL(fileRef);
     };
 
-    const saveProjectData = async (userId, description, link, imageUrl, fileUrl) => {
+    const saveProjectData = async (userId, title, description, link, imageUrl, fileUrl) => {
         try {
             const docRef = await addDoc(collection(db, "projects"), {
                 userId,
+                title, // title 추가
                 description,
                 link,
                 imageUrl,
@@ -56,7 +58,7 @@ function ProjectUpload() {
 
         const userId = auth.currentUser ? auth.currentUser.uid : null;
         if (userId && (imageUrl || fileUrl)) {
-            saveProjectData(userId, description, link, imageUrl, fileUrl);
+            saveProjectData(userId, title, description, link, imageUrl, fileUrl);
         }
     };
 
@@ -68,6 +70,9 @@ function ProjectUpload() {
     return (
         <div className="projectUpload">
             <form onSubmit={handleSubmit}>
+                <p>프로젝트 이름</p>
+                <input type="text" value={title} onChange={e => setTitle(e.target.value)} /> {/* 프로젝트 이름 입력 필드 */}
+
                 <p>이미지</p>
                 <input type="file" onChange={handleImageChange} />
 

@@ -1,8 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ProjectDetail from './ProjectDetail'; // ProjectDetail 컴포넌트를 불러옵니다
+import { db, auth } from '../firebase'; // Firebase 설정 파일을 불러옵니다
+import { collection, query, getDocs } from 'firebase/firestore'; // Firestore 함수를 임포트합니다
 
 function ProjectList() {
     const [showPopup, setShowPopup] = useState(false); // 팝업 표시 여부
     const [selectedProject, setSelectedProject] = useState(null); // 선택된 프로젝트 정보
+    const [projects, setProjects] = useState([]); // Firestore에서 가져온 프로젝트 데이터를 저장할 상태
+
+    useEffect(() => {
+        // Firestore에서 프로젝트 데이터를 가져오는 함수
+        const fetchProjects = async () => {
+            const projectCollection = collection(db, "projects");
+            const projectQuery = query(projectCollection);
+
+            try {
+                const projectSnapshot = await getDocs(projectQuery);
+                const projectData = projectSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // 사용자 이름을 가져오기
+                const user = auth.currentUser;
+                const userName = user ? user.displayName : "Unknown User";
+
+                // 사용자 이름을 추가한 데이터를 설정
+                const projectsWithUserName = projectData.map(project => ({
+                    ...project,
+                    userName: userName
+                }));
+
+                setProjects(projectsWithUserName);
+            } catch (error) {
+                console.error("프로젝트 데이터 가져오기 에러:", error);
+            }
+        };
+
+        // 페이지가 로드될 때 프로젝트 데이터를 가져옵니다.
+        fetchProjects();
+    }, []); // []를 빈 배열로 설정하여 한 번만 실행되도록 합니다.
 
     const showProjectDetail = (projectId) => {
         setSelectedProject(projectId); // 선택된 프로젝트 설정
@@ -11,25 +48,11 @@ function ProjectList() {
 
     const projectDiv = {
         width: "350px",
-        height: "250px",
+        height: "300px",
         border: "solid 1px",
         float: "left",
         margin: "15px",
         cursor: "pointer"
-    };
-
-    const popup = {
-        width: '80vw',
-        height: '80vh',
-        border: 'solid 1px',
-        position: 'fixed',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        backgroundColor: 'white',
-        padding: '20px',
-        boxSizing: 'border-box',
-        zIndex: 1000,
     };
 
     const projectThumbnail = {
@@ -37,39 +60,35 @@ function ProjectList() {
         border: "solid 1px"
     };
 
-    // 프로젝트 상세 페이지로 이동하는 함수
-    // const goToProjectDetail = (projectId) => {
-    //     navigate(`/project/${projectId}`);
-    // };
-
     return (
         <div className="projectList">
-            {[1, 2, 3, 4].map((projectId) => (
+            {projects.map((project) => (
                 <div
-                    key={projectId}
+                    key={project.id}
                     className="projectDiv"
                     style={projectDiv}
-                    onClick={() => showProjectDetail(projectId)}
+                    onClick={() => showProjectDetail(project.id)}
                 >
                     <div className="projectThumbnail" style={projectThumbnail}>
-                        Thumbnail img
+                        <img
+                            src={project.imageUrl}
+                            alt="프로젝트 이미지"
+                            style={{
+                                maxWidth: "100%",
+                                maxHeight: "100%",
+                                width: "auto",
+                                height: "auto"
+                            }}
+                        />
                     </div>
-                    <div className="projectTitle">Project Title {projectId}</div>
+                    <div className="projectTitle">{project.title}</div>
+                    <div className="projectCreatedAt">{project.createdAt.toDate().toLocaleString()}</div>
+                    <div className="projectAuthor">{project.userName}</div> {/* 사용자 이름 표시 */}
                 </div>
             ))}
 
             {showPopup && (
-                <div className="popup" style={popup}>
-                    <div>Project Details for {selectedProject}</div>
-                    <p>좌우 슬라이더 이미지</p>
-                    <p>링크와 본문</p>
-                    <p>카테고리</p>
-                    <p>별점</p>
-                    <p>좋아요/싫어요</p>
-                    <p>신고</p>
-                    <p>댓글</p>
-                    <button onClick={() => setShowPopup(false)}>X</button>
-                </div>
+                <ProjectDetail projectId={selectedProject} setShowPopup={setShowPopup} />
             )}
         </div>
     );
