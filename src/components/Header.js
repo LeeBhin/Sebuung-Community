@@ -11,6 +11,7 @@ function Header() {
             <div style={{ position: "absolute", right: 0 }}>
                 <Link to="/upload">업로드</Link>
                 <Link to="/login">로그인</Link>
+                <Link to="/mypage">마이페이지</Link>
             </div>
             <input type="text" placeholder="검색" style={{ maxWidth: "100%", width: "300px", lineHeight: "30px", marginTop: "20px" }} />
             <button>검색</button>
