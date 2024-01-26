@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import ProjectDetail from './ProjectDetail'; // ProjectDetail 컴포넌트를 불러옵니다
-import { db } from '../firebase'; // Firebase 설정 파일을 불러옵니다
-import { collection, query, getDocs, doc, getDoc } from 'firebase/firestore'; // Firestore 함수를 임포트합니다
+import ProjectDetail from './ProjectDetail';
+import { db } from '../firebase'; //
+import { collection, query, getDocs, doc, getDoc } from 'firebase/firestore';
+
+import '../styles/ProjectList.css'
 
 function ProjectList() {
     const [showPopup, setShowPopup] = useState(false); // 팝업 표시 여부
@@ -34,6 +36,9 @@ function ProjectList() {
                     });
                 }
 
+                // 프로젝트 데이터를 최신순으로 정렬
+                projectData.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+
                 // 모든 데이터를 가져온 후에 상태를 업데이트합니다.
                 setProjects(projectData);
             } catch (error) {
@@ -51,39 +56,18 @@ function ProjectList() {
         setShowPopup(true); // 팝업 표시
     };
 
-    const projectDiv = {
-        width: "350px",
-        height: "300px",
-        border: "solid 1px",
-        float: "left",
-        margin: "15px",
-        cursor: "pointer"
-    };
-
-    const projectThumbnail = {
-        height: "80%",
-        border: "solid 1px"
-    };
-
     return (
         <div className="projectList">
             {projects.map((project) => (
                 <div
                     key={project.id}
                     className="projectDiv"
-                    style={projectDiv}
                     onClick={() => showProjectDetail(project.id)}
                 >
-                    <div className="projectThumbnail" style={projectThumbnail}>
+                    <div className="projectThumbnail">
                         <img
                             src={project.imageUrl}
                             alt="프로젝트 이미지"
-                            style={{
-                                maxWidth: "100%",
-                                maxHeight: "100%",
-                                width: "auto",
-                                height: "auto"
-                            }}
                         />
                     </div>
                     <div className="projectTitle">{project.title}</div>

@@ -1,12 +1,14 @@
 import Header from "../components/Header";
 import ProjectList from "../components/ProjectList";
 
+import '../styles/Home.css'
+
 function Home() {
     return (
         <div className="home">
             <Header />
 
-            <div className="contents" style={{ border: "solid 1px", width: "95%", height: "88vh", margin: "20px auto" }}>
+            <div className="contents">
                 <ProjectList />
             </div>
         </div>

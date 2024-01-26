@@ -1,0 +1,12 @@
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5vh;
+}
+
+.searchBar {
+    padding: 1vh;
+    width: 25vw;
+    border: solid 2px;
+}

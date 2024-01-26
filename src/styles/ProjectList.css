@@ -1,0 +1,11 @@
+.projectDiv {
+    width: 16vw;
+    height: 16vw;
+    border: solid 1px ;
+    float: left;
+    margin: 2vw 0 0 2vw;
+}
+
+.projectDiv img {
+    height: 15vh;
+}
