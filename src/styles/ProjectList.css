@@ -1,11 +1,56 @@
-.projectDiv {
-    width: 16vw;
-    height: 16vw;
-    border: solid 1px ;
-    float: left;
-    margin: 2vw 0 0 2vw;
+.projectList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
 }
 
-.projectDiv img {
-    height: 15vh;
+.projectDiv {
+    aspect-ratio: 16 / 9;
+    display: flex;
+    flex-direction: column;
+    margin-top: 3vh;
+    cursor: pointer;
+}
+
+.projectDiv:hover {
+    .projectThumbnail img {
+        border-radius: 0%;
+    }
+}
+
+.projectThumbnail {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    overflow: hidden;
+}
+
+.projectThumbnail img {
+    transition: .5s;
+    position: absolute;
+    top: 50%;
+    border-radius: 15px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.info {
+    margin-left: .5rem
+}
+
+.projectTitle {
+    font-size: 23px;
+}
+
+.projectStats {
+    display: flex;
+    align-items: center;
+}
+
+.projectViews,
+.projectCreatedAt {
+    margin-right: 0.5rem;
 }

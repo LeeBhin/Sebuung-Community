@@ -32,14 +32,15 @@ function ProjectUpload() {
         try {
             const docRef = await addDoc(collection(db, "projects"), {
                 userId,
-                title, // title 추가
+                title,
                 description,
                 link,
                 imageUrl,
                 fileUrl,
+                views: 0,
                 createdAt: new Date()
             });
-            console.log("문서 작성 성공, ID:", docRef.id);
+            alert("업로드 완료, ID:", docRef.id);
         } catch (e) {
             console.error("문서 작성 에러:", e);
         }

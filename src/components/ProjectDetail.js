@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase'; // Firebase 설정 파일을 불러옵니다
-import { doc, getDoc } from 'firebase/firestore'; // Firestore 함수를 임포트합니다
-import '../styles/ProjectDetail.css'; // 스타일 파일을 임포트합니다
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import '../styles/ProjectDetail.css';
 
 function ProjectDetail({ projectId, setShowPopup }) {
     const [projectData, setProjectData] = useState(null);
-    const [authorName, setAuthorName] = useState(null); // 작성자 이름 상태 추가
-
+    const [authorName, setAuthorName] = useState(null);
     useEffect(() => {
-        // Firestore에서 특정 프로젝트 문서의 데이터와 작성자 UID를 가져오는 함수
         const fetchProjectData = async () => {
-            const projectDocRef = doc(db, "projects", projectId); // "projects"는 컬렉션 이름, projectId는 문서의 ID
+            const projectDocRef = doc(db, "projects", projectId);
             const projectDocSnapshot = await getDoc(projectDocRef);
 
             if (projectDocSnapshot.exists()) {
@@ -41,7 +39,7 @@ function ProjectDetail({ projectId, setShowPopup }) {
 
         // 페이지가 로드될 때 특정 프로젝트 데이터를 가져옵니다.
         fetchProjectData();
-    }, [projectId]);
+    }, [projectId], db);
 
     return (
         <div className="popup-container">
@@ -66,6 +64,9 @@ function ProjectDetail({ projectId, setShowPopup }) {
                         </div>
                         <div className="project-detail-item">
                             <strong>링크:</strong> <a href={projectData.link} target="_blank" rel="noopener noreferrer">{projectData.link}</a>
+                        </div>
+                        <div className="project-detail-item">
+                            <strong>조회수:</strong> {projectData.views}
                         </div>
                     </div>
                 )}

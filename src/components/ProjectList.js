@@ -1,11 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import ProjectDetail from './ProjectDetail';
-import { db } from '../firebase'; //
-import { collection, query, getDocs, doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase'; //
+import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc } from 'firebase/firestore';
 
 import '../styles/ProjectList.css'
 
 function ProjectList() {
+
+    const incrementViews = async (projectId) => {
+        const userId = auth.currentUser ? auth.currentUser.uid : null;
+        if (!userId) return;
+
+        const userViewsRef = doc(db, "userViews", userId);
+        const userViewsDoc = await getDoc(userViewsRef);
+
+        if (userViewsDoc.exists()) {
+            const viewedProjects = userViewsDoc.data().viewedProjects || [];
+            if (!viewedProjects.includes(projectId)) {
+                await updateDoc(userViewsRef, {
+                    viewedProjects: arrayUnion(projectId)
+                });
+                const projectRef = doc(db, "projects", projectId);
+                await updateDoc(projectRef, {
+                    views: increment(1)
+                });
+            }
+        } else {
+            await setDoc(userViewsRef, {
+                viewedProjects: [projectId]
+            });
+            const projectRef = doc(db, "projects", projectId);
+            await updateDoc(projectRef, {
+                views: increment(1)
+            });
+        }
+    };
+
     const [showPopup, setShowPopup] = useState(false); // 팝업 표시 여부
     const [selectedProject, setSelectedProject] = useState(null); // 선택된 프로젝트 정보
     const [projects, setProjects] = useState([]); // Firestore에서 가져온 프로젝트 데이터를 저장할 상태
@@ -24,6 +54,7 @@ function ProjectList() {
                     const projectInfo = docRef.data();
                     const authorDocRef = doc(db, "users", projectInfo.userId); // projectInfo.userId로 접근
                     const authorDocSnapshot = await getDoc(authorDocRef);
+                    projectInfo.views = docRef.data().views || 0;
 
                     if (authorDocSnapshot.exists()) {
                         const authorInfo = authorDocSnapshot.data();
@@ -50,10 +81,10 @@ function ProjectList() {
         fetchProjects();
     }, [])
 
-
     const showProjectDetail = (projectId) => {
-        setSelectedProject(projectId); // 선택된 프로젝트 설정
-        setShowPopup(true); // 팝업 표시
+        setSelectedProject(projectId);
+        setShowPopup(true);
+        incrementViews(projectId);
     };
 
     return (
@@ -70,9 +101,14 @@ function ProjectList() {
                             alt="프로젝트 이미지"
                         />
                     </div>
-                    <div className="projectTitle">{project.title}</div>
-                    <div className="projectCreatedAt">{project.createdAt.toDate().toLocaleString()}</div>
-                    <div className="projectAuthor">{project.authorName}</div> {/* 작성자 이름 표시 */}
+                    <div className='info'>
+                        <div className="projectTitle">{project.title}</div>
+                        <div className="projectAuthor">{project.authorName}</div>
+                        <div className="projectStats">
+                            <span className="projectViews">조회수 {project.views}회</span>
+                            <span className="projectCreatedAt">{project.createdAt.toDate().toLocaleDateString()}</span>
+                        </div>
+                    </div>
                 </div>
             ))}
 
