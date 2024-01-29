@@ -5,6 +5,33 @@ import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUni
 
 import '../styles/ProjectList.css'
 
+function timeAgo(date) {
+    const now = new Date();
+    const seconds = Math.round((now - date) / 1000);
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.round(minutes / 60);
+    const days = Math.round(hours / 24);
+    const weeks = Math.round(days / 7);
+    const months = Math.round(days / 30);
+    const years = Math.round(days / 365);
+
+    if (seconds < 60) {
+        return `${seconds}초 전`;
+    } else if (minutes < 60) {
+        return `${minutes}분 전`;
+    } else if (hours < 24) {
+        return `${hours}시간 전`;
+    } else if (days < 7) {
+        return `${days}일 전`;
+    } else if (weeks < 5) {
+        return `${weeks}주 전`;
+    } else if (months < 12) {
+        return `${months}달 전`;
+    } else {
+        return `${years}년 전`;
+    }
+}
+
 function ProjectList() {
 
     const incrementViews = async (projectId) => {
@@ -55,6 +82,7 @@ function ProjectList() {
                     const authorDocRef = doc(db, "users", projectInfo.userId); // projectInfo.userId로 접근
                     const authorDocSnapshot = await getDoc(authorDocRef);
                     projectInfo.views = docRef.data().views || 0;
+                    projectInfo.relativeDate = timeAgo(projectInfo.createdAt.toDate());
 
                     if (authorDocSnapshot.exists()) {
                         const authorInfo = authorDocSnapshot.data();
@@ -100,8 +128,8 @@ function ProjectList() {
                         <div className="projectTitle">{project.title}</div>
                         <div className="projectAuthor">{project.authorName}</div>
                         <div className="projectStats">
-                            <span className="projectViews">조회수 {project.views}회</span>
-                            <span className="projectCreatedAt">{project.createdAt.toDate().toLocaleDateString()}</span>
+                            <span className="projectViews">조회수 {project.views}회 •</span>
+                            <span className="projectCreatedAt">&nbsp;{project.relativeDate}</span>
                         </div>
                     </div>
                 </div>

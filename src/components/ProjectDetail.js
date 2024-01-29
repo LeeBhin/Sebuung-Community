@@ -15,23 +15,23 @@ function ProjectDetail({ projectId, setShowPopup }) {
 
             if (projectDocSnapshot.exists()) {
                 const projectInfo = projectDocSnapshot.data();
-
-                // timestamp 객체를 문자열로 변환하여 저장
-                projectInfo.createdAt = projectInfo.createdAt.toDate().toLocaleString();
+                projectInfo.createdAt = projectInfo.createdAt.toDate().toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
                 setProjectData(projectInfo);
 
-                // 작성자의 UID를 가져옵니다.
                 const authorUid = projectInfo.userId;
-
-                // UID를 사용하여 작성자 정보를 Firestore에서 가져옵니다.
-                const authorRef = doc(db, "users", authorUid); // "users"는 사용자 컬렉션 이름
+                const authorRef = doc(db, "users", authorUid);
                 const authorDocSnapshot = await getDoc(authorRef);
                 if (authorDocSnapshot.exists()) {
                     const authorInfo = authorDocSnapshot.data();
                     setAuthorName(authorInfo.displayName);
                 } else {
-                    // 사용자 정보가 없는 경우, UID를 표시
                     setAuthorName(authorUid);
                 }
             } else {
@@ -39,7 +39,6 @@ function ProjectDetail({ projectId, setShowPopup }) {
             }
         };
 
-        // 페이지가 로드될 때 특정 프로젝트 데이터를 가져옵니다.
         fetchProjectData();
     }, [projectId]);
 
@@ -55,31 +54,64 @@ function ProjectDetail({ projectId, setShowPopup }) {
         );
     };
 
+    const downloadFile = () => {
+        if (projectData.fileUrl) {
+            window.open(projectData.fileUrl);
+        }
+    };
+
     return (
         <div className="project-detail-overlay">
             <div className="project-detail-popup">
                 <button className="close-button" onClick={() => setShowPopup(false)}>X</button>
                 <div className="project-detail-container">
-                    {projectData && (
-                        <div className="project-image-slider">
-                            <img src={projectData.imageUrls[currentImageIndex]} alt={`이미지 ${currentImageIndex + 1}`} />
-                            <div className="image-index-overlay">
-                                {currentImageIndex + 1}/{projectData.imageUrls.length}
-                            </div>
-                            <button className="slider-button prev-button" onClick={handlePrevClick}>이전</button>
-                            <button className="slider-button next-button" onClick={handleNextClick}>다음</button>
-                        </div>
-                    )}
-
+                    <div className="project-content">
+                        {projectData && (
+                            <>
+                                <div className="project-image-slider">
+                                    <img src={projectData.imageUrls[currentImageIndex]} alt={`이미지 ${currentImageIndex + 1}`} />
+                                    <div className="image-index-overlay">
+                                        {currentImageIndex + 1}/{projectData.imageUrls.length}
+                                    </div>
+                                    <div>
+                                        <button className="slider-button prev-button" onClick={handlePrevClick}>이전</button>
+                                        <button className="slider-button next-button" onClick={handleNextClick}>다음</button>
+                                    </div>
+                                </div>
+                                <div className="project-info">
+                                    <div className="project-info-header">
+                                        <h2 className="project-title">{projectData.title}</h2>
+                                        <div className="project-date-views">
+                                            <span className="project-date">{projectData.createdAt}</span>
+                                            <span className="project-views">조회수 {projectData.views}회</span>
+                                        </div>
+                                    </div>
+                                    <div className="project-info-body">
+                                        <span className="project-author">{authorName}</span>
+                                        <div className="project-actions">
+                                            <button className="like-button bookmark-button">☆</button>
+                                            <button className="like-button">추천</button>
+                                            <button className="share-button">공유</button>
+                                            {projectData.fileUrl && (
+                                                <button className="download-button" onClick={downloadFile}>다운</button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <p className="project-description">{projectData.description}</p>
+                                </div>
+                            </>
+                        )}
+                    </div>
                     <div className="project-comments-section">
-                        {/* 프로젝트 정보와 댓글 섹션 */}
-                        <div className="project-detail-item">
-                            <strong>프로젝트 이름:</strong> {projectData?.title}
+                        <div className="comments-header">
+                            <h3>댓글</h3>
                         </div>
-                        <div className="project-detail-item">
-                            <strong>작성자:</strong> {authorName}
+                        <div className="comments-list">
                         </div>
-                        {/* ... 기타 정보 ... */}
+                        <div className="comment-input-section">
+                            <input type="text" placeholder="댓글 달기..." />
+                            <button type="submit">게시</button>
+                        </div>
                     </div>
                 </div>
             </div>

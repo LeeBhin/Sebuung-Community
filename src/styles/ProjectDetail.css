@@ -13,33 +13,49 @@
 .project-detail-popup {
     background-color: white;
     padding: 20px;
-    width: 80%;
-    max-width: 800px;
+    width: 80vw;
+    height: 70vh;
     display: flex;
     flex-direction: column;
+    /* 세로 방향으로 자식 요소들을 정렬 */
+    overflow: hidden;
 }
 
 .close-button {
     align-self: flex-end;
+    /* 버튼을 오른쪽 상단에 위치시킴 */
     background: none;
     border: none;
     font-size: 1.5rem;
+    cursor: pointer;
+    /* 마우스 커서를 포인터로 변경 */
 }
 
 .project-detail-container {
     display: flex;
-    margin-top: 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.project-content {
+    flex: 3;
+    display: flex;
+    overflow-y: scroll;
+    flex-direction: column;
 }
 
 .project-image-slider {
-    flex: 1;
+    width: 100%;
+    height: 600px;
     position: relative;
-    margin-right: 20px;
+    overflow: hidden;
 }
 
 .project-image-slider img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
 }
 
 .slider-button {
@@ -53,17 +69,19 @@
     padding: 10px;
 }
 
+.prev-button,
+.next-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 .prev-button {
     left: 10px;
 }
 
 .next-button {
     right: 10px;
-}
-
-.project-comments-section {
-    flex: 1;
-    /* 여기에 댓글 섹션 스타일을 추가하세요 */
 }
 
 .image-index-overlay {
@@ -75,4 +93,87 @@
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 0.9rem;
+}
+
+.project-comments-section {
+    flex: 1.5;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    background-color: #f9f9f9;
+}
+
+.comments-header h3 {
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.project-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-date-views {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* 조회수와 날짜 사이의 간격 */
+}
+
+.project-date,
+.project-views {
+    margin: 0;
+}
+
+.comments-list {
+    flex: 1;
+    overflow-y: auto;
+    /* 댓글 목록에 스크롤바 추가 */
+    padding: 10px 0;
+}
+
+.comment {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.comment-author {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.comment-content {
+    margin-top: 5px;
+}
+
+.comment-input-section {
+    display: flex;
+    margin-top: 10px;
+}
+
+.comment-input-section input {
+    flex: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+}
+
+.comment-input-section button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.download-button {
+    /* 다운로드 버튼 스타일 */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-left: 10px;
+    cursor: pointer;
 }

@@ -8,5 +8,13 @@
 .searchBar {
     padding: 1vh;
     width: 25vw;
-    border: solid 2px;
+    border: solid 2px #4CAF50;
+}
+
+.searchBtn {
+    background-color: #4CAF50;
+    border: none;
+    padding: 10px;
+    margin-left: 10px;
+    color: white;
 }

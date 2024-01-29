@@ -23,3 +23,53 @@
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     /* 그림자 효과 */
 }
+
+.project-info {
+    padding: 20px;
+}
+
+.project-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-title {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.project-date {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.project-info-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.project-author {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.project-actions {
+    display: flex;
+}
+
+.like-button,
+.share-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.project-description {
+    margin-top: 20px;
+}

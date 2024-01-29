@@ -38,11 +38,12 @@
 }
 
 .info {
-    margin-left: .5rem
+    margin: .5rem 0 0 0.5rem
 }
 
 .projectTitle {
     font-size: 23px;
+    padding-bottom: .3rem;
 }
 
 .projectStats {
@@ -50,7 +51,6 @@
     align-items: center;
 }
 
-.projectViews,
-.projectCreatedAt {
-    margin-right: 0.5rem;
+.projectStats span {
+    color: #777777;
 }

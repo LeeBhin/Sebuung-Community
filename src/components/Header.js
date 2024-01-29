@@ -11,7 +11,7 @@ function Header() {
                 <Link to="/mypage">마이페이지</Link>
             </div>
             <input type="text" className="searchBar" placeholder="검색" />
-            <button>검색</button>
+            <button className="searchBtn">검색</button>
         </div>
     );
 }
