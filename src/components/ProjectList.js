@@ -89,17 +89,12 @@ function ProjectList() {
 
     return (
         <div className="projectList">
-            {projects.map((project) => (
-                <div
-                    key={project.id}
-                    className="projectDiv"
-                    onClick={() => showProjectDetail(project.id)}
-                >
+            {projects.map(project => (
+                <div key={project.id} className="projectDiv" onClick={() => showProjectDetail(project.id)}>
                     <div className="projectThumbnail">
-                        <img
-                            src={project.imageUrl}
-                            alt="프로젝트 이미지"
-                        />
+                        {project.imageUrls && project.imageUrls.length > 0 && (
+                            <img src={project.imageUrls[0]} alt={`${project.title} 프로젝트 썸네일`} />
+                        )}
                     </div>
                     <div className='info'>
                         <div className="projectTitle">{project.title}</div>

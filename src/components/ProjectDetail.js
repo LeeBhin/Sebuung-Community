@@ -6,6 +6,8 @@ import '../styles/ProjectDetail.css';
 function ProjectDetail({ projectId, setShowPopup }) {
     const [projectData, setProjectData] = useState(null);
     const [authorName, setAuthorName] = useState(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     useEffect(() => {
         const fetchProjectData = async () => {
             const projectDocRef = doc(db, "projects", projectId);
@@ -39,37 +41,47 @@ function ProjectDetail({ projectId, setShowPopup }) {
 
         // 페이지가 로드될 때 특정 프로젝트 데이터를 가져옵니다.
         fetchProjectData();
-    }, [projectId], db);
+    }, [projectId]);
+
+    const handlePrevClick = () => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex > 0 ? prevIndex - 1 : projectData.imageUrls.length - 1
+        );
+    };
+
+    const handleNextClick = () => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex < projectData.imageUrls.length - 1 ? prevIndex + 1 : 0
+        );
+    };
 
     return (
-        <div className="popup-container">
-            <div className="popup">
-                <div className="popup-header">
-                    <h2>프로젝트 상세 정보</h2>
-                    <button className="close-button" onClick={() => setShowPopup(false)}>X</button>
-                </div>
-                {projectData && (
-                    <div className="project-details">
+        <div className="project-detail-overlay">
+            <div className="project-detail-popup">
+                <button className="close-button" onClick={() => setShowPopup(false)}>X</button>
+                <div className="project-detail-container">
+                    {projectData && (
+                        <div className="project-image-slider">
+                            <img src={projectData.imageUrls[currentImageIndex]} alt={`이미지 ${currentImageIndex + 1}`} />
+                            <div className="image-index-overlay">
+                                {currentImageIndex + 1}/{projectData.imageUrls.length}
+                            </div>
+                            <button className="slider-button prev-button" onClick={handlePrevClick}>이전</button>
+                            <button className="slider-button next-button" onClick={handleNextClick}>다음</button>
+                        </div>
+                    )}
+
+                    <div className="project-comments-section">
+                        {/* 프로젝트 정보와 댓글 섹션 */}
                         <div className="project-detail-item">
-                            <strong>프로젝트 이름:</strong> {projectData.title}
+                            <strong>프로젝트 이름:</strong> {projectData?.title}
                         </div>
                         <div className="project-detail-item">
                             <strong>작성자:</strong> {authorName}
                         </div>
-                        <div className="project-detail-item">
-                            <strong>작성일:</strong> {projectData.createdAt}
-                        </div>
-                        <div className="project-detail-item">
-                            <strong>설명:</strong> {projectData.description}
-                        </div>
-                        <div className="project-detail-item">
-                            <strong>링크:</strong> <a href={projectData.link} target="_blank" rel="noopener noreferrer">{projectData.link}</a>
-                        </div>
-                        <div className="project-detail-item">
-                            <strong>조회수:</strong> {projectData.views}
-                        </div>
+                        {/* ... 기타 정보 ... */}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );
