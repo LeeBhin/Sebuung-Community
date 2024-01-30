@@ -5,6 +5,8 @@ import { doc, updateDoc, deleteDoc, collection, query, where, onSnapshot } from 
 import { useNavigate } from 'react-router-dom';
 import ProjectDetail from '../components/ProjectDetail';
 
+import '../styles/MyPage.css';
+
 const MyPage = () => {
     const [user] = useAuthState(auth);
     const [displayName, setDisplayName] = useState('');
@@ -60,7 +62,7 @@ const MyPage = () => {
 
     return (
         <div className="myPage">
-            <h1>{displayName}님의 마이페이지</h1>
+            <h1>{displayName}님</h1>
             <div>
                 <input
                     type="text"
@@ -68,13 +70,13 @@ const MyPage = () => {
                     value={newDisplayName}
                     onChange={(e) => setNewDisplayName(e.target.value)}
                 />
-                <button onClick={updateDisplayName}>닉네임 변경</button>
+                <button className='myPageBtn' onClick={updateDisplayName}>닉네임 변경</button>
             </div>
             <div>
-                <button onClick={deleteAccount}>계정 삭제</button>
+                <button className='myPageBtn' onClick={deleteAccount} style={{ 'background': 'red' }}>계정 삭제</button>
             </div>
             <div>
-                <h2>내가 올린 프로젝트</h2>
+                <h2>나의 프로젝트</h2>
                 <ul>
                     {myProjects.map((project) => (
                         <li key={project.id} onClick={() => showProjectDetail(project.id)}>

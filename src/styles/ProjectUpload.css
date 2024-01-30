@@ -1,3 +1,86 @@
+/* ProjectUpload.css */
+.projectUpload {
+    max-width: 1100px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.projectUpload form {
+    display: flex;
+    flex-direction: column;
+}
+
+.projectUpload p {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.projectUpload input[type="text"],
+.projectUpload input[type="file"] {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.projectUpload .image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.projectUpload .preview-item {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 200px;
+    height: calc(200px / 16 * 9);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.preview-item img {
+    width: 200px;
+}
+
+.projectUpload .preview-item.selected-thumbnail::after {
+    content: '썸네일';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+}
+
+.projectUpload button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.projectUpload button:hover {
+    background-color: #0056b3;
+}
+
+.projectUpload textarea {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
 .image-preview img {
     width: 150px;
     cursor: pointer;
@@ -18,58 +101,6 @@
 }
 
 .selected-thumbnail {
-    border: 2px solid #4CAF50;
-    /* 녹색 테두리 */
+    border: 2px solid rgb(100, 100, 255);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    /* 그림자 효과 */
-}
-
-.project-info {
-    padding: 20px;
-}
-
-.project-info-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.project-title {
-    margin: 0;
-    font-size: 1.5em;
-}
-
-.project-date {
-    font-size: 0.9em;
-    color: #666;
-}
-
-.project-info-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.project-author {
-    font-size: 1em;
-    font-weight: bold;
-}
-
-.project-actions {
-    display: flex;
-}
-
-.like-button,
-.share-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.project-description {
-    margin-top: 20px;
 }

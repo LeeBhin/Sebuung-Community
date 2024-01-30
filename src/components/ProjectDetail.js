@@ -3,6 +3,13 @@ import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import '../styles/ProjectDetail.css';
 
+function ensureAbsoluteUrl(url) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return `http://${url}`;
+    }
+    return url;
+}
+
 function ProjectDetail({ projectId, setShowPopup }) {
     const [projectData, setProjectData] = useState(null);
     const [authorName, setAuthorName] = useState(null);
@@ -97,6 +104,10 @@ function ProjectDetail({ projectId, setShowPopup }) {
                                             )}
                                         </div>
                                     </div>
+                                    <a href={ensureAbsoluteUrl(projectData.link)}
+                                        className="project-url"
+                                        target="_blank"
+                                        rel="noopener noreferrer">{projectData.link}</a>
                                     <p className="project-description">{projectData.description}</p>
                                 </div>
                             </>

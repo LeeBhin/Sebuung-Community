@@ -14,7 +14,7 @@
     background-color: white;
     padding: 20px;
     width: 80vw;
-    height: 70vh;
+    height: 80vh;
     display: flex;
     flex-direction: column;
     /* 세로 방향으로 자식 요소들을 정렬 */
@@ -34,21 +34,21 @@
 .project-detail-container {
     display: flex;
     width: 100%;
-    height: 100%;
+    height: 95%;
 }
 
 .project-content {
     flex: 3;
     display: flex;
-    overflow-y: scroll;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .project-image-slider {
+    flex-shrink: 0;
     width: 100%;
-    height: 600px;
+    height: 500px;
     position: relative;
-    overflow: hidden;
 }
 
 .project-image-slider img {
@@ -67,6 +67,7 @@
     border: none;
     cursor: pointer;
     padding: 10px;
+    border-radius: 5px;
 }
 
 .prev-button,
@@ -119,7 +120,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    /* 조회수와 날짜 사이의 간격 */
 }
 
 .project-date,
@@ -129,9 +129,7 @@
 
 .comments-list {
     flex: 1;
-    overflow-y: auto;
-    /* 댓글 목록에 스크롤바 추가 */
-    padding: 10px 0;
+    overflow-y: scroll;
 }
 
 .comment {
@@ -161,19 +159,78 @@
 }
 
 .comment-input-section button {
-    background-color: #4CAF50;
+    background-color: rgb(100, 100, 255);
     color: white;
     border: none;
     padding: 10px 15px;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .download-button {
-    /* 다운로드 버튼 스타일 */
-    background-color: #007bff;
+    background-color: rgb(215, 160, 50);
     color: white;
     border: none;
     padding: 10px 15px;
     margin-left: 10px;
     cursor: pointer;
+    border-radius: 5px;
+}
+
+
+.project-info {
+    padding: 20px;
+    overflow-y: visible;
+}
+
+.project-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-title {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.project-date {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.project-info-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.project-author {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.project-actions {
+    display: flex;
+}
+
+.like-button,
+.share-button {
+    background-color: rgb(100, 100, 255);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.project-description {
+    margin-top: 20px;
+    white-space: pre-line;
+}
+
+.bookmark-button {
+    background-color: rgba(100, 100, 255, 0.5);
 }

@@ -3,7 +3,7 @@ import { storage, db, auth } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-import '../styles/ProjectUpload.css'
+import '../styles/ProjectUpload.css';
 
 function ProjectUpload() {
     const [images, setImages] = useState([]);
@@ -14,7 +14,7 @@ function ProjectUpload() {
 
     const fileInputRef = useRef(null); // 파일 입력을 위한 ref
 
-    const handleImageChange = e => {
+    const handleImageChange = (e) => {
         if (e.target.files) {
             setImages([...images, ...Array.from(e.target.files).slice(0, 5 - images.length)]);
             if (fileInputRef.current) {
@@ -23,8 +23,8 @@ function ProjectUpload() {
         }
     };
 
-    const setAsThumbnail = index => {
-        setImages(prevImages => {
+    const setAsThumbnail = (index) => {
+        setImages((prevImages) => {
             const newImages = [...prevImages];
             const selectedImage = newImages.splice(index, 1)[0];
             newImages.unshift(selectedImage);
@@ -32,14 +32,14 @@ function ProjectUpload() {
         });
     };
 
-    const removeImage = index => {
-        setImages(prevImages => prevImages.filter((_, i) => i !== index));
+    const removeImage = (index) => {
+        setImages((prevImages) => prevImages.filter((_, i) => i !== index));
         if (fileInputRef.current) {
             fileInputRef.current.value = ''; // 파일 입력 필드 초기화
         }
     };
 
-    const handleFileChange = e => {
+    const handleFileChange = (e) => {
         if (e.target.files[0]) {
             setFile(e.target.files[0]);
         }
@@ -71,7 +71,7 @@ function ProjectUpload() {
                 link,
                 imageUrls,
                 views: 0,
-                createdAt: new Date()
+                createdAt: new Date(),
             };
 
             // fileUrl이 정의되어 있지 않은 경우를 고려하여 추가
@@ -79,13 +79,12 @@ function ProjectUpload() {
                 projectData.fileUrl = fileUrl;
             }
 
-            await addDoc(collection(db, "projects"), projectData);
-            alert("업로드 완료");
+            await addDoc(collection(db, 'projects'), projectData);
+            alert('업로드 완료');
         } catch (e) {
-            console.error("문서 작성 에러: ", e);
+            console.error('문서 작성 에러: ', e);
         }
     };
-
 
     const uploadToFirebase = async () => {
         let imageUrls = [], fileUrl;
@@ -102,7 +101,16 @@ function ProjectUpload() {
         }
     };
 
-    const handleSubmit = e => {
+    const maxDescriptionLength = 800;
+
+    const handleDescriptionChange = (e) => {
+        const text = e.target.value;
+        if (text.length <= maxDescriptionLength) {
+            setDescription(text);
+        }
+    };
+
+    const handleSubmit = (e) => {
         e.preventDefault();
         uploadToFirebase();
     };
@@ -111,9 +119,10 @@ function ProjectUpload() {
         <div className="projectUpload">
             <form onSubmit={handleSubmit}>
                 <p>프로젝트 이름</p>
-                <input type="text" value={title} onChange={e => setTitle(e.target.value)} />
+                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
 
                 <p>이미지 (최대 5개)</p>
+                <p style={{ fontSize: '13px', fontWeight: 'normal' }}>좌클릭 썸네일 선택, 우클릭 삭제</p>
                 <input type="file" multiple onChange={handleImageChange} ref={fileInputRef} />
                 <div className="image-preview">
                     {images.map((image, index) => (
@@ -130,12 +139,16 @@ function ProjectUpload() {
                         </div>
                     ))}
                 </div>
-
                 <p>설명</p>
-                <input type="text" value={description} onChange={e => setDescription(e.target.value)} />
-
-                <p>링크</p>
-                <input type="text" value={link} onChange={e => setLink(e.target.value)} />
+                <textarea
+                    value={description}
+                    onChange={handleDescriptionChange}
+                    rows="8"
+                    placeholder="프로젝트에 대한 설명을 작성하세요"
+                ></textarea>
+                <p>({maxDescriptionLength - description.length}/{maxDescriptionLength})</p>
+                <p>URL</p>
+                <input type="text" value={link} onChange={(e) => setLink(e.target.value)} />
 
                 <p>파일</p>
                 <input type="file" onChange={handleFileChange} />

@@ -1,0 +1,48 @@
+.myPage {
+    max-width:1000px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.myPage h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.myPage input[type="text"] {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.myPageBtn {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.myPage button:hover {
+    background-color: #0056b3;
+}
+
+.myPage ul {
+    list-style: none;
+    padding: 0;
+}
+
+.myPage li {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.myPage li:hover {
+    background-color: #f1f1f1;
+}

@@ -1,20 +1,33 @@
+/* Header.css */
 .header {
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
-    padding: 5vh;
+    padding: 3vh;
+}
+
+.search-container {
+    position: relative;
+    margin-left: 3rem;
 }
 
 .searchBar {
-    padding: 1vh;
-    width: 25vw;
-    border: solid 2px #4CAF50;
+    padding: 1rem;
+    width: 30vw;
+    border: solid 1px rgb(100, 100, 255);
+    border-radius: 100px
 }
 
 .searchBtn {
-    background-color: #4CAF50;
-    border: none;
-    padding: 10px;
-    margin-left: 10px;
-    color: white;
+    position: absolute;
+    right: 0;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    color: rgb(100, 100, 255);
+}
+
+.logo {
+    width: 200px;
+    height: 60px;
+    background-color: lightblue;
 }

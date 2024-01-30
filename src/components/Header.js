@@ -1,20 +1,18 @@
-import { Link } from "react-router-dom";
-
 import '../styles/Header.css'
+import { IoIosSearch } from "react-icons/io";
 
 function Header() {
     return (
         <div className="header">
-            <div style={{ position: "absolute", right: 0 }}>
-                <Link to="/upload">업로드</Link>
-                <Link to="/login">로그인</Link>
-                <Link to="/mypage">마이페이지</Link>
+            <div className='logo'>
+                <img src='' alt='로고'></img>
             </div>
-            <input type="text" className="searchBar" placeholder="검색" />
-            <button className="searchBtn">검색</button>
+            <div className="search-container">
+                <input type="text" className="searchBar" placeholder="검색" />
+                <IoIosSearch className='searchBtn' />
+            </div>
         </div>
     );
 }
-
 
 export default Header;
