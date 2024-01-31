@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
+import React, { useEffect } from 'react';
 import { auth, googleProvider, githubProvider, db } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { signInWithPopup, signOut } from 'firebase/auth';
+import { signInWithPopup, } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [user, loading, error] = useAuthState(auth);
-    const [loginMethod, setLoginMethod] = useState(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // 로컬 스토리지에서 사용자 정보를 가져옵니다.
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
-            setLoginMethod(savedUser);
+        if (user) {
+            navigate('/mypage');
         }
-    }, []);
+    }, [user, navigate]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
 
     const loginWithProvider = async (provider, providerName) => {
         try {
             await signInWithPopup(auth, provider);
-            setLoginMethod(providerName);
 
             // 사용자 정보를 Firestore에 저장합니다.
             const user = auth.currentUser;
@@ -54,23 +59,6 @@ const Login = () => {
         alert('네이버 로그인 준비중')
     };
 
-    const logout = async () => {
-        try {
-            // Firebase Authentication에서 로그아웃
-            await signOut(auth);
-
-            // 브라우저 캐시 삭제 (LocalStorage)
-            localStorage.removeItem('user');
-
-            // Firebase Authentication 세션 정보 삭제 (세션 쿠키 삭제)
-            document.cookie = 'firebaseAuthToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-
-            // 로그인 상태 초기화
-            setLoginMethod(null);
-        } catch (error) {
-            console.error("로그아웃 실패:", error);
-        }
-    };
 
     if (loading) {
         return <div>Loading...</div>;
@@ -82,13 +70,7 @@ const Login = () => {
     return (
         <div className="login">
             <p>로그인</p>
-            {user ? (
-                <>
-                    <p>{user.displayName || user.email}님, 환영합니다</p>
-                    {loginMethod && <p>{loginMethod}로 로그인됨</p>}
-                    <button onClick={logout}>로그아웃</button>
-                </>
-            ) : (
+            {!user && (
                 <>
                     <button onClick={loginWithGoogle}>구글</button>
                     <button onClick={loginWithGitHub}>깃허브</button>
@@ -96,7 +78,6 @@ const Login = () => {
                     <button onClick={loginWithEmail}>이메일</button>
                 </>
             )}
-            <Link to="/">돌아가기</Link>
         </div>
     );
 };

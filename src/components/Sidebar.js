@@ -7,7 +7,8 @@ function Sidebar() {
     const location = useLocation();
 
     const getLinkClass = (path) => {
-        return `sidebar-item ${location.pathname === path ? 'active' : ''}`;
+        const isActive = location.pathname === path || (path === '/mypage' && location.pathname === '/login');
+        return `sidebar-item ${isActive ? 'active' : ''}`;
     };
 
     return (

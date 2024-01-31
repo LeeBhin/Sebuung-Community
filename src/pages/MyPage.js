@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, updateDoc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import ProjectDetail from '../components/ProjectDetail';
 
@@ -12,16 +13,17 @@ const MyPage = () => {
     const [displayName, setDisplayName] = useState('');
     const [newDisplayName, setNewDisplayName] = useState('');
     const [myProjects, setMyProjects] = useState([]);
-    const [showPopup, setShowPopup] = useState(false); // 팝업 표시 여부
-    const [selectedProject, setSelectedProject] = useState(null); // 선택된 프로젝트 정보
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [loginMethod, setLoginMethod] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user) {
-            // 현재 닉네임 설정
+        if (!user) {
+            navigate('/login');
+        } else {
             setDisplayName(user.displayName || user.email);
 
-            // 사용자의 프로젝트 목록을 불러옵니다.
             const q = query(collection(db, 'projects'), where('userId', '==', user.uid));
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 const projects = [];
@@ -31,15 +33,17 @@ const MyPage = () => {
                 setMyProjects(projects);
             });
 
-            return () => unsubscribe(); // 클린업 함수
+            setLoginMethod(localStorage.getItem('user')); // 로컬 스토리지에서 로그인 방식 불러오기
+
+            return () => unsubscribe();
         }
-    }, [user]);
+    }, [user, navigate]);
 
     const updateDisplayName = async () => {
         if (user && newDisplayName) {
             await updateDoc(doc(db, 'users', user.uid), { displayName: newDisplayName });
-            setDisplayName(newDisplayName); // 현재 닉네임 업데이트
-            setNewDisplayName(''); // 입력 필드 초기화
+            setDisplayName(newDisplayName);
+            setNewDisplayName('');
         }
     };
 
@@ -51,9 +55,14 @@ const MyPage = () => {
         }
     };
 
+    const logout = async () => {
+        await signOut(auth);
+        navigate('/login');
+    };
+
     const showProjectDetail = (projectId) => {
-        setSelectedProject(projectId); // 선택된 프로젝트 설정
-        setShowPopup(true); // 팝업 표시
+        setSelectedProject(projectId);
+        setShowPopup(true);
     };
 
     if (!user) {
@@ -63,6 +72,7 @@ const MyPage = () => {
     return (
         <div className="myPage">
             <h1>{displayName}님</h1>
+            {loginMethod && <p>{loginMethod}로 로그인됨</p>}
             <div>
                 <input
                     type="text"
@@ -72,18 +82,23 @@ const MyPage = () => {
                 />
                 <button className='myPageBtn' onClick={updateDisplayName}>닉네임 변경</button>
             </div>
+            <button className='myPageBtn' onClick={logout} style={{ 'background': 'orangered' }}>로그아웃</button>
             <div>
                 <button className='myPageBtn' onClick={deleteAccount} style={{ 'background': 'red' }}>계정 삭제</button>
             </div>
             <div>
                 <h2>나의 프로젝트</h2>
-                <ul>
-                    {myProjects.map((project) => (
-                        <li key={project.id} onClick={() => showProjectDetail(project.id)}>
-                            {project.title}
-                        </li>
-                    ))}
-                </ul>
+                {myProjects.length > 0 ? (
+                    <ul>
+                        {myProjects.map((project) => (
+                            <li key={project.id} onClick={() => showProjectDetail(project.id)}>
+                                {project.title}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>프로젝트가 없습니다.</p>
+                )}
             </div>
             {showPopup && (
                 <ProjectDetail projectId={selectedProject} setShowPopup={setShowPopup} />

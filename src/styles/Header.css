@@ -1,8 +1,7 @@
 /* Header.css */
 .header {
     display: flex;
-    justify-content: start;
-    align-items: center;
+    align-items: flex-start;
     padding: 3vh;
 }
 
