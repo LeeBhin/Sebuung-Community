@@ -51,6 +51,7 @@ async function fetchProjectsByIds(projectIds) {
 
 function Bookmarks() {
     const [bookmarkedProjects, setBookmarkedProjects] = useState([]);
+    const [displayName, setDisplayName] = useState("");
 
     useEffect(() => {
         const fetchBookmarkedProjects = async () => {
@@ -61,19 +62,19 @@ function Bookmarks() {
                     const userData = userDoc.data();
                     const projects = await fetchProjectsByIds(userData.bookmarks || []);
                     setBookmarkedProjects(projects);
+                    setDisplayName(userData.displayName || "");
                 }
             }
         };
 
-        // auth.currentUser가 변경될 때마다 fetchBookmarkedProjects를 호출
         auth.onAuthStateChanged((user) => {
             fetchBookmarkedProjects();
         });
-    }, []); // 빈 의존성 배열로 설정하여 한 번만 호출
+    }, []);
 
     return (
         <div>
-            <h2>내 북마크</h2>
+            <h2>{displayName && `${displayName}님의 북마크`}</h2>
             <ProjectList projectsData={bookmarkedProjects} isBookmarkPage={true} />
         </div>
     );

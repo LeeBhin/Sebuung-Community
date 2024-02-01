@@ -1,24 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { storage, db, auth } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useNavigate } from 'react-router-dom';
 
 import '../styles/ProjectUpload.css';
 
 function ProjectUpload() {
-
-    const navigate = useNavigate(); // useNavigate 훅 초기화
-
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            if (!user) {
-                alert('로그인이 필요합니다');
-                navigate('/login');
-            }
-        });
-        return () => unsubscribe();
-    }, [navigate]);
 
     const [images, setImages] = useState([]);
     const [file, setFile] = useState(null);

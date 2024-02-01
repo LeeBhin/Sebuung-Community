@@ -44,14 +44,14 @@ function ProjectDetail({ projectId, setShowPopup }) {
                     setAuthorName(authorUid);
                 }
 
-                // 북마크 상태 확인
-                const userRef = doc(db, "users", auth.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    setIsBookmarked(userData.bookmarks?.includes(projectId));
+                if (auth.currentUser) {
+                    const userRef = doc(db, "users", auth.currentUser.uid);
+                    const userDoc = await getDoc(userRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        setIsBookmarked(userData.bookmarks?.includes(projectId));
+                    }
                 }
-
             } else {
                 console.log("해당 문서가 존재하지 않습니다.");
             }

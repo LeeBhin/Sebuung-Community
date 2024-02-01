@@ -33,7 +33,7 @@ const MyPage = () => {
                 setMyProjects(projects);
             });
 
-            setLoginMethod(localStorage.getItem('user')); // 로컬 스토리지에서 로그인 방식 불러오기
+            setLoginMethod(localStorage.getItem('user'));
 
             return () => unsubscribe();
         }
