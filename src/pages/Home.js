@@ -1,4 +1,3 @@
-import Header from "../components/Header";
 import ProjectList from "../components/ProjectList";
 
 import '../styles/Home.css'

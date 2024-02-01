@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AiFillHome, AiOutlineUpload, AiOutlineUser } from 'react-icons/ai';
+import { FaRegBookmark } from "react-icons/fa6";
 import '../styles/Sidebar.css';
 
 function Sidebar() {
@@ -24,6 +25,10 @@ function Sidebar() {
             <Link to="/mypage" className={getLinkClass("/mypage")}>
                 <AiOutlineUser />
                 <span>마이페이지</span>
+            </Link>
+            <Link to="/bookmarks" className={getLinkClass("/bookmarks")}>
+                <FaRegBookmark />
+                <span>북마크</span>
             </Link>
         </div>
     );
