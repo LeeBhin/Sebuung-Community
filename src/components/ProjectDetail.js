@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { BsBookmark, BsBookmarkFill } from 'react-icons/bs';
 import '../styles/ProjectDetail.css';
 
 function ensureAbsoluteUrl(url) {
@@ -13,6 +14,7 @@ function ensureAbsoluteUrl(url) {
 function ProjectDetail({ projectId, setShowPopup }) {
     const [projectData, setProjectData] = useState(null);
     const [authorName, setAuthorName] = useState(null);
+    const [isBookmarked, setIsBookmarked] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     useEffect(() => {
@@ -41,6 +43,15 @@ function ProjectDetail({ projectId, setShowPopup }) {
                 } else {
                     setAuthorName(authorUid);
                 }
+
+                // 북마크 상태 확인
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setIsBookmarked(userData.bookmarks?.includes(projectId));
+                }
+
             } else {
                 console.log("해당 문서가 존재하지 않습니다.");
             }
@@ -66,6 +77,31 @@ function ProjectDetail({ projectId, setShowPopup }) {
             window.open(projectData.fileUrl);
         }
     };
+
+    const toggleBookmark = async () => {
+        // 북마크 상태 토글
+        const newBookmarkStatus = !isBookmarked;
+        setIsBookmarked(newBookmarkStatus);
+
+        // Firestore 데이터 업데이트
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+            let updatedBookmarks = userDoc.data().bookmarks || [];
+            if (newBookmarkStatus) {
+                // 프로젝트 ID 추가
+                updatedBookmarks = [...updatedBookmarks, projectId];
+            } else {
+                // 프로젝트 ID 제거
+                updatedBookmarks = updatedBookmarks.filter(id => id !== projectId);
+            }
+
+            await updateDoc(userRef, {
+                bookmarks: updatedBookmarks
+            });
+        }
+    };
+
 
     return (
         <div className="project-detail-overlay">
@@ -96,7 +132,9 @@ function ProjectDetail({ projectId, setShowPopup }) {
                                     <div className="project-info-body">
                                         <span className="project-author">{authorName}</span>
                                         <div className="project-actions">
-                                            <button className="like-button bookmark-button">☆</button>
+                                            <button className="bookmark-button" onClick={toggleBookmark}>
+                                                {isBookmarked ? <BsBookmarkFill /> : <BsBookmark />}
+                                            </button>
                                             <button className="like-button">추천</button>
                                             <button className="share-button">공유</button>
                                             {projectData.fileUrl && (

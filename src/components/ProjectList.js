@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProjectDetail from './ProjectDetail';
-import { auth, db } from '../firebase'; //
+import { auth, db } from '../firebase';
 import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc } from 'firebase/firestore';
-
 import '../styles/ProjectList.css'
 
 function timeAgo(date) {
@@ -32,8 +31,7 @@ function timeAgo(date) {
     }
 }
 
-function ProjectList() {
-
+function ProjectList({ isBookmarkPage, projectsData }) {
     const incrementViews = async (projectId) => {
         const userId = auth.currentUser ? auth.currentUser.uid : null;
         if (!userId) return;
@@ -63,51 +61,53 @@ function ProjectList() {
         }
     };
 
-    const [showPopup, setShowPopup] = useState(false); // 팝업 표시 여부
-    const [selectedProject, setSelectedProject] = useState(null); // 선택된 프로젝트 정보
-    const [projects, setProjects] = useState([]); // Firestore에서 가져온 프로젝트 데이터를 저장할 상태
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [projects, setProjects] = useState([]);
 
-    useEffect(() => {
-        // Firestore에서 프로젝트 데이터를 가져오는 함수
-        const fetchProjects = async () => {
-            const projectCollection = collection(db, "projects");
-            const projectQuery = query(projectCollection);
+    const fetchProjects = async () => {
+        const projectCollection = collection(db, "projects");
+        const projectQuery = query(projectCollection);
 
-            try {
-                const projectSnapshot = await getDocs(projectQuery);
-                const projectData = [];
+        try {
+            const projectSnapshot = await getDocs(projectQuery);
+            const projectData = [];
 
-                for (const docRef of projectSnapshot.docs) {
-                    const projectInfo = docRef.data();
-                    const authorDocRef = doc(db, "users", projectInfo.userId); // projectInfo.userId로 접근
-                    const authorDocSnapshot = await getDoc(authorDocRef);
-                    projectInfo.views = docRef.data().views || 0;
-                    projectInfo.relativeDate = timeAgo(projectInfo.createdAt.toDate());
+            for (const docRef of projectSnapshot.docs) {
+                const projectInfo = docRef.data();
+                const authorDocRef = doc(db, "users", projectInfo.userId);
 
-                    if (authorDocSnapshot.exists()) {
-                        const authorInfo = authorDocSnapshot.data();
-                        projectInfo.authorName = authorInfo.displayName;
-                    }
+                const authorDocSnapshot = await getDoc(authorDocRef);
 
-                    projectData.push({
-                        id: docRef.id,
-                        ...projectInfo
-                    });
+                projectInfo.views = docRef.data().views || 0;
+                projectInfo.relativeDate = timeAgo(projectInfo.createdAt.toDate());
+
+                if (authorDocSnapshot.exists()) {
+                    const authorInfo = authorDocSnapshot.data();
+                    projectInfo.authorName = authorInfo.displayName;
                 }
 
-                // 프로젝트 데이터를 최신순으로 정렬
-                projectData.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
-
-                // 모든 데이터를 가져온 후에 상태를 업데이트합니다.
-                setProjects(projectData);
-            } catch (error) {
-                console.error("프로젝트 데이터 가져오기 에러:", error);
+                projectData.push({
+                    id: docRef.id,
+                    ...projectInfo
+                });
             }
-        };
 
-        // 페이지가 로드될 때 프로젝트 데이터를 가져옵니다.
-        fetchProjects();
-    }, [])
+            projectData.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+
+            setProjects(projectData);
+        } catch (error) {
+            console.error("프로젝트 데이터 가져오기 에러:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (isBookmarkPage) {
+            setProjects(projectsData);
+        } else {
+            fetchProjects();
+        }
+    }, [isBookmarkPage, projectsData]);
 
     const showProjectDetail = (projectId) => {
         setSelectedProject(projectId);

@@ -18,7 +18,7 @@ function ProjectUpload() {
             }
         });
         return () => unsubscribe();
-    }, []);
+    }, [navigate]);
 
     const [images, setImages] = useState([]);
     const [file, setFile] = useState(null);
