@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
-import { useNavigate } from 'react-router-dom';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { BsBookmark, BsBookmarkFill } from 'react-icons/bs';
 import '../styles/ProjectDetail.css';
+import { PiDownloadSimple } from "react-icons/pi";
 
 function ensureAbsoluteUrl(url) {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -12,13 +13,15 @@ function ensureAbsoluteUrl(url) {
     return url;
 }
 
-function ProjectDetail({ projectId, setShowPopup }) {
+function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) {
     const [projectData, setProjectData] = useState(null);
     const [authorName, setAuthorName] = useState(null);
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isAuthor, setIsAuthor] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -55,6 +58,9 @@ function ProjectDetail({ projectId, setShowPopup }) {
                         setIsBookmarked(userData.bookmarks?.includes(projectId));
                     }
                 }
+
+                const isAuthor = auth.currentUser && auth.currentUser.uid === projectInfo.userId;
+                setIsAuthor(isAuthor); // 상태 업데이트
             } else {
                 console.log("해당 문서가 존재하지 않습니다.");
             }
@@ -66,6 +72,21 @@ function ProjectDetail({ projectId, setShowPopup }) {
     const handleEditProject = () => {
         navigate(`/edit/${projectId}`);
     };
+
+    const handleDeleteProject = async () => {
+        const isConfirmed = window.confirm('이 프로젝트를 삭제하시겠습니까?');
+        if (isConfirmed) {
+            try {
+                await deleteDoc(doc(db, "projects", projectId));
+                alert('프로젝트가 성공적으로 삭제되었습니다.');
+                window.location.reload();
+            } catch (error) {
+                console.error("프로젝트 삭제 중 오류 발생:", error);
+                alert('프로젝트 삭제에 실패했습니다.', error);
+            }
+        }
+    };
+
 
     const handlePrevClick = () => {
         setCurrentImageIndex((prevIndex) =>
@@ -109,11 +130,32 @@ function ProjectDetail({ projectId, setShowPopup }) {
         }
     };
 
+    const handleClosePopup = () => {
+        setShowPopup(false);
+        if (location.pathname === '/bookmarks') {
+            OPCBookmarks()
+        }
+        onPopupClose();
+    };
+
+    const handleShare = () => {
+        const encodedProjectId = btoa(projectId);
+        const shareUrl = `${window.location.origin}/?sharingcode=${encodedProjectId}`;
+
+        navigator.clipboard.writeText(shareUrl)
+            .then(() => {
+                alert("공유 URL이 클립보드에 복사되었습니다.");
+            })
+            .catch(err => {
+                console.error("클립보드에 복사 실패:", err);
+                alert("URL 복사에 실패했습니다.");
+            });
+    };
 
     return (
         <div className="project-detail-overlay">
             <div className="project-detail-popup">
-                <button className="close-button" onClick={() => setShowPopup(false)}>X</button>
+                <button className="close-button" onClick={() => handleClosePopup()}>X</button>
                 <div className="project-detail-container">
                     <div className="project-content">
                         {projectData && (
@@ -140,14 +182,20 @@ function ProjectDetail({ projectId, setShowPopup }) {
                                         <span className="project-author">{authorName}</span>
                                         <div className="project-actions">
                                             <button className="bookmark-button" onClick={toggleBookmark}>
-                                                {isBookmarked ? <BsBookmarkFill /> : <BsBookmark />}
+                                                {isBookmarked ? <BsBookmarkFill size={"20px"} /> : <BsBookmark size={"20px"} />}
                                             </button>
                                             <button className="like-button">추천</button>
-                                            <button className="share-button">공유</button>
+                                            <button className="share-button" onClick={handleShare}>공유</button>
                                             {projectData.fileUrl && (
-                                                <button className="download-button" onClick={downloadFile}>다운</button>
+                                                <button className="download-button" onClick={downloadFile}><PiDownloadSimple size={"20px"} /></button>
                                             )}
-                                            <button className="edit-button" onClick={handleEditProject}>수정</button>
+                                            {isAuthor && (
+                                                <>
+                                                    <button className="edit-button" onClick={handleEditProject}>수정</button>
+                                                    <button className="delete-button" onClick={handleDeleteProject}>삭제</button>
+                                                </>
+
+                                            )}
                                         </div>
                                     </div>
                                     <a href={ensureAbsoluteUrl(projectData.link)}
@@ -172,7 +220,7 @@ function ProjectDetail({ projectId, setShowPopup }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

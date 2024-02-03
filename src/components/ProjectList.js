@@ -31,7 +31,14 @@ function timeAgo(date) {
     }
 }
 
-function ProjectList({ isBookmarkPage, projectsData }) {
+function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
+
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [reloadTrigger, setReloadTrigger] = useState(false);
+
+
     const incrementViews = async (projectId) => {
         const userId = auth.currentUser ? auth.currentUser.uid : null;
         if (!userId) return;
@@ -60,10 +67,6 @@ function ProjectList({ isBookmarkPage, projectsData }) {
             });
         }
     };
-
-    const [showPopup, setShowPopup] = useState(false);
-    const [selectedProject, setSelectedProject] = useState(null);
-    const [projects, setProjects] = useState([]);
 
     const fetchProjects = async () => {
         const projectCollection = collection(db, "projects");
@@ -107,7 +110,7 @@ function ProjectList({ isBookmarkPage, projectsData }) {
         } else {
             fetchProjects();
         }
-    }, [isBookmarkPage, projectsData]);
+    }, [isBookmarkPage, projectsData, reloadTrigger]);
 
     const showProjectDetail = (projectId) => {
         setSelectedProject(projectId);
@@ -136,7 +139,12 @@ function ProjectList({ isBookmarkPage, projectsData }) {
             ))}
 
             {showPopup && (
-                <ProjectDetail projectId={selectedProject} setShowPopup={setShowPopup} />
+                <ProjectDetail
+                    projectId={selectedProject}
+                    setShowPopup={setShowPopup}
+                    onPopupClose={() => setReloadTrigger(prev => !prev)}
+                    OPCBookmarks={() => setRefreshTrigger(prev => !prev)}
+                />
             )}
         </div>
     );

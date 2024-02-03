@@ -52,6 +52,7 @@ async function fetchProjectsByIds(projectIds) {
 function Bookmarks() {
     const [bookmarkedProjects, setBookmarkedProjects] = useState([]);
     const [displayName, setDisplayName] = useState("");
+    const [refreshTrigger, setRefreshTrigger] = useState(false);
 
     useEffect(() => {
         const fetchBookmarkedProjects = async () => {
@@ -70,12 +71,12 @@ function Bookmarks() {
         auth.onAuthStateChanged((user) => {
             fetchBookmarkedProjects();
         });
-    }, []);
+    }, [refreshTrigger]);
 
     return (
         <div>
             <h2>{displayName && `${displayName}님의 북마크`}</h2>
-            <ProjectList projectsData={bookmarkedProjects} isBookmarkPage={true} />
+            <ProjectList projectsData={bookmarkedProjects} isBookmarkPage={true} setRefreshTrigger={setRefreshTrigger} />
         </div>
     );
 }

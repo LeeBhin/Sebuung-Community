@@ -14,9 +14,7 @@ function ProjectUpdate() {
     const [link, setLink] = useState('');
     const [images, setImages] = useState([]);
     const [file, setFile] = useState(null);
-    const [existingImageUrls, setExistingImageUrls] = useState([]);
     const [existingFileUrl, setExistingFileUrl] = useState('');
-    const [imageUrls, setImageUrls] = useState([]);
     const fileInputRef = useRef(null);
     const [fileName, setFileName] = useState('');
 
@@ -26,6 +24,12 @@ function ProjectUpdate() {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
+                if (auth.currentUser && auth.currentUser.uid !== data.userId || !auth.currentUser) {
+                    alert('접근 권한이 없습니다.');
+                    navigate('/');
+                    return;
+                }
+
                 setTitle(data.title);
                 setDescription(data.description);
                 setLink(data.link);
@@ -127,7 +131,7 @@ function ProjectUpdate() {
         alert('프로젝트 수정 완료');
         navigate('/');
     };
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
         updateProjectData();
