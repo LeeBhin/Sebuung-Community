@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { BsBookmark, BsBookmarkFill } from 'react-icons/bs';
 import '../styles/ProjectDetail.css';
@@ -16,6 +17,8 @@ function ProjectDetail({ projectId, setShowPopup }) {
     const [authorName, setAuthorName] = useState(null);
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -59,6 +62,10 @@ function ProjectDetail({ projectId, setShowPopup }) {
 
         fetchProjectData();
     }, [projectId]);
+
+    const handleEditProject = () => {
+        navigate(`/edit/${projectId}`);
+    };
 
     const handlePrevClick = () => {
         setCurrentImageIndex((prevIndex) =>
@@ -140,6 +147,7 @@ function ProjectDetail({ projectId, setShowPopup }) {
                                             {projectData.fileUrl && (
                                                 <button className="download-button" onClick={downloadFile}>다운</button>
                                             )}
+                                            <button className="edit-button" onClick={handleEditProject}>수정</button>
                                         </div>
                                     </div>
                                     <a href={ensureAbsoluteUrl(projectData.link)}

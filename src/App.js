@@ -7,6 +7,7 @@ import ProjectUpload from './pages/ProjectUpload';
 import MyPage from './pages/MyPage';
 import LoadingBar from './components/LoadingBar';
 import Bookmarks from './pages/Bookmarks';
+import ProjectUpdate from './pages/ProjectUpdate';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/upload" element={<Layout><ProjectUpload /></Layout>} />
         <Route path="/mypage" element={<Layout><MyPage /></Layout>} />
         <Route path="/bookmarks" element={<Layout><Bookmarks /></Layout>} />
+        <Route path="/edit/:projectId" element={<Layout><ProjectUpdate /></Layout>} />
       </Routes>
     </Router>
   );
