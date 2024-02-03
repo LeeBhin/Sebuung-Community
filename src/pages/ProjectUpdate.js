@@ -24,7 +24,7 @@ function ProjectUpdate() {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                if (auth.currentUser && auth.currentUser.uid !== data.userId || !auth.currentUser) {
+                if (!auth.currentUser || (auth.currentUser && auth.currentUser.uid !== data.userId)) {
                     alert('접근 권한이 없습니다.');
                     navigate('/');
                     return;
