@@ -147,7 +147,7 @@ function ProjectUpload() {
                     rows="8"
                     placeholder="프로젝트에 대한 설명을 작성하세요"
                 ></textarea>
-                <p>({maxDescriptionLength - description.length}/{maxDescriptionLength})</p>
+                <p>({description.length}/{maxDescriptionLength})</p>
                 <p>URL</p>
                 <input type="text" value={link} onChange={(e) => setLink(e.target.value)} />
 

@@ -18,6 +18,7 @@ function ProjectUpdate() {
     const [existingFileUrl, setExistingFileUrl] = useState('');
     const [imageUrls, setImageUrls] = useState([]);
     const fileInputRef = useRef(null);
+    const [fileName, setFileName] = useState('');
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -28,9 +29,11 @@ function ProjectUpdate() {
                 setTitle(data.title);
                 setDescription(data.description);
                 setLink(data.link);
-                // 불러온 이미지 URL들을 images 상태에 통합
-                const loadedImages = data.imageUrls.map(url => ({ file: null, url: url }));
-                setImages(loadedImages);
+                // 파일 URL에서 파일 이름 추출
+                const fileName = data.fileUrl ? data.fileUrl.split('/').pop().split('?')[0] : ''; // 간단한 추출 방법
+                setExistingFileUrl(data.fileUrl || '');
+                // 파일 이름 상태 설정
+                setFileName(fileName);
             } else {
                 console.log("No such document!");
                 navigate('/');
@@ -48,9 +51,19 @@ function ProjectUpdate() {
 
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
-            setFile(e.target.files[0]);
+            // 사용자에게 기존 파일을 삭제할 것인지 확인
+            const confirmDelete = fileName ? window.confirm("기존 파일을 삭제하고 새 파일을 업로드하시겠습니까?") : true;
+            if (confirmDelete) {
+                setFile(e.target.files[0]); // 새 파일 상태 설정
+                setFileName(''); // 기존 파일 이름 상태 초기화
+                setExistingFileUrl(''); // 기존 파일 URL 상태 초기화
+            } else {
+                // 사용자가 취소를 선택한 경우, 파일 입력 필드를 리셋
+                e.target.value = '';
+            }
         }
     };
+
     // 이미지 변경 핸들러
     const handleImageChange = (e) => {
         if (e.target.files) {
@@ -82,6 +95,10 @@ function ProjectUpdate() {
     const updateProjectData = async () => {
         let imageUrls = existingImageUrls;
         let fileUrl = existingFileUrl;
+
+        if (file) {
+            fileUrl = await uploadFileToStorage(file, 'files'); // 새 파일 업로드
+        }
 
         if (images.length > 0) {
             imageUrls = await Promise.all(
@@ -144,7 +161,6 @@ function ProjectUpdate() {
                         </div>
                     ))}
                 </div>
-
                 <p>설명</p>
                 <textarea
                     value={description}
@@ -152,13 +168,17 @@ function ProjectUpdate() {
                     rows="8"
                     placeholder="프로젝트에 대한 설명을 작성하세요"
                 ></textarea>
-                <p>({maxDescriptionLength - description.length}/{maxDescriptionLength})</p>
+                <p>({description.length}/{maxDescriptionLength})</p>
                 <p>URL</p>
                 <input type="text" value={link} onChange={(e) => setLink(e.target.value)} />
-
-                <p>파일</p>
+                {existingFileUrl && (
+                    <div>
+                        <p>현재 파일: <a href={existingFileUrl} target="_blank" rel="noopener noreferrer"> {fileName}</a></p>
+                        <button type="button" onClick={() => setExistingFileUrl('')}>기존 파일 삭제</button>
+                    </div>
+                )}
+                <p>새 파일 업로드 (기존 파일 대체):</p>
                 <input type="file" onChange={handleFileChange} />
-
                 <button type="submit">업로드</button>
             </form>
         </div>
