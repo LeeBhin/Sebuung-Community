@@ -29,10 +29,10 @@ function ProjectUpdate() {
                 setTitle(data.title);
                 setDescription(data.description);
                 setLink(data.link);
-                // 파일 URL에서 파일 이름 추출
+                const loadedImages = data.imageUrls.map(url => ({ file: null, url: url }));
+                setImages(loadedImages);
                 const fileName = data.fileUrl ? data.fileUrl.split('/').pop().split('?')[0] : ''; // 간단한 추출 방법
                 setExistingFileUrl(data.fileUrl || '');
-                // 파일 이름 상태 설정
                 setFileName(fileName);
             } else {
                 console.log("No such document!");
@@ -64,14 +64,13 @@ function ProjectUpdate() {
         }
     };
 
-    // 이미지 변경 핸들러
     const handleImageChange = (e) => {
         if (e.target.files) {
             const fileObjects = Array.from(e.target.files).map(file => ({
                 file: file,
-                url: URL.createObjectURL(file) // 파일로부터 생성된 URL
+                url: URL.createObjectURL(file)
             }));
-            setImages(fileObjects); // 파일 객체 배열을 상태에 설정
+            setImages(prevImages => [...prevImages, ...fileObjects]);
         }
     };
 
@@ -93,36 +92,42 @@ function ProjectUpdate() {
     };
 
     const updateProjectData = async () => {
-        let imageUrls = existingImageUrls;
+        let uploadedImageUrls = [];
         let fileUrl = existingFileUrl;
 
-        if (file) {
-            fileUrl = await uploadFileToStorage(file, 'files'); // 새 파일 업로드
-        }
-
+        // 이미지 파일 업로드 로직 수정
         if (images.length > 0) {
-            imageUrls = await Promise.all(
-                images.map(image => uploadFileToStorage(image, 'images'))
-            );
+            const uploadPromises = images.map(image => {
+                // 파일 객체가 존재할 때만 업로드를 시도합니다.
+                if (image.file) {
+                    return uploadFileToStorage(image.file, 'images');
+                } else {
+                    // 파일 객체가 없는 경우(기존에 업로드된 이미지 URL), URL을 직접 반환합니다.
+                    return Promise.resolve(image.url);
+                }
+            });
+            uploadedImageUrls = await Promise.all(uploadPromises);
         }
 
+        // 새 파일 업로드 처리
         if (file) {
             fileUrl = await uploadFileToStorage(file, 'files');
         }
 
+        // Firestore 문서 업데이트 시, 업로드된 이미지 URL 배열 사용
         const projectRef = doc(db, 'projects', projectId);
         await updateDoc(projectRef, {
             title,
             description,
             link,
-            imageUrls,
+            imageUrls: uploadedImageUrls, // 수정된 이미지 URL 배열
             fileUrl,
         });
 
-        alert('프로젝트가 업데이트 되었습니다.');
+        alert('프로젝트 수정 완료');
         navigate('/');
     };
-
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         updateProjectData();

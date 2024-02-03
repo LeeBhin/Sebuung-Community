@@ -4,6 +4,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import '../styles/ProjectUpload.css';
+import { useNavigate } from 'react-router-dom';
 
 function ProjectUpload() {
 
@@ -12,8 +13,9 @@ function ProjectUpload() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [link, setLink] = useState('');
-
     const fileInputRef = useRef(null); // 파일 입력을 위한 ref
+
+    const navigate = useNavigate()
 
     const handleImageChange = (e) => {
         if (e.target.files) {
@@ -82,6 +84,7 @@ function ProjectUpload() {
 
             await addDoc(collection(db, 'projects'), projectData);
             alert('업로드 완료');
+            navigate('/');
         } catch (e) {
             console.error('문서 작성 에러: ', e);
         }
