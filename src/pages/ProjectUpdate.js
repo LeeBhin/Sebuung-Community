@@ -188,7 +188,7 @@ function ProjectUpdate() {
                 )}
                 <p>새 파일 업로드 (기존 파일 대체):</p>
                 <input type="file" onChange={handleFileChange} />
-                <button type="submit">업로드</button>
+                <button type="submit">수정</button>
             </form>
         </div>
     );

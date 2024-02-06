@@ -42,6 +42,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+
 }
 
 .project-image-slider {
@@ -101,7 +102,7 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    background-color: #f9f9f9;
+    background-color: rgb(192, 248, 255);
 }
 
 .comments-header h3 {
@@ -144,6 +145,10 @@
 
 .comment-content {
     margin-top: 5px;
+}
+
+.comment-date{
+    font-size: 15px;
 }
 
 .comment-input-section {
@@ -253,4 +258,32 @@
     margin-left: 10px;
     cursor: pointer;
     border-radius: 5px;
+}
+
+.rating-input-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-input-section button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.rating-input-section .star {
+    font-size: 24px;
+    color: #ccc;
+}
+
+.rating-input-section .on .star {
+    color: #ffc107;
+}
+
+/* 별점 컨테이너 및 별 모양에 마우스 오버 시 */
+.rating-input-section button:hover .star,
+.rating-input-section button:focus .star {
+    color: #ffeb3b;
 }

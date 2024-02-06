@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, updateDoc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+import { signOut, updateProfile } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import ProjectDetail from '../components/ProjectDetail';
 
@@ -16,6 +16,7 @@ const MyPage = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
     const [loginMethod, setLoginMethod] = useState('');
+    const [reloadTrigger, setReloadTrigger] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -41,8 +42,23 @@ const MyPage = () => {
 
     const updateDisplayName = async () => {
         if (user && newDisplayName) {
+            // Firebase Authentication의 사용자 프로필 업데이트
+            await updateProfile(user, {
+                displayName: newDisplayName,
+            }).then(() => {
+                // 성공적으로 업데이트 되었을 때
+                console.log("Profile updated successfully!");
+                // 사용자 인터페이스에 표시되는 displayName 업데이트
+                setDisplayName(newDisplayName);
+            }).catch((error) => {
+                // 에러 핸들링
+                console.error("Error updating profile: ", error);
+            });
+
+            // Firestore 내부의 사용자 문서 업데이트
             await updateDoc(doc(db, 'users', user.uid), { displayName: newDisplayName });
-            setDisplayName(newDisplayName);
+
+            // 입력 필드 초기화
             setNewDisplayName('');
         }
     };
@@ -101,7 +117,10 @@ const MyPage = () => {
                 )}
             </div>
             {showPopup && (
-                <ProjectDetail projectId={selectedProject} setShowPopup={setShowPopup} />
+                <ProjectDetail
+                    projectId={selectedProject}
+                    setShowPopup={setShowPopup}
+                    onPopupClose={() => setReloadTrigger(prev => !prev)} />
             )}
         </div>
     );
