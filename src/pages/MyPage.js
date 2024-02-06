@@ -38,7 +38,7 @@ const MyPage = () => {
 
             return () => unsubscribe();
         }
-    }, [user, navigate]);
+    }, [user, navigate, reloadTrigger]);
 
     const updateDisplayName = async () => {
         if (user && newDisplayName) {

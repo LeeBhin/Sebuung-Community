@@ -191,7 +191,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
 
     useEffect(() => {
         fetchComments();
-    }, [projectId]);
+    },);
 
     const fetchComments = async () => {
         const q = query(collection(db, "comments"), where("projectId", "==", projectId), orderBy("createdAt", "desc"));
