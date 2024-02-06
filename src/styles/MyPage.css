@@ -47,28 +47,3 @@
 .myPage li:hover {
     background-color: rgb(133, 188, 250);
 }
-
-.comment {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    /* 댓글 내용이 여러 줄인 경우에도 버튼을 상단에 정렬 */
-    padding: 10px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #eee;
-}
-
-.commentContent {
-    flex-grow: 1;
-    margin-right: 10px;
-    /* 삭제 버튼과의 간격 */
-}
-
-.deleteComment {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    align-self: flex-start;
-    /* 내용이 여러 줄일 경우 버튼이 상단에 유지되도록 */
-}

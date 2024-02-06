@@ -147,7 +147,7 @@
     margin-top: 5px;
 }
 
-.comment-date{
+.comment-date {
     font-size: 15px;
 }
 
@@ -286,4 +286,26 @@
 .rating-input-section button:hover .star,
 .rating-input-section button:focus .star {
     color: #ffeb3b;
+}
+
+.comment {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-startD;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.commentContent {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.deleteComment {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    align-self: flex-start;
 }
