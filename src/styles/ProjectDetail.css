@@ -273,39 +273,6 @@
     height: 40px;
 }
 
-.project-actions button {
-    overflow: hidden;
-    width: 40px; /* 초기 너비 설정 */
-    transition: width 0.3s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center; /* 아이콘 중앙 정렬 */
-    position: relative;
-    border-radius: 100px;
-}
-
-.project-actions button:hover {
-    width: 100px; /* 텍스트를 포함할 수 있도록 호버 시 너비 조정 */
-}
-
-.project-actions button .button-text {
-    display: flex; /* flex 항목으로 텍스트 설정 */
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    opacity: 0; /* 초기 상태에서 텍스트를 투명하게 설정 */
-    transition: opacity 0.3s ease-in-out; /* 투명도에 대한 전환 효과 설정 */
-    overflow: hidden;
-    width: 0; /* 초기 너비를 0으로 설정하여 텍스트 숨김 */
-    transition: opacity 0.3s, width 0.3s ease-in-out; /* 너비와 투명도 전환 효과 */
-}
-
-.project-actions button:hover .button-text {
-    opacity: 1; /* 호버 시 텍스트를 불투명하게 설정 */
-    width: auto; /* 텍스트 내용에 따라 너비 자동 조정 */
-    transition-delay: 0s; /* 호버 시 전환 지연 없음 */
-}
-
 .project-description {
     margin-top: 20px;
     white-space: pre-line;

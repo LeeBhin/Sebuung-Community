@@ -420,35 +420,21 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                     <div className="project-info-body">
                                         <span className="project-author">{authorName}</span>
                                         <div className="project-actions">
-                                            <button className="like-button" onClick={toggleLike}>
+                                            <button className="like-button" onClick={toggleLike} title='좋아요'>
                                                 {isLiked ? <TbThumbUpFilled size={"20px"} /> : <TbThumbUp size={"20px"} />}
                                                 <span className="likes-count">{likesCount}</span>
-                                                <span className="button-text">좋아요</span>
                                             </button>
-                                            <button className="bookmark-button" onClick={toggleBookmark}>
+                                            <button className="bookmark-button" onClick={toggleBookmark} title='북마크'>
                                                 {isBookmarked ? <BsBookmarkFill size={"20px"} /> : <BsBookmark size={"20px"} />}
-                                                <span className="button-text">북마크</span>
                                             </button>
-                                            <button className="share-button" onClick={handleShare}>
-                                                <FaRegShareSquare size={'20px'} />
-                                                <span className="button-text">공유</span>
-                                            </button>
+                                            <button className="share-button" onClick={handleShare} title='공유'><FaRegShareSquare size={'20px'} /> </button>
                                             {projectData.fileUrl && (
-                                                <button className="download-button" onClick={downloadFile} >
-                                                    <BiSolidDownload size={"20px"} />
-                                                    <span className="button-text">다운로드</span>
-                                                </button>
+                                                <button className="download-button" onClick={downloadFile} title='다운로드'><BiSolidDownload size={"20px"} /></button>
                                             )}
                                             {isAuthor && (
                                                 <>
-                                                    <button className="edit-button" onClick={handleEditProject}>
-                                                        <LiaEditSolid size={"20px"} />
-                                                        <span className="button-text">수정</span>
-                                                    </button>
-                                                    <button className="delete-button" onClick={handleDeleteProject}>
-                                                        <MdDeleteOutline size={"20px"} />
-                                                        <span className="button-text">삭제</span>
-                                                    </button>
+                                                    <button className="edit-button" onClick={handleEditProject} title='수정'><LiaEditSolid size={"20px"} /></button>
+                                                    <button className="delete-button" onClick={handleDeleteProject} title='삭제'><MdDeleteOutline size={"20px"} /></button>
                                                 </>
 
                                             )}

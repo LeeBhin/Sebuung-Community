@@ -121,7 +121,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
         };
 
         loadProjects();
-    }, [isBookmarkPage, projectsData]);
+    }, [isBookmarkPage, projectsData, reloadTrigger]);
 
     const showProjectDetail = (projectId) => {
         setSelectedProject(projectId);

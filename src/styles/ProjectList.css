@@ -60,3 +60,7 @@
 .projectStats span {
     color: #777777;
 }
+
+.temp {
+    opacity: .5;
+}
