@@ -191,7 +191,8 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
 
     useEffect(() => {
         fetchComments();
-    },);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const fetchComments = async () => {
         const q = query(collection(db, "comments"), where("projectId", "==", projectId), orderBy("createdAt", "desc"));
@@ -224,9 +225,10 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     };
 
     function StarRating({ rating, setRating }) {
-        const handleStarClick = (index, event) => {
-            const rect = event.currentTarget.getBoundingClientRect();
-            const clickPosition = event.clientX - rect.left;
+        const handleRatingSelect = (index, position) => {
+            const rect = position.currentTarget.getBoundingClientRect();
+            const positionX = position.clientX || position.changedTouches[0].clientX;
+            const clickPosition = positionX - rect.left;
             const halfWidth = rect.width / 2;
 
             if (clickPosition < halfWidth) {
@@ -234,6 +236,15 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
             } else {
                 setRating(index);
             }
+        };
+
+        const handleStarClick = (index, event) => {
+            handleRatingSelect(index, event);
+        };
+
+        const handleStarTouch = (index, event) => {
+            event.preventDefault(); // 터치 이벤트가 클릭 이벤트로도 해석되는 것을 방지
+            handleRatingSelect(index, event);
         };
 
         return (
@@ -245,6 +256,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                             key={starIndex}
                             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                             onClick={(e) => handleStarClick(starIndex, e)}
+                            onTouchEnd={(e) => handleStarTouch(starIndex, e)}
                         >
                             {starIndex <= rating ? (
                                 <FaStar color="#ffc107" size={'25px'} />
