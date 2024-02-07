@@ -2,17 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
-import { BsBookmark, BsBookmarkFill } from 'react-icons/bs';
 import '../styles/ProjectDetail.css';
-import { PiDownloadSimple } from "react-icons/pi";
-import { FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
-import { MdDeleteOutline } from "react-icons/md";
+
+import { BsBookmark, BsBookmarkFill } from 'react-icons/bs';
+import { BiSolidDownload } from "react-icons/bi";
+import { FaStar, FaRegStar, FaStarHalfAlt, FaRegShareSquare } from 'react-icons/fa';
+import { MdDeleteOutline, MdArrowForwardIos, MdArrowBackIosNew } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
+import { TbThumbUp, TbThumbUpFilled } from "react-icons/tb";
+import { LiaEditSolid } from "react-icons/lia";
 
 function ensureAbsoluteUrl(url) {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
         return `http://${url}`;
     }
     return url;
+}
+
+function timeAgo(date) {
+    const now = new Date();
+    const seconds = Math.round((now - date) / 1000);
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.round(minutes / 60);
+    const days = Math.round(hours / 24);
+    const weeks = Math.round(days / 7);
+    const months = Math.round(days / 30);
+    const years = Math.round(days / 365);
+
+    if (seconds < 60) {
+        return `${seconds}초 전`;
+    } else if (minutes < 60) {
+        return `${minutes}분 전`;
+    } else if (hours < 24) {
+        return `${hours}시간 전`;
+    } else if (days < 7) {
+        return `${days}일 전`;
+    } else if (weeks < 5) {
+        return `${weeks}주 전`;
+    } else if (months < 12) {
+        return `${months}달 전`;
+    } else {
+        return `${years}년 전`;
+    }
 }
 
 function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) {
@@ -24,6 +55,8 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
     const [rating, setRating] = useState(0);
+    const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(0);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -44,6 +77,17 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                 });
 
                 setProjectData(projectInfo);
+
+                // 좋아요한 작품인지 확인
+                const user = auth.currentUser;
+                if (user) {
+                    const userLikes = projectInfo.likes || [];
+                    const userHasLiked = userLikes.includes(user.uid);
+                    setIsLiked(userHasLiked);
+                }
+
+                // likesCount 초기화
+                setLikesCount(projectInfo.likesCount || 0);
 
                 const authorUid = projectInfo.userId;
                 const authorRef = doc(db, "users", authorUid);
@@ -309,11 +353,48 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         }
     };
 
+    const toggleLike = async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        const projectRef = doc(db, "projects", projectId);
+        const projectDoc = await getDoc(projectRef);
+
+        if (projectDoc.exists()) {
+            const projectData = projectDoc.data();
+            const userLikes = projectData.likes || [];
+            const userHasLiked = userLikes.includes(user.uid);
+
+            let updatedLikes;
+            if (userHasLiked) {
+                // 이미 추천한 경우, 추천 취소
+                updatedLikes = userLikes.filter(id => id !== user.uid);
+            } else {
+                // 아직 추천하지 않은 경우, 추천 추가
+                updatedLikes = [...userLikes, user.uid];
+            }
+
+            // likesCount를 projects 컬렉션의 likes 배열의 길이로 설정
+            const likesCount = updatedLikes.length;
+
+            await updateDoc(projectRef, {
+                likes: updatedLikes,
+                likesCount: likesCount // likesCount 업데이트
+            });
+
+            // 상태 업데이트
+            setLikesCount(likesCount);
+            setIsLiked(!userHasLiked);
+        }
+    };
 
     return (
         <div className="project-detail-overlay">
             <div className="project-detail-popup">
-                <button className="close-button" onClick={() => handleClosePopup()}>X</button>
+                <button className="close-button" onClick={() => handleClosePopup()}><IoMdClose /></button>
                 <div className="project-detail-container">
                     <div className="project-content">
                         {projectData && (
@@ -324,8 +405,8 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                         {currentImageIndex + 1}/{projectData.imageUrls.length}
                                     </div>
                                     <div>
-                                        <button className="slider-button prev-button" onClick={handlePrevClick}>이전</button>
-                                        <button className="slider-button next-button" onClick={handleNextClick}>다음</button>
+                                        <button className="slider-button prev-button" onClick={handlePrevClick}><MdArrowBackIosNew size={'20px'} /></button>
+                                        <button className="slider-button next-button" onClick={handleNextClick}><MdArrowForwardIos size={'20px'} /></button>
                                     </div>
                                 </div>
                                 <div className="project-info">
@@ -339,18 +420,35 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                     <div className="project-info-body">
                                         <span className="project-author">{authorName}</span>
                                         <div className="project-actions">
+                                            <button className="like-button" onClick={toggleLike}>
+                                                {isLiked ? <TbThumbUpFilled size={"20px"} /> : <TbThumbUp size={"20px"} />}
+                                                <span className="likes-count">{likesCount}</span>
+                                                <span className="button-text">좋아요</span>
+                                            </button>
                                             <button className="bookmark-button" onClick={toggleBookmark}>
                                                 {isBookmarked ? <BsBookmarkFill size={"20px"} /> : <BsBookmark size={"20px"} />}
+                                                <span className="button-text">북마크</span>
                                             </button>
-                                            <button className="like-button">추천</button>
-                                            <button className="share-button" onClick={handleShare}>공유</button>
+                                            <button className="share-button" onClick={handleShare}>
+                                                <FaRegShareSquare size={'20px'} />
+                                                <span className="button-text">공유</span>
+                                            </button>
                                             {projectData.fileUrl && (
-                                                <button className="download-button" onClick={downloadFile}><PiDownloadSimple size={"20px"} /></button>
+                                                <button className="download-button" onClick={downloadFile} >
+                                                    <BiSolidDownload size={"20px"} />
+                                                    <span className="button-text">다운로드</span>
+                                                </button>
                                             )}
                                             {isAuthor && (
                                                 <>
-                                                    <button className="edit-button" onClick={handleEditProject}>수정</button>
-                                                    <button className="delete-button" onClick={handleDeleteProject}>삭제</button>
+                                                    <button className="edit-button" onClick={handleEditProject}>
+                                                        <LiaEditSolid size={"20px"} />
+                                                        <span className="button-text">수정</span>
+                                                    </button>
+                                                    <button className="delete-button" onClick={handleDeleteProject}>
+                                                        <MdDeleteOutline size={"20px"} />
+                                                        <span className="button-text">삭제</span>
+                                                    </button>
                                                 </>
 
                                             )}
@@ -374,12 +472,12 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                             {comments.map((comment, index) => (
                                 <div key={index} className="comment">
                                     <div className="commentContent">
-                                        <div>
+                                        <div className='namediv' >
                                             <strong>{comment.displayName}</strong>
                                             <StarDisplay rating={comment.rating} />
                                         </div>
                                         <p>{comment.comment}</p>
-                                        <p className="comment-date">{new Date(comment.createdAt.toDate()).toLocaleDateString()}</p>
+                                        <p className="comment-date">{timeAgo(comment.createdAt.toDate())}</p>
                                     </div>
                                     {auth.currentUser && auth.currentUser.uid === comment.userId && (
                                         <button className='deleteComment' onClick={() => handleDeleteComment(comment.id)}><MdDeleteOutline size={'20px'} /></button>
@@ -405,5 +503,4 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         </div >
     );
 }
-
 export default ProjectDetail;
