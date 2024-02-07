@@ -4,6 +4,9 @@ import { auth, db } from '../firebase';
 import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc } from 'firebase/firestore';
 import '../styles/ProjectList.css'
 
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css'; // NProgress 스타일
+
 function timeAgo(date) {
     const now = new Date();
     const seconds = Math.round((now - date) / 1000);
@@ -68,49 +71,57 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
         }
     };
 
-    const fetchProjects = async () => {
-        const projectCollection = collection(db, "projects");
-        const projectQuery = query(projectCollection);
+    useEffect(() => {
+        NProgress.start(); // 데이터 로딩 시작 시 NProgress 시작
 
-        try {
-            const projectSnapshot = await getDocs(projectQuery);
-            const projectData = [];
+        // 임시 데이터로 UI 초기화
+        const temporaryProjects = Array(15).fill().map((_, index) => ({
+            id: `temp-${index}`, // 고유한 ID를 보장하기 위해 임시 인덱스 사용
+            title: '불러오는 중...',
+            imageUrls: ['https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'],
+            views: '통합사',
+            relativeDate: '방금 전',
+            authorName: '불러오는 중...'
+        }));
+        setProjects(temporaryProjects);
 
-            for (const docRef of projectSnapshot.docs) {
-                const projectInfo = docRef.data();
-                const authorDocRef = doc(db, "users", projectInfo.userId);
+        const loadProjects = async () => {
+            // 북마크 페이지가 아닐 때 Firestore에서 실제 데이터 불러오기
+            if (!isBookmarkPage) {
+                const projectCollection = collection(db, "projects");
+                const projectQuery = query(projectCollection);
 
-                const authorDocSnapshot = await getDoc(authorDocRef);
+                try {
+                    const projectSnapshot = await getDocs(projectQuery);
+                    const projectDataPromises = projectSnapshot.docs.map(async (docRef) => {
+                        const projectInfo = docRef.data();
+                        projectInfo.id = docRef.id;
+                        projectInfo.relativeDate = timeAgo(projectInfo.createdAt.toDate());
 
-                projectInfo.views = docRef.data().views || 0;
-                projectInfo.relativeDate = timeAgo(projectInfo.createdAt.toDate());
+                        // 작성자 정보 불러오기
+                        const authorDocRef = doc(db, "users", projectInfo.userId);
+                        const authorDocSnapshot = await getDoc(authorDocRef);
+                        projectInfo.authorName = authorDocSnapshot.exists() ? authorDocSnapshot.data().displayName : "알 수 없음";
 
-                if (authorDocSnapshot.exists()) {
-                    const authorInfo = authorDocSnapshot.data();
-                    projectInfo.authorName = authorInfo.displayName;
+                        return projectInfo;
+                    });
+
+                    // 모든 프로젝트 데이터의 Promise가 해결된 후 상태 업데이트
+                    const loadedProjects = await Promise.all(projectDataPromises);
+                    setProjects(loadedProjects.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate()));
+                } catch (error) {
+                    console.error("프로젝트 데이터 가져오기 에러:", error);
                 }
-
-                projectData.push({
-                    id: docRef.id,
-                    ...projectInfo
-                });
+            } else {
+                // 북마크 페이지일 경우 전달받은 데이터 사용
+                setProjects(projectsData);
             }
 
-            projectData.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+            NProgress.done(); // 데이터 로딩 완료 시 NProgress 종료
+        };
 
-            setProjects(projectData);
-        } catch (error) {
-            console.error("프로젝트 데이터 가져오기 에러:", error);
-        }
-    };
-
-    useEffect(() => {
-        if (isBookmarkPage) {
-            setProjects(projectsData);
-        } else {
-            fetchProjects();
-        }
-    }, [isBookmarkPage, projectsData, reloadTrigger]);
+        loadProjects();
+    }, [isBookmarkPage, projectsData]);
 
     const showProjectDetail = (projectId) => {
         setSelectedProject(projectId);
@@ -121,7 +132,8 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
     return (
         <div className="projectList">
             {projects.map(project => (
-                <div key={project.id} className="projectDiv" onClick={() => showProjectDetail(project.id)}>
+                <div key={project.id} className={`projectDiv ${project.id.startsWith('temp') ? 'temp' : ''}`}
+                    onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
                     <div className="projectThumbnail">
                         {project.imageUrls && project.imageUrls.length > 0 && (
                             <img src={project.imageUrls[0]} alt={`${project.title} 프로젝트 썸네일`} />
@@ -137,7 +149,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
                     </div>
                 </div>
             ))}
-
             {showPopup && (
                 <ProjectDetail
                     projectId={selectedProject}

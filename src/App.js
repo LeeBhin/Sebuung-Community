@@ -14,7 +14,6 @@ function App() {
   const [showPopup, setShowPopup] = useState(false);
   const [projectId, setProjectId] = useState(null);
   useEffect(() => {
-    // URL에서 projectId 쿼리 파라미터 값 추출
     const queryParams = new URLSearchParams(window.location.search);
     const projectIdFromUrl = queryParams.get('sharingcode');
 
