@@ -34,7 +34,7 @@ function timeAgo(date) {
     }
 }
 
-function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
+function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '', searchOption }) {
 
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -108,6 +108,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
 
                     // 모든 프로젝트 데이터의 Promise가 해결된 후 상태 업데이트
                     const loadedProjects = await Promise.all(projectDataPromises);
+
                     setProjects(loadedProjects.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate()));
                 } catch (error) {
                     console.error("프로젝트 데이터 가져오기 에러:", error);
@@ -123,6 +124,20 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
         loadProjects();
     }, [isBookmarkPage, projectsData, reloadTrigger]);
 
+    const filteredProjects = projects.filter(project => {
+        const queryLower = searchQuery.toLowerCase();
+        switch (searchOption) {
+            case 'title':
+                return project.title.toLowerCase().includes(queryLower);
+            case 'content':
+                return project.description.toLowerCase().includes(queryLower);
+            case 'both':
+                return project.title.toLowerCase().includes(queryLower) || project.description.toLowerCase().includes(queryLower);
+            default:
+                return true;
+        }
+    });
+
     const showProjectDetail = (projectId) => {
         setSelectedProject(projectId);
         setShowPopup(true);
@@ -131,7 +146,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger }) {
 
     return (
         <div className="projectList">
-            {projects.map(project => (
+            {filteredProjects.map(project => (
                 <div key={project.id} className={`projectDiv ${project.id.startsWith('temp') ? 'temp' : ''}`}
                     onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
                     <div className="projectThumbnail">
