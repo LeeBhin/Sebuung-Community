@@ -14,13 +14,14 @@
     padding: 1rem;
     width: 30vw;
     border: solid 1px rgb(100, 100, 255);
-    border-radius: 100px
+    border-radius: 0 100px 100px 0;
+    box-shadow: inset 1px 1px 5px rgba(100, 100, 255, 0.2);
 }
 
 .searchBtn {
     position: absolute;
     right: 0;
-    padding: 1rem 1.5rem;
+    padding: .8rem 1.5rem;
     cursor: pointer;
     color: rgb(100, 100, 255);
 }
@@ -29,4 +30,25 @@
     width: 200px;
     height: 60px;
     background-color: lightblue;
+}
+
+.search-dropdown {
+    float: left;
+    width: auto;
+    height: 50px;
+    border-radius: 100px 0 0 100px;
+    text-align: center;
+    border: solid 1px rgb(100, 100, 255);
+    margin-right: .2rem;
+    appearance: none;
+    padding: 0 1.5rem 0 .6rem;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23666666" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0rem center;
+    box-shadow: inset 1px 1px 5px rgba(100, 100, 255, 0.2);
+}
+
+.input-container {
+    position: relative;
+    float: left;
 }

@@ -34,7 +34,7 @@ function timeAgo(date) {
     }
 }
 
-function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '', searchOption }) {
+function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '' }) {
 
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -125,14 +125,15 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     }, [isBookmarkPage, projectsData, reloadTrigger]);
 
     const filteredProjects = projects.filter(project => {
-        const queryLower = searchQuery.toLowerCase();
-        switch (searchOption) {
+        const query = searchQuery.searchQuery.toLowerCase()
+        const option = searchQuery.searchOption
+        switch (option) {
             case 'title':
-                return project.title.toLowerCase().includes(queryLower);
+                return project.title.toLowerCase().includes(query);
             case 'content':
-                return project.description.toLowerCase().includes(queryLower);
+                return project.description.toLowerCase().includes(query);
             case 'both':
-                return project.title.toLowerCase().includes(queryLower) || project.description.toLowerCase().includes(queryLower);
+                return project.title.toLowerCase().includes(query) || project.description.toLowerCase().includes(query);
             default:
                 return true;
         }

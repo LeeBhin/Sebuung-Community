@@ -1,16 +1,14 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import '../styles/Home.css';
-import ProjectUpload from './ProjectUpload';
 
 const ProjectList = React.lazy(() => import('../components/ProjectList'));
 
-function Home() {
+function Home(searchQuery) {
+
     return (
         <div className="home">
             <div className="contents">
-                <Suspense fallback={<ProjectUpload />}>
-                    <ProjectList />
-                </Suspense>
+                <ProjectList searchQuery={searchQuery} />
             </div>
         </div>
     );

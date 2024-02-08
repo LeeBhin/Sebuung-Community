@@ -28,7 +28,6 @@ function App() {
     setShowPopup(false);
   };
 
-
   return (
     <Router>
       <LoadingBar />

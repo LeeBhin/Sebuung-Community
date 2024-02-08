@@ -12,6 +12,7 @@ code {
     monospace;
 }
 
+select:focus,
 input:focus {
   outline: none;
 }
