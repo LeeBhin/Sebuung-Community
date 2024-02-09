@@ -64,3 +64,14 @@
 .temp {
     opacity: .5;
 }
+
+.sortButtons {
+    position: absolute;
+}
+
+.sortButton {
+    margin: 0 0 .5rem .5rem;
+    padding: .5rem;
+    border-radius: 100px;
+    border: none;
+}

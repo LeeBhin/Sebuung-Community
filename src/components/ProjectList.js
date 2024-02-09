@@ -72,21 +72,41 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     };
 
     useEffect(() => {
-        NProgress.start(); // 데이터 로딩 시작 시 NProgress 시작
+        NProgress.start();
 
-        // 임시 데이터로 UI 초기화
         const temporaryProjects = Array(15).fill().map((_, index) => ({
-            id: `temp-${index}`, // 고유한 ID를 보장하기 위해 임시 인덱스 사용
+            id: `temp-${index}`,
             title: '불러오는 중...',
             imageUrls: ['https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'],
-            views: '통합사',
+            views: '999,999',
             relativeDate: '방금 전',
             authorName: '불러오는 중...'
         }));
         setProjects(temporaryProjects);
 
+        const sortProjects = (projects) => {
+            switch (searchQuery.sortOption) {
+                case 'popular':
+                    // 인기순
+                    return projects.sort((a, b) => (b.views + b.ratingAverage + b.likesCount) - (a.views + a.ratingAverage + a.likesCount));
+                case 'latest':
+                    // 최신순
+                    return projects.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+                case 'views':
+                    // 조회수순
+                    return projects.sort((a, b) => b.views - a.views);
+                case 'likes':
+                    // 추천순
+                    return projects.sort((a, b) => b.likesCount - a.likesCount);
+                case 'oldest':
+                    // 오래된 순
+                    return projects.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate());
+                default:
+                    return projects;
+            }
+        };
+
         const loadProjects = async () => {
-            // 북마크 페이지가 아닐 때 Firestore에서 실제 데이터 불러오기
             if (!isBookmarkPage) {
                 const projectCollection = collection(db, "projects");
                 const projectQuery = query(projectCollection);
@@ -98,7 +118,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         projectInfo.id = docRef.id;
                         projectInfo.relativeDate = timeAgo(projectInfo.createdAt.toDate());
 
-                        // 작성자 정보 불러오기
                         const authorDocRef = doc(db, "users", projectInfo.userId);
                         const authorDocSnapshot = await getDoc(authorDocRef);
                         projectInfo.authorName = authorDocSnapshot.exists() ? authorDocSnapshot.data().displayName : "알 수 없음";
@@ -106,23 +125,22 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         return projectInfo;
                     });
 
-                    // 모든 프로젝트 데이터의 Promise가 해결된 후 상태 업데이트
                     const loadedProjects = await Promise.all(projectDataPromises);
-
-                    setProjects(loadedProjects.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate()));
+                    const sortedProjects = sortProjects(loadedProjects);
+                    console.log(sortedProjects)
+                    setProjects(sortedProjects);
                 } catch (error) {
                     console.error("프로젝트 데이터 가져오기 에러:", error);
                 }
             } else {
-                // 북마크 페이지일 경우 전달받은 데이터 사용
                 setProjects(projectsData);
             }
 
-            NProgress.done(); // 데이터 로딩 완료 시 NProgress 종료
+            NProgress.done();
         };
 
         loadProjects();
-    }, [isBookmarkPage, projectsData, reloadTrigger]);
+    }, [isBookmarkPage, projectsData, reloadTrigger, searchQuery]);
 
     const filteredProjects = projects.filter(project => {
         const query = searchQuery.searchQuery.toLowerCase()

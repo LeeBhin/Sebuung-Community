@@ -197,41 +197,58 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
             });
     };
 
+    const submitRating = async (projectId, newRating) => {
+        await addDoc(collection(db, "comments"), {
+            projectId,
+            userId: auth.currentUser.uid,
+            rating: newRating,
+            createdAt: new Date(),
+        });
+
+        const ratingsQuery = query(collection(db, "comments"), where("projectId", "==", projectId));
+        const ratingsSnapshot = await getDocs(ratingsQuery);
+        let totalRating = 0;
+        ratingsSnapshot.forEach(doc => {
+            totalRating += doc.data().rating;
+        });
+        const averageRating = totalRating / ratingsSnapshot.size;
+
+        const projectRef = doc(db, "projects", projectId);
+        await updateDoc(projectRef, {
+            ratingAverage: averageRating
+        });
+
+    };
+
     const submitComment = async () => {
         if (!auth.currentUser) {
             alert("로그인이 필요합니다.");
             return;
         }
 
-        const userId = auth.currentUser.uid;
-        const existingRatingQuery = query(collection(db, "ratings"), where("projectId", "==", projectId), where("userId", "==", userId));
-        const existingCommentQuery = query(collection(db, "comments"), where("projectId", "==", projectId), where("userId", "==", userId));
-
-        const existingRatingSnapshot = await getDocs(existingRatingQuery);
-        const existingCommentSnapshot = await getDocs(existingCommentQuery);
-
-        if (!existingRatingSnapshot.empty || !existingCommentSnapshot.empty) {
-            alert("이미 작성하셨습니다.");
-            return;
-        }
-
-        if (comment.trim() === "") return;
-        const commentData = {
-            projectId,
-            userId: auth.currentUser.uid,
-            comment: comment.trim(),
-            rating: rating,
-            createdAt: new Date(),
-        };
-        try {
-            await addDoc(collection(db, "comments"), commentData);
-            setComment("");
-            setRating(0);
-            fetchComments();
-        } catch (error) {
-            console.error("댓글 추가 실패:", error);
+        // 기존에 별점을 추가하는 로직을 제거하고, 댓글 데이터에 별점을 포함시킵니다.
+        if (comment.trim() !== "" || rating > 0) {
+            const commentData = {
+                projectId,
+                userId: auth.currentUser.uid,
+                comment: comment.trim(),
+                rating: rating, // 댓글에 별점 데이터를 포함
+                createdAt: new Date(),
+            };
+            try {
+                await addDoc(collection(db, "comments"), commentData);
+                setComment("");
+                setRating(0);
+                fetchComments();
+                updateProjectRatingAverage(projectId); // 댓글 추가 후 평균 별점 업데이트
+            } catch (error) {
+                console.error("댓글 추가 실패:", error);
+            }
+        } else {
+            alert("댓글 또는 별점을 입력해주세요.");
         }
     };
+
 
     useEffect(() => {
         fetchComments();
@@ -287,7 +304,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         };
 
         const handleStarTouch = (index, event) => {
-            event.preventDefault(); // 터치 이벤트가 클릭 이벤트로도 해석되는 것을 방지
+            event.preventDefault();
             handleRatingSelect(index, event);
         };
 
@@ -344,6 +361,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         if (window.confirm("정말로 삭제하시겠습니까?")) {
             try {
                 await deleteDoc(doc(db, "comments", commentId));
+                updateProjectRatingAverage(projectId);
                 alert("삭제되었습니다.");
                 fetchComments();
             } catch (error) {
@@ -351,6 +369,23 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                 alert("삭제에 실패했습니다.");
             }
         }
+    };
+
+    const updateProjectRatingAverage = async (projectId) => {
+        const ratingsQuery = query(collection(db, "comments"), where("projectId", "==", projectId));
+        const snapshot = await getDocs(ratingsQuery);
+
+        let totalRating = 0;
+        snapshot.forEach(doc => {
+            totalRating += doc.data().rating;
+        });
+
+        const averageRating = snapshot.size > 0 ? totalRating / snapshot.size : 0;
+
+        const projectRef = doc(db, "projects", projectId);
+        await updateDoc(projectRef, {
+            ratingAverage: averageRating
+        });
     };
 
     const toggleLike = async () => {
