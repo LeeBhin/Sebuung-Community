@@ -11,7 +11,7 @@
     margin-top: 3vh;
     cursor: pointer;
     padding: .5rem;
-    transition: .5s;
+    transition: .3s;
 }
 
 .projectDiv:hover {
@@ -19,8 +19,7 @@
         border-radius: 0%;
     }
 
-    box-shadow: 5px 5px 5px rgba(100, 100, 255, 0.15);
-    border-radius: 0 0 10px 10px;
+    box-shadow: 0px 0px 8px rgba(100, 100, 255, 0.4);
 }
 
 .projectThumbnail {
@@ -64,3 +63,7 @@
 .temp {
     opacity: .5;
 }
+
+#nprogress .spinner {
+    display: none !important;
+  }

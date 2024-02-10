@@ -86,8 +86,27 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         const sortProjects = (projects) => {
             switch (sortOption) {
                 case 'popular':
-                    // 인기순
-                    return projects.sort((a, b) => (b.views + b.ratingAverage + b.likesCount) - (a.views + a.ratingAverage + a.likesCount));
+                    // 인기순 정렬 로직 수정
+                    const calculatePopularityScore = (item) => {
+                        const ratingAverageWeight = 5; // 별점 평균의 가중치
+                        const ratingCountWeight = 2; // 별점 개수의 가중치
+                        const viewsWeight = 1; // 조회수의 가중치
+                        const likesWeight = 3; // 좋아요 수의 가중치
+
+                        const ratingScore = item.ratingAverage * ratingAverageWeight;
+                        // 별점 개수를 고려하여 로그 스케일로 가중치 적용
+                        const ratingCountScore = Math.log(1 + item.ratingCount) * ratingCountWeight;
+                        // 조회수를 고려하여 로그 스케일로 가중치 적용
+                        const viewsScore = Math.log(1 + item.views) * viewsWeight;
+                        // 좋아요 수를 고려하여 로그 스케일로 가중치 적용
+                        const likesScore = Math.log(1 + item.likesCount) * likesWeight;
+
+                        const popularityScore = ratingScore + ratingCountScore + viewsScore + likesScore;
+
+                        return popularityScore;
+                    };
+
+                    return projects.sort((a, b) => calculatePopularityScore(b) - calculatePopularityScore(a));
                 case 'latest':
                     // 최신순
                     return projects.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
@@ -104,6 +123,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                     return projects;
             }
         };
+
 
         const loadProjects = async () => {
             if (!isBookmarkPage) {

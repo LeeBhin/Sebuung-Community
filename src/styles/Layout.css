@@ -1,7 +1,3 @@
-.sortButtons {
-    position: absolute;
-}
-
 .sortButton {
     margin: 0 0 .5rem .5rem;
     padding: .5rem;
@@ -10,7 +6,7 @@
 }
 
 .sortBtns {
-    margin-left: .5rem;
+    margin: 0.5rem 0 0 .5rem;
 }
 
 .sortBtns>button {

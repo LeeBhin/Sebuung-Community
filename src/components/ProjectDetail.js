@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../firebase';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
@@ -60,6 +60,23 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
 
     const navigate = useNavigate();
     const location = useLocation();
+
+    const popupRef = useRef();
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                handleClosePopup();
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [popupRef]);
+
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -356,13 +373,17 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
             totalRating += doc.data().rating;
         });
 
-        const averageRating = snapshot.size > 0 ? totalRating / snapshot.size : 0;
+        const ratingCount = snapshot.size;
+
+        const averageRating = ratingCount > 0 ? totalRating / ratingCount : 0;
 
         const projectRef = doc(db, "projects", projectId);
         await updateDoc(projectRef, {
-            ratingAverage: averageRating
+            ratingAverage: averageRating,
+            ratingCount: ratingCount
         });
     };
+
 
     const toggleLike = async () => {
         const user = auth.currentUser;
@@ -402,9 +423,13 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         }
     };
 
+    const handlePopupClick = (event) => {
+        event.stopPropagation();
+    };
+
     return (
-        <div className="project-detail-overlay">
-            <div className="project-detail-popup">
+        <div className="project-detail-overlay" onClick={handleClosePopup}>
+            <div className="project-detail-popup" onClick={handlePopupClick}>
                 <button className="close-button" onClick={() => handleClosePopup()}><IoMdClose /></button>
                 <div className="project-detail-container">
                     <div className="project-content">
