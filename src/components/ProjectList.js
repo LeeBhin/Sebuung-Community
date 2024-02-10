@@ -88,8 +88,8 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                 case 'popular':
                     const calculatePopularityScore = (item) => {
                         const ratingAverageWeight = 5; // 별점 평균의 가중치
-                        const ratingCountWeight = 2; // 별점 개수의 가중치
-                        const viewsWeight = 1; // 조회수의 가중치
+                        const ratingCountWeight = 2.5; // 별점 개수의 가중치
+                        const viewsWeight = 4.5; // 조회수의 가중치
                         const likesWeight = 3; // 좋아요 수의 가중치
 
                         // 각 지표가 0일 경우에도 최소한의 가중치를 부여하기 위해, Math.log의 인자에 1을 더하는 대신
