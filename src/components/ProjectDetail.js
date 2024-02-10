@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { auth, db } from '../firebase';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
@@ -62,21 +62,6 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     const location = useLocation();
 
     const popupRef = useRef();
-
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
-                handleClosePopup();
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [popupRef]);
-
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -192,13 +177,27 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         }
     };
 
-    const handleClosePopup = () => {
+    const handleClosePopup = useCallback(() => {
         setShowPopup(false);
         if (location.pathname === '/bookmarks') {
-            OPCBookmarks()
+            OPCBookmarks();
         }
         onPopupClose();
-    };
+    }, [setShowPopup, OPCBookmarks, onPopupClose, location.pathname]);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                handleClosePopup();
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [handleClosePopup]);
 
     const handleShare = () => {
         const encodedProjectId = btoa(projectId);
@@ -241,7 +240,6 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
             alert("댓글 또는 별점을 입력해주세요.");
         }
     };
-
 
     useEffect(() => {
         fetchComments();
