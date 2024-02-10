@@ -10,6 +10,7 @@ function Layout({ children }) {
     const [sortOption, setSortOption] = useState('popular');
 
     const updatedChildren = React.cloneElement(children, { searchQuery, searchOption, sortOption });
+    const isHome = children.type.displayName === 'Home';
 
     const handleSortChange = (option) => {
         setSortOption(option);
@@ -25,7 +26,7 @@ function Layout({ children }) {
             <div className='Layout' style={{ display: 'flex' }}>
                 <Sidebar />
                 <main style={{ flexGrow: 1 }}>
-                    {children.type.name === 'Home' && (
+                    {isHome && (
                         <div className='sortBtns'>
                             <button style={getButtonStyle('popular')} onClick={() => handleSortChange('popular')}>인기순</button>
                             <button style={getButtonStyle('latest')} onClick={() => handleSortChange('latest')}>최신순</button>

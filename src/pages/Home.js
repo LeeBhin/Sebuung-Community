@@ -15,4 +15,5 @@ function Home({ searchQuery, searchOption, sortOption }) {
     );
 }
 
+Home.displayName = 'Home';
 export default Home;
