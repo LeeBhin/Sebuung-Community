@@ -86,20 +86,20 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         const sortProjects = (projects) => {
             switch (sortOption) {
                 case 'popular':
-                    // 인기순 정렬 로직 수정
                     const calculatePopularityScore = (item) => {
                         const ratingAverageWeight = 5; // 별점 평균의 가중치
                         const ratingCountWeight = 2; // 별점 개수의 가중치
                         const viewsWeight = 1; // 조회수의 가중치
                         const likesWeight = 3; // 좋아요 수의 가중치
 
+                        // 각 지표가 0일 경우에도 최소한의 가중치를 부여하기 위해, Math.log의 인자에 1을 더하는 대신
+                        // 작은 값을 더하여 로그 함수가 0을 반환하지 않도록 합니다.
+                        const minFactor = 0.01; // 최소 가중치 팩터
+
                         const ratingScore = item.ratingAverage * ratingAverageWeight;
-                        // 별점 개수를 고려하여 로그 스케일로 가중치 적용
-                        const ratingCountScore = Math.log(1 + item.ratingCount) * ratingCountWeight;
-                        // 조회수를 고려하여 로그 스케일로 가중치 적용
-                        const viewsScore = Math.log(1 + item.views) * viewsWeight;
-                        // 좋아요 수를 고려하여 로그 스케일로 가중치 적용
-                        const likesScore = Math.log(1 + item.likesCount) * likesWeight;
+                        const ratingCountScore = Math.log(1 + item.ratingCount + minFactor) * ratingCountWeight;
+                        const viewsScore = Math.log(1 + item.views + minFactor) * viewsWeight;
+                        const likesScore = Math.log(1 + item.likesCount + minFactor) * likesWeight;
 
                         const popularityScore = ratingScore + ratingCountScore + viewsScore + likesScore;
 
