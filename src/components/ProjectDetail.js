@@ -57,6 +57,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     const [rating, setRating] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -219,26 +220,42 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
             return;
         }
 
-        if (comment.trim() !== "" || rating > 0) {
-            const commentData = {
-                projectId,
-                userId: auth.currentUser.uid,
-                comment: comment.trim(),
-                rating: rating,
-                createdAt: new Date(),
-            };
-            try {
-                await addDoc(collection(db, "comments"), commentData);
-                setComment("");
-                setRating(0);
-                fetchComments();
-                updateProjectRatingAverage(projectId);
-            } catch (error) {
-                console.error("댓글 추가 실패:", error);
-            }
-        } else {
+        if (comment.trim() === "" && rating <= 0) {
             alert("댓글 또는 별점을 입력해주세요.");
+            return;
         }
+
+        setIsSubmitting(true); // 댓글 제출 시작 시
+
+        const existingCommentQuery = query(collection(db, "comments"), where("projectId", "==", projectId), where("userId", "==", auth.currentUser.uid));
+        const querySnapshot = await getDocs(existingCommentQuery);
+
+        if (!querySnapshot.empty) {
+            alert("이미 이 프로젝트에 댓글을 달았습니다.");
+            setIsSubmitting(false); // 댓글이 이미 존재하면 작업 종료 시
+            return;
+        }
+
+        const commentData = {
+            projectId,
+            userId: auth.currentUser.uid,
+            comment: comment.trim(),
+            rating,
+            createdAt: new Date(),
+        };
+
+        try {
+            await addDoc(collection(db, "comments"), commentData);
+            setComment("");
+            setRating(0);
+            fetchComments();
+            updateProjectRatingAverage(projectId);
+        } catch (error) {
+            console.error("댓글 추가 실패:", error);
+            alert("댓글을 추가하는데 실패했습니다.");
+        }
+
+        setIsSubmitting(false); // 댓글 작업 완료 시
     };
 
     useEffect(() => {
@@ -428,7 +445,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     return (
         <div className="project-detail-overlay" onClick={handleClosePopup}>
             <div className="project-detail-popup" onClick={handlePopupClick}>
-                <button className="close-button" onClick={() => handleClosePopup()}><IoMdClose /></button>
+                <button className="close-button" onClick={() => handleClosePopup()}><IoMdClose className='closeBtn' /></button>
                 <div className="project-detail-container">
                     <div className="project-content">
                         {projectData && (
@@ -515,7 +532,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                             />
-                            <button type="submit" onClick={submitComment}>작성</button>
+                            <button type="submit" onClick={submitComment} disabled={isSubmitting}>작성</button>
                         </div>
                     </div>
                 </div>

@@ -13,7 +13,8 @@ function ProjectUpload() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [link, setLink] = useState('');
-    const fileInputRef = useRef(null); // 파일 입력을 위한 ref
+    const fileInputRef = useRef(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     const navigate = useNavigate()
 
@@ -91,6 +92,8 @@ function ProjectUpload() {
     };
 
     const uploadToFirebase = async () => {
+        setIsUploading(true); // 업로드 시작
+
         let imageUrls = [], fileUrl;
         if (images.length) {
             imageUrls = await uploadFiles(images, 'images');
@@ -101,7 +104,19 @@ function ProjectUpload() {
 
         const userId = auth.currentUser ? auth.currentUser.uid : null;
         if (userId) {
-            saveProjectData(userId, title, description, link, imageUrls, fileUrl);
+            try {
+                await saveProjectData(userId, title, description, link, imageUrls, fileUrl);
+                alert('업로드 완료');
+                navigate('/');
+            } catch (error) {
+                console.error('업로드 중 오류 발생:', error);
+                alert('업로드에 실패했습니다.');
+            } finally {
+                setIsUploading(false); // 업로드 완료 또는 실패 시
+            }
+        } else {
+            alert('로그인이 필요합니다.');
+            setIsUploading(false); // 사용자가 로그인하지 않은 경우
         }
     };
 
@@ -157,7 +172,7 @@ function ProjectUpload() {
                 <p>파일</p>
                 <input type="file" onChange={handleFileChange} />
 
-                <button type="submit">업로드</button>
+                <button type="submit" disabled={isUploading}>업로드</button>
             </form>
         </div>
     );

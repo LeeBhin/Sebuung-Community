@@ -66,4 +66,8 @@
 
 #nprogress .spinner {
     display: none !important;
-  }
+}
+
+.project-actions>button:hover {
+    background-color: rgba(100, 100, 255, 0.5);
+}
