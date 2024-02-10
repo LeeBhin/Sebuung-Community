@@ -5,7 +5,7 @@ import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUni
 import '../styles/ProjectList.css'
 
 import NProgress from 'nprogress';
-import 'nprogress/nprogress.css'; // NProgress 스타일
+import 'nprogress/nprogress.css';
 
 function timeAgo(date) {
     const now = new Date();
@@ -34,7 +34,7 @@ function timeAgo(date) {
     }
 }
 
-function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '' }) {
+function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '', searchOption = '', sortOption = '' }) {
 
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -73,7 +73,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
     useEffect(() => {
         NProgress.start();
-
         const temporaryProjects = Array(15).fill().map((_, index) => ({
             id: `temp-${index}`,
             title: '불러오는 중...',
@@ -85,7 +84,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         setProjects(temporaryProjects);
 
         const sortProjects = (projects) => {
-            switch (searchQuery.sortOption) {
+            switch (sortOption) {
                 case 'popular':
                     // 인기순
                     return projects.sort((a, b) => (b.views + b.ratingAverage + b.likesCount) - (a.views + a.ratingAverage + a.likesCount));
@@ -127,7 +126,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
                     const loadedProjects = await Promise.all(projectDataPromises);
                     const sortedProjects = sortProjects(loadedProjects);
-                    console.log(sortedProjects)
                     setProjects(sortedProjects);
                 } catch (error) {
                     console.error("프로젝트 데이터 가져오기 에러:", error);
@@ -140,18 +138,17 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         };
 
         loadProjects();
-    }, [isBookmarkPage, projectsData, reloadTrigger, searchQuery]);
+    }, [isBookmarkPage, projectsData, reloadTrigger, searchQuery, searchOption, sortOption]);
 
     const filteredProjects = projects.filter(project => {
-        const query = searchQuery.searchQuery.toLowerCase()
-        const option = searchQuery.searchOption
-        switch (option) {
+        const query = searchQuery.toLowerCase()
+        switch (searchOption) {
             case 'title':
-                return project.title.toLowerCase().includes(query);
+                return project.title.toLowerCase().includes(query)
             case 'content':
-                return project.description.toLowerCase().includes(query);
+                return project.description.toLowerCase().includes(query)
             case 'both':
-                return project.title.toLowerCase().includes(query) || project.description.toLowerCase().includes(query);
+                return project.title.toLowerCase().includes(query) || project.description.toLowerCase().includes(query)
             default:
                 return true;
         }

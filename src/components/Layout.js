@@ -15,8 +15,8 @@ function Layout({ children }) {
         setSortOption(option);
     };
 
-    const getButtonClass = (option) => {
-        return sortOption === option ? "selectedSortButton" : "";
+    const getButtonStyle = (option) => {
+        return sortOption === option ? { backgroundColor: 'rgb(100,100,255)', color: 'white', fontWeight: 'bold' } : {};
     };
 
     return (
@@ -25,13 +25,15 @@ function Layout({ children }) {
             <div className='Layout' style={{ display: 'flex' }}>
                 <Sidebar />
                 <main style={{ flexGrow: 1 }}>
-                    <div className='sortBtns'>
-                        <button className={getButtonClass('popular')} onClick={() => handleSortChange('popular')}>인기순</button>
-                        <button className={getButtonClass('latest')} onClick={() => handleSortChange('latest')}>최신순</button>
-                        <button className={getButtonClass('views')} onClick={() => handleSortChange('views')}>조회수순</button>
-                        <button className={getButtonClass('likes')} onClick={() => handleSortChange('likes')}>추천순</button>
-                        <button className={getButtonClass('oldest')} onClick={() => handleSortChange('oldest')}>오래된 순</button>
-                    </div>
+                    {children.type.name === 'Home' && (
+                        <div className='sortBtns'>
+                            <button style={getButtonStyle('popular')} onClick={() => handleSortChange('popular')}>인기순</button>
+                            <button style={getButtonStyle('latest')} onClick={() => handleSortChange('latest')}>최신순</button>
+                            <button style={getButtonStyle('views')} onClick={() => handleSortChange('views')}>조회수순</button>
+                            <button style={getButtonStyle('likes')} onClick={() => handleSortChange('likes')}>추천순</button>
+                            <button style={getButtonStyle('oldest')} onClick={() => handleSortChange('oldest')}>오래된 순</button>
+                        </div>
+                    )}
                     {updatedChildren}
                 </main>
             </div>

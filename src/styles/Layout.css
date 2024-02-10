@@ -10,7 +10,7 @@
 }
 
 .sortBtns {
-    position: relative;
+    margin-left: .5rem;
 }
 
 .sortBtns>button {
@@ -20,8 +20,4 @@
     margin-right: 10px;
     border-radius: 100px;
     cursor: pointer;
-}
-
-.selectedSortButton {
-    background-color: rgb(100, 100, 255);
 }

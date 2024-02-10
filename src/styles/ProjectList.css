@@ -28,7 +28,7 @@
     width: 100%;
     padding-top: 56.25%;
     overflow: hidden;
-    border-radius: 15px;
+    border-radius: 10px;
     transition: .5s;
     border: solid 1px rgba(100, 100, 255, 0.1);
 }

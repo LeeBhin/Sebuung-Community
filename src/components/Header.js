@@ -4,11 +4,22 @@ import '../styles/Header.css';
 
 function Header({ setSearchQuery, setSearchOption }) {
     const [searchOption, setSearchOptionLocal] = useState('title');
+    const [inputValue, setInputValue] = useState('');
 
     const handleSearchOptionChange = (e) => {
         const option = e.target.value;
         setSearchOptionLocal(option);
         setSearchOption(option);
+    };
+
+    const handleSearch = () => {
+        setSearchQuery(inputValue);
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
     };
 
     return (
@@ -23,8 +34,15 @@ function Header({ setSearchQuery, setSearchOption }) {
                     <option value="both">제목 + 내용</option>
                 </select>
                 <div className='input-container'>
-                    <input type="text" className="searchBar" placeholder="검색" onChange={(e) => setSearchQuery(e.target.value)} />
-                    <IoIosSearch size={'20px'} className='searchBtn' />
+                    <input
+                        type="text"
+                        className="searchBar"
+                        placeholder="검색"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                    />
+                    <IoIosSearch size={'20px'} className='searchBtn' onClick={handleSearch} />
                 </div>
             </div>
         </div>

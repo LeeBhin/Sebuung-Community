@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AiFillHome, AiOutlineUpload, AiOutlineUser } from 'react-icons/ai';
 import { FaRegBookmark } from "react-icons/fa6";
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase'; // Firebase 인증 모듈 가져오기
+import { auth } from '../firebase';
 import '../styles/Sidebar.css';
 
 function Sidebar() {
