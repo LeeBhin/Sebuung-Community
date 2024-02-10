@@ -1,0 +1,27 @@
+.sortButtons {
+    position: absolute;
+}
+
+.sortButton {
+    margin: 0 0 .5rem .5rem;
+    padding: .5rem;
+    border-radius: 100px;
+    border: none;
+}
+
+.sortBtns {
+    position: relative;
+}
+
+.sortBtns>button {
+    background-color: rgba(100, 100, 255, 0.1);
+    border: none;
+    padding: 8px 13px;
+    margin-right: 10px;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.selectedSortButton {
+    background-color: rgb(100, 100, 255);
+}

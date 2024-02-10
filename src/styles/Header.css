@@ -11,7 +11,7 @@
 }
 
 .searchBar {
-    padding: 1rem;
+    padding: .7rem 1rem .7rem 1rem;
     width: 30vw;
     border: solid 1px rgb(100, 100, 255);
     border-radius: 0 100px 100px 0;
@@ -35,7 +35,7 @@
 .search-dropdown {
     float: left;
     width: auto;
-    height: 50px;
+    height: 39px;
     border-radius: 100px 0 0 100px;
     text-align: center;
     border: solid 1px rgb(100, 100, 255);

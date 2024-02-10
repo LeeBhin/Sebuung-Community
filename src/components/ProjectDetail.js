@@ -197,42 +197,18 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
             });
     };
 
-    const submitRating = async (projectId, newRating) => {
-        await addDoc(collection(db, "comments"), {
-            projectId,
-            userId: auth.currentUser.uid,
-            rating: newRating,
-            createdAt: new Date(),
-        });
-
-        const ratingsQuery = query(collection(db, "comments"), where("projectId", "==", projectId));
-        const ratingsSnapshot = await getDocs(ratingsQuery);
-        let totalRating = 0;
-        ratingsSnapshot.forEach(doc => {
-            totalRating += doc.data().rating;
-        });
-        const averageRating = totalRating / ratingsSnapshot.size;
-
-        const projectRef = doc(db, "projects", projectId);
-        await updateDoc(projectRef, {
-            ratingAverage: averageRating
-        });
-
-    };
-
     const submitComment = async () => {
         if (!auth.currentUser) {
             alert("로그인이 필요합니다.");
             return;
         }
 
-        // 기존에 별점을 추가하는 로직을 제거하고, 댓글 데이터에 별점을 포함시킵니다.
         if (comment.trim() !== "" || rating > 0) {
             const commentData = {
                 projectId,
                 userId: auth.currentUser.uid,
                 comment: comment.trim(),
-                rating: rating, // 댓글에 별점 데이터를 포함
+                rating: rating,
                 createdAt: new Date(),
             };
             try {
@@ -240,7 +216,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                 setComment("");
                 setRating(0);
                 fetchComments();
-                updateProjectRatingAverage(projectId); // 댓글 추가 후 평균 별점 업데이트
+                updateProjectRatingAverage(projectId);
             } catch (error) {
                 console.error("댓글 추가 실패:", error);
             }
