@@ -100,7 +100,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         // ratingAverage에 최소 가중치를 적용
                         const adjustedRatingAverage = item.ratingAverage + minFactor;
 
-                        const ratingScore = item.ratingAverage * ratingAverageWeight;
+                        const ratingScore = adjustedRatingAverage * ratingAverageWeight;
                         const ratingCountScore = Math.log(1 + item.ratingCount + minFactor) * ratingCountWeight;
                         const viewsScore = Math.log(1 + item.views + minFactor) * viewsWeight;
                         const likesScore = Math.log(1 + item.likesCount + minFactor) * likesWeight;
