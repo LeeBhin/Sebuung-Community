@@ -94,7 +94,11 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
                         // 각 지표가 0일 경우에도 최소한의 가중치를 부여하기 위해, Math.log의 인자에 1을 더하는 대신
                         // 작은 값을 더하여 로그 함수가 0을 반환하지 않도록 합니다.
+
                         const minFactor = 0.01; // 최소 가중치 팩터
+
+                        // ratingAverage에 최소 가중치를 적용
+                        const adjustedRatingAverage = item.ratingAverage + minFactor;
 
                         const ratingScore = item.ratingAverage * ratingAverageWeight;
                         const ratingCountScore = Math.log(1 + item.ratingCount + minFactor) * ratingCountWeight;
