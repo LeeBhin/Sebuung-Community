@@ -11,15 +11,13 @@
     margin-top: 3vh;
     cursor: pointer;
     padding: .5rem;
-    transition: .3s;
+    transition: .2s;
 }
 
-.projectDiv:hover {
-    .projectThumbnail {
-        border-radius: 0%;
-    }
-
-    box-shadow: 0px 0px 8px rgba(100, 100, 255, 0.4);
+.projectDiv:hover .projectThumbnail {
+    border-radius: 0%;
+    position: relative;
+    transform: translateY(-8px);
 }
 
 .projectThumbnail {
