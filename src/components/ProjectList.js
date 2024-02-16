@@ -128,7 +128,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             }
         };
 
-
         const loadProjects = async () => {
             if (!isBookmarkPage) {
                 const projectCollection = collection(db, "projects");
@@ -141,6 +140,11 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         projectInfo.id = docRef.id;
                         projectInfo.relativeDate = timeAgo(projectInfo.createdAt.toDate());
 
+                        // Firestore 문서에서 필드 값을 불러온 후 다시 projectInfo 객체에 할당
+                        projectInfo.ratingAverage = projectInfo.ratingAverage || 0;
+                        projectInfo.ratingCount = projectInfo.ratingCount || 0;
+                        projectInfo.likesCount = projectInfo.likesCount || 0;
+
                         const authorDocRef = doc(db, "users", projectInfo.userId);
                         const authorDocSnapshot = await getDoc(authorDocRef);
                         projectInfo.authorName = authorDocSnapshot.exists() ? authorDocSnapshot.data().displayName : "알 수 없음";
@@ -149,6 +153,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                     });
 
                     const loadedProjects = await Promise.all(projectDataPromises);
+
                     const sortedProjects = sortProjects(loadedProjects);
                     setProjects(sortedProjects);
                 } catch (error) {
@@ -162,6 +167,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         };
 
         loadProjects();
+
     }, [isBookmarkPage, projectsData, reloadTrigger, searchQuery, searchOption, sortOption]);
 
     const filteredProjects = projects.filter(project => {
