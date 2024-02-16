@@ -341,7 +341,6 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         );
     }
 
-
     function StarDisplay({ rating }) {
         const totalStars = 5;
         let stars = [];

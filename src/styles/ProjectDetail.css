@@ -36,12 +36,20 @@
     height: 95%;
 }
 
+.project-content-up {
+    height: 760px;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
 .project-content {
+    height: 760px;
     flex: 3;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-
 }
 
 .project-image-slider {
@@ -49,6 +57,22 @@
     width: 100%;
     height: 500px;
     position: relative;
+}
+
+.project-image-slider-up {
+    width: 100%;
+    height: 400px;
+}
+
+.project-image-slider-up img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+#slider-up {
+    height: 300px;
 }
 
 .project-image-slider img {
@@ -210,7 +234,8 @@
 
 .project-title {
     margin: 0;
-    font-size: 1.5em;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 .project-date {
