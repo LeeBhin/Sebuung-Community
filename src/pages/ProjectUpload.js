@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { storage, db, auth } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -25,8 +25,32 @@ function ProjectUpload() {
     const [isUploading, setIsUploading] = useState(false);
     const [thumbnailIndex, setThumbnailIndex] = useState(0);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+    const [currentTime, setCurrentTime] = useState(new Date());
+    const [authorDisplayName, setAuthorDisplayName] = useState('');
     const navigate = useNavigate()
+
+    useEffect(() => {
+
+        const fetchAuthorDisplayName = async () => {
+            if (auth.currentUser) {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+                if (docSnap.exists()) {
+                    setAuthorDisplayName(docSnap.data().displayName);
+                } else {
+                    console.log("해당 사용자를 찾을 수 없습니다.");
+                }
+            }
+        };
+
+        fetchAuthorDisplayName();
+
+        const timer = setInterval(() => {
+            setCurrentTime(new Date()); // 1초마다 현재 시간 업데이트
+        }, 1000);
+
+        return () => clearInterval(timer); // 컴포넌트 언마운트 시 타이머 정리
+    }, []);
 
     const handleImageChange = (e) => {
         if (e.target.files) {
@@ -249,12 +273,12 @@ function ProjectUpload() {
                                     <input type="text" placeholder='프로젝트 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
                                 </h2>
                                 <div className="project-date-views">
-                                    <span className="project-date">new Date</span>
+                                    <span className="project-date">{currentTime.toLocaleString()}</span>
                                     <span className="project-views">조회수 100회</span>
                                 </div>
                             </div>
                             <div className="project-info-body">
-                                <span className="project-author">이름</span>
+                                <span className="project-author">{authorDisplayName || '알 수 없음'}</span>
                                 <div className="project-actions">
                                     <button className="like-button" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />99</span></button>
                                     <button className="bookmark-button" type='button'><BsBookmark size={"20px"} /></button>

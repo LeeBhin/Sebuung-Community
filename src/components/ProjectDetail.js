@@ -461,7 +461,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                     <div className="project-info-header">
                                         <h2 className="project-title">{projectData.title}</h2>
                                         <div className="project-date-views">
-                                            <span className="project-date">{projectData.createdAt}</span>
+                                            <span className="project-date" title={`수정됨: ${projectData.updatedAt.toDate().toLocaleString('ko-KR')}`}>{projectData.createdAt}</span>
                                             <span className="project-views">조회수 {projectData.views}회</span>
                                         </div>
                                     </div>

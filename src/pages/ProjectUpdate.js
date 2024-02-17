@@ -30,10 +30,27 @@ function ProjectUpdate() {
     const [existingFileUrl, setExistingFileUrl] = useState('');
     const [fileName, setFileName] = useState('');
     const [toDeleteFile, setToDeleteFile] = useState(null);
+    const [createdAt, setCreatedAt] = useState('');
+    const [authorDisplayName, setAuthorDisplayName] = useState('');
 
     const navigate = useNavigate()
 
     useEffect(() => {
+
+        const fetchAuthorDisplayName = async () => {
+            if (auth.currentUser) {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+                if (docSnap.exists()) {
+                    setAuthorDisplayName(docSnap.data().displayName);
+                } else {
+                    console.log("해당 사용자를 찾을 수 없습니다.");
+                }
+            }
+        };
+
+        fetchAuthorDisplayName();
+
         const fetchProjectData = async () => {
             const docRef = doc(db, 'projects', projectId);
             const docSnap = await getDoc(docRef);
@@ -54,6 +71,9 @@ function ProjectUpdate() {
                 const thumbnailUrl = data.thumbnailUrl;
                 const thumbnailIndex = loadedImages.findIndex(image => image.url === thumbnailUrl);
                 setThumbnailIndex(thumbnailIndex >= 0 ? thumbnailIndex : 0);
+
+                const createdDate = data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date();
+                setCreatedAt(formatDate(createdDate));
 
                 const fileName = data.fileUrl ? data.fileUrl.split('/').pop().split('?')[0] : '';
                 setExistingFileUrl(data.fileUrl || '');
@@ -294,6 +314,20 @@ function ProjectUpdate() {
         setThumbnailIndex(newThumbnailIndex);
     };
 
+    function formatDate(date) {
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1; // getMonth()는 0부터 시작
+        const d = date.getDate();
+        const h = date.getHours();
+        const mi = date.getMinutes();
+        const session = h < 12 ? '오전' : '오후';
+
+        const hour = h % 12 || 12; // 12시간제로 변환
+        const minute = mi < 10 ? `0${mi}` : mi; // 분이 한 자리수인 경우 앞에 0 추가
+
+        return `${y}. ${m < 10 ? `0${m}` : m}. ${d < 10 ? `0${d}` : d}. ${session} ${hour}:${minute}`;
+    }
+
     return (
         <div className="project-detail-popup-up">
             <form>
@@ -317,12 +351,12 @@ function ProjectUpdate() {
                                     <input type="text" placeholder='프로젝트 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
                                 </h2>
                                 <div className="project-date-views">
-                                    <span className="project-date">new Date</span>
+                                    <span className="project-date">{createdAt}</span>
                                     <span className="project-views">조회수 100회</span>
                                 </div>
                             </div>
                             <div className="project-info-body">
-                                <span className="project-author">이름</span>
+                                <span className="project-author">{authorDisplayName || '알 수 없음'}</span>
                                 <div className="project-actions">
                                     <button className="like-button" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />99</span></button>
                                     <button className="bookmark-button" type='button'><BsBookmark size={"20px"} /></button>
