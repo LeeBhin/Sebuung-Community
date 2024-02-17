@@ -102,9 +102,8 @@ function ProjectUpload() {
     };
 
     const saveProjectData = async (userId, title, description, link, imageUrls, fileUrl) => {
-        const updatedImages = [...images];
-        const thumbnailImage = updatedImages.splice(thumbnailIndex, 1)[0];
-        updatedImages.unshift(thumbnailImage);
+        const thumbnailUrl = imageUrls[thumbnailIndex];
+
         try {
             const projectData = {
                 userId,
@@ -112,17 +111,17 @@ function ProjectUpload() {
                 description,
                 link,
                 imageUrls,
+                thumbnailUrl,
+                fileUrl,
                 views: 0,
                 createdAt: new Date(),
             };
-            console.log(projectData)
 
             if (fileUrl) {
                 projectData.fileUrl = fileUrl;
             }
 
             await addDoc(collection(db, 'projects'), projectData);
-            alert('업로드 완료');
             navigate('/');
         } catch (e) {
             console.error('문서 작성 에러: ', e);
@@ -130,31 +129,24 @@ function ProjectUpload() {
     };
 
     const uploadToFirebase = async () => {
-        setIsUploading(true); // 업로드 시작
+        setIsUploading(true);
 
-        let imageUrls = [];
-        let fileUrl;
+        // 이미지 업로드
+        const imageUrls = await uploadFiles(images, 'images');
 
-        if (images.length) {
-            // 썸네일 이미지 먼저 업로드
-            const thumbnailImage = images[thumbnailIndex];
-            const thumbnailImageUrl = await uploadFile(thumbnailImage, 'images');
-            imageUrls.push(thumbnailImageUrl);
-
-            // 나머지 이미지들 업로드
-            const remainingImages = images.filter((_, index) => index !== thumbnailIndex);
-            const remainingImageUrls = await uploadFiles(remainingImages, 'images');
-            imageUrls = [...imageUrls, ...remainingImageUrls];
-        }
-
+        let fileUrl = "";
         if (file) {
+            // 파일 업로드 및 URL 반환
             fileUrl = await uploadFile(file, 'files');
         }
 
         const userId = auth.currentUser ? auth.currentUser.uid : null;
         if (userId) {
             try {
+                // 프로젝트 데이터 저장, 여기서 thumbnailImageUrl은 이미지 URL 중 썸네일로 지정된 것
+                // fileUrl은 실제 파일의 URL
                 await saveProjectData(userId, title, description, link, imageUrls, fileUrl);
+
                 alert('업로드 완료');
                 navigate('/');
             } catch (error) {
@@ -278,7 +270,7 @@ function ProjectUpload() {
                                     className='up-texta'
                                     value={description}
                                     onChange={handleDescriptionChange}
-                                    rows="8"
+                                    rows="7"
                                     placeholder="프로젝트에 대한 설명을 작성하세요"
                                 >
                                 </textarea>

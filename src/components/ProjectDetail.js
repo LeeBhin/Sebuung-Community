@@ -130,7 +130,6 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         if (isConfirmed) {
             try {
                 await deleteDoc(doc(db, "projects", projectId));
-                alert('프로젝트가 성공적으로 삭제되었습니다.');
                 window.location.reload();
             } catch (error) {
                 console.error("프로젝트 삭제 중 오류 발생:", error);
@@ -369,7 +368,6 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
             try {
                 await deleteDoc(doc(db, "comments", commentId));
                 updateProjectRatingAverage(projectId);
-                alert("삭제되었습니다.");
                 fetchComments();
             } catch (error) {
                 console.error("삭제 중 오류 발생:", error);

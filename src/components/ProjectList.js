@@ -196,9 +196,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                 <div key={project.id} className={`projectDiv ${project.id.startsWith('temp') ? 'temp' : ''}`}
                     onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
                     <div className="projectThumbnail">
-                        {project.imageUrls && project.imageUrls.length > 0 && (
-                            <img src={project.imageUrls[0]} alt={`${project.title} 프로젝트 썸네일`} />
-                        )}
+                        <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
                     </div>
                     <div className='info'>
                         <div className="projectTitle">{project.title}</div>
