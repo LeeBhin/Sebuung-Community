@@ -138,16 +138,13 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         }
     };
 
-
     const handlePrevClick = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex > 0 ? prevIndex - 1 : projectData.imageUrls.length - 1
-        );
+        setCurrentImageIndex(prevIndex => prevIndex > 0 ? prevIndex - 1 : 0);
     };
 
     const handleNextClick = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex < projectData.imageUrls.length - 1 ? prevIndex + 1 : 0
+        setCurrentImageIndex(prevIndex =>
+            prevIndex < projectData.imageUrls.length - 1 ? prevIndex + 1 : prevIndex
         );
     };
 
@@ -448,20 +445,35 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                         {projectData && (
                             <>
                                 <div className="project-image-slider">
-                                    <img src={projectData.imageUrls[currentImageIndex]} alt={`이미지 ${currentImageIndex + 1}`} />
+                                    <div
+                                        className="project-images-container"
+                                        style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                                    >
+                                        {projectData.imageUrls.map((url, index) => (
+                                            <img key={index} src={url} alt={`이미지 ${index + 1}`} />
+                                        ))}
+                                    </div>
+                                    {currentImageIndex > 0 && (
+                                        <button className="slider-button prev-button" onClick={handlePrevClick}>
+                                            <MdArrowBackIosNew size={'20px'} />
+                                        </button>
+                                    )}
+                                    {currentImageIndex < projectData.imageUrls.length - 1 && (
+                                        <button className="slider-button next-button" onClick={handleNextClick}>
+                                            <MdArrowForwardIos size={'20px'} />
+                                        </button>
+                                    )}
                                     <div className="image-index-overlay">
                                         {currentImageIndex + 1}/{projectData.imageUrls.length}
-                                    </div>
-                                    <div>
-                                        <button className="slider-button prev-button" onClick={handlePrevClick}><MdArrowBackIosNew size={'20px'} /></button>
-                                        <button className="slider-button next-button" onClick={handleNextClick}><MdArrowForwardIos size={'20px'} /></button>
                                     </div>
                                 </div>
                                 <div className="project-info">
                                     <div className="project-info-header">
                                         <h2 className="project-title">{projectData.title}</h2>
                                         <div className="project-date-views">
-                                            <span className="project-date" title={`수정됨: ${projectData.updatedAt.toDate().toLocaleString('ko-KR')}`}>{projectData.createdAt}</span>
+                                            <span className="project-date" {...(projectData.updatedAt && { title: `수정됨: ${projectData.updatedAt.toDate().toLocaleString('ko-KR')}` })}>
+                                                {projectData.createdAt}
+                                            </span>
                                             <span className="project-views">조회수 {projectData.views}회</span>
                                         </div>
                                     </div>

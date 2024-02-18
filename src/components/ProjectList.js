@@ -76,7 +76,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         const temporaryProjects = Array(15).fill().map((_, index) => ({
             id: `temp-${index}`,
             title: '불러오는 중...',
-            imageUrls: ['https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'],
+            thumbnailUrl: ['https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'],
             views: '999,999',
             relativeDate: '방금 전',
             authorName: '불러오는 중...'

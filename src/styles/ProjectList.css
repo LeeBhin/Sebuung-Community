@@ -11,7 +11,7 @@
     margin-top: 3vh;
     cursor: pointer;
     padding: .5rem;
-    transition: .2s;
+    transition: transform 0.5s ease-in-out;
 }
 
 .projectDiv:hover .projectThumbnail {
