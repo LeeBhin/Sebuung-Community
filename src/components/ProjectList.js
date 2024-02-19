@@ -76,10 +76,11 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         const temporaryProjects = Array(15).fill().map((_, index) => ({
             id: `temp-${index}`,
             title: '불러오는 중...',
+            authorPhotoURL: ['https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'],
             thumbnailUrl: ['https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'],
             views: '999,999',
             relativeDate: '방금 전',
-            authorName: '불러오는 중...'
+            authorName: '불러오는 중...',
         }));
         setProjects(temporaryProjects);
 
@@ -146,8 +147,15 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         projectInfo.likesCount = projectInfo.likesCount || 0;
 
                         const authorDocRef = doc(db, "users", projectInfo.userId);
+
                         const authorDocSnapshot = await getDoc(authorDocRef);
-                        projectInfo.authorName = authorDocSnapshot.exists() ? authorDocSnapshot.data().displayName : "알 수 없음";
+                        if (authorDocSnapshot.exists()) {
+                            const authorInfo = authorDocSnapshot.data();
+                            // 이 부분에서 authorPhotoURL을 설정합니다.
+                            projectInfo.authorPhotoURL = authorInfo.photoURL || "/path/to/default/profile/image.jpg";
+                        } else {
+                            projectInfo.authorPhotoURL = "/path/to/default/profile/image.jpg";
+                        }
 
                         return projectInfo;
                     });
@@ -199,11 +207,14 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
                     </div>
                     <div className='info'>
-                        <div className="projectTitle">{project.title}</div>
-                        <div className="projectAuthor">{project.authorName}</div>
-                        <div className="projectStats">
-                            <span className="projectViews">조회수 {project.views}회 •</span>
-                            <span className="projectCreatedAt">&nbsp;{project.relativeDate}</span>
+                        <img src={project.authorPhotoURL || "/path/to/default/profile/image.jpg"} alt="Author" className="author-profile-image" />
+                        <div className="textInfo">
+                            <div className="projectTitle">{project.title}</div>
+                            <div className="projectAuthor">{project.authorName}</div>
+                            <div className="projectStats">
+                                <span className="projectViews">조회수 {project.views}회 •</span>
+                                <span className="projectCreatedAt">&nbsp;{project.relativeDate}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

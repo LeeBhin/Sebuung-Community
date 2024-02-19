@@ -179,13 +179,23 @@
 }
 
 .commentContent {
-    margin-top: 5px;
     justify-content: space-between;
     align-items: flex-start;
 }
 
 .namediv {
     display: flex;
+    margin-bottom: 3px;
+}
+
+.comment-profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    /* 원형 이미지로 만들기 */
+    margin-right: 10px;
+    object-fit: cover;
+    /* 이미지 비율 유지 */
 }
 
 .namediv strong {
@@ -255,6 +265,24 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* 이미지와 이름 사이의 간격 */
+}
+
+.author-profile-image {
+    width: 50px;
+    /* 프로필 이미지의 크기 */
+    height: 50px;
+    /* 프로필 이미지의 크기 */
+    border-radius: 50%;
+    /* 원형 이미지 */
+    object-fit: cover;
+    /* 이미지 비율을 유지하면서 요소에 완전히 채움 */
 }
 
 .project-author {

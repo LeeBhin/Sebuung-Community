@@ -1,49 +1,106 @@
 .myPage {
-    max-width: 1000px;
+    width: 90%;
+    max-width: 960px;
+    margin: 40px;
     padding: 20px;
-    border: 1px solid rgb(100, 100, 255);
-    border-radius: 8px;
-    background-color: rgb(192, 248, 255);
 }
 
-.myPage h1 {
-    color: #333;
+/* 프로필 섹션 */
+.profile-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    margin-right: 20px;
+    object-fit: cover;
+}
+
+.profile-name {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* 닉네임 변경 및 로그아웃 섹션 */
+.update-section,
+.actions-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
 }
 
-.myPage input[type="text"] {
-    padding: 8px;
-    margin-right: 10px;
+.myPage input[type="text"],
+.myPageBtn {
+    padding: 10px 15px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 .myPageBtn {
-    padding: 8px 15px;
-    background-color: #007bff;
+    cursor: pointer;
+    background-color: #0056b3;
     color: white;
     border: none;
-    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.myPageBtn:hover {
+    background-color: #003d82;
+}
+
+/* 프로젝트 목록 스타일 */
+.project-list {
+    margin-top: 20px;
+}
+
+.project-item {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
     cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.myPage button:hover {
-    background-color: #0056b3;
+.project-item:hover {
+    transform: translateY(-3px);
 }
 
-.myPage ul {
-    list-style: none;
-    padding: 0;
-}
+/* 반응형 디자인 */
+@media (max-width: 768px) {
 
-.myPage li {
-    padding: 10px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: .5s;
-}
+    .profile-section,
+    .update-section,
+    .actions-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-.myPage li:hover {
-    background-color: rgb(133, 188, 250);
+    .myPageBtn,
+    input[type="text"] {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .profile-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .profile-image {
+        margin-bottom: 20px;
+    }
 }

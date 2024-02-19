@@ -71,6 +71,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
 
             if (projectDocSnapshot.exists()) {
                 const projectInfo = projectDocSnapshot.data();
+
                 projectInfo.createdAt = projectInfo.createdAt.toDate().toLocaleString('ko-KR', {
                     year: 'numeric',
                     month: '2-digit',
@@ -98,8 +99,11 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                 if (authorDocSnapshot.exists()) {
                     const authorInfo = authorDocSnapshot.data();
                     setAuthorName(authorInfo.displayName);
+                    // 프로젝트 데이터에 작성자의 photoURL 추가
+                    setProjectData(prevData => ({ ...prevData, authorPhotoURL: authorInfo.photoURL || "/path/to/default/profile/image.jpg" }));
                 } else {
-                    setAuthorName(authorUid);
+                    setAuthorName("알 수 없는 사용자");
+                    setProjectData(prevData => ({ ...prevData, authorPhotoURL: "/path/to/default/profile/image.jpg" }));
                 }
 
                 if (auth.currentUser) {
@@ -262,31 +266,32 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     const fetchComments = async () => {
         const q = query(collection(db, "comments"), where("projectId", "==", projectId), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-        const commentsWithUsernames = [];
+        const commentsWithUsernamesAndPhotos = [];
 
         for (const docSnapshot of querySnapshot.docs) {
             const commentData = docSnapshot.data();
-            const commentId = docSnapshot.id; // 댓글의 ID를 가져옵니다.
             const userRef = doc(db, "users", commentData.userId);
             const userSnapshot = await getDoc(userRef);
 
             if (userSnapshot.exists()) {
                 const userData = userSnapshot.data();
-                commentsWithUsernames.push({
+                commentsWithUsernamesAndPhotos.push({
                     ...commentData,
-                    id: commentId, // 모든 댓글 데이터에 id를 추가
-                    displayName: userData.displayName || "익명", // 사용자의 displayName이 존재하면 추가, 없으면 "익명" 사용
+                    id: docSnapshot.id,
+                    displayName: userData.displayName || "익명",
+                    photoURL: userData.photoURL || "/path/to/default/profile/image.jpg" // 기본 이미지 경로로 대체
                 });
             } else {
-                commentsWithUsernames.push({
+                commentsWithUsernamesAndPhotos.push({
                     ...commentData,
-                    id: commentId, // 이 부분을 if 조건문 안에서 밖으로 옮겼습니다.
-                    displayName: "알 수 없음", // 사용자 정보가 없는 경우 "익명"으로 설정
+                    id: docSnapshot.id,
+                    displayName: "알 수 없음",
+                    photoURL: "/path/to/default/profile/image.jpg"
                 });
             }
         }
 
-        setComments(commentsWithUsernames); // 상태 업데이트
+        setComments(commentsWithUsernamesAndPhotos);
     };
 
     function StarRating({ rating, setRating }) {
@@ -478,7 +483,10 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                         </div>
                                     </div>
                                     <div className="project-info-body">
-                                        <span className="project-author">{authorName}</span>
+                                        <div className="author-info">
+                                            <img src={projectData?.authorPhotoURL || "/path/to/default/profile/image.jpg"} alt="Author" className="author-profile-image" />
+                                            <span className="project-author">{authorName}</span>
+                                        </div>
                                         <div className="project-actions">
                                             <button className="like-button" onClick={toggleLike} title='좋아요'>
                                                 {isLiked ? <TbThumbUpFilled size={"20px"} /> : <TbThumbUp size={"20px"} />}
@@ -517,11 +525,12 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                         <div className="comments-list">
                             {comments.map((comment, index) => (
                                 <div key={index} className="comment">
+                                    <img src={comment.photoURL} alt="Profile" className="comment-profile-image" />
                                     <div className="commentContent">
                                         <div className='namediv' >
                                             <strong>{comment.displayName}</strong>
-                                            <StarDisplay rating={comment.rating} />
                                         </div>
+                                        <StarDisplay rating={comment.rating} />
                                         <p>{comment.comment}</p>
                                         <p className="comment-date">{timeAgo(comment.createdAt.toDate())}</p>
                                     </div>

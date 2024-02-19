@@ -22,19 +22,19 @@ const Login = () => {
     if (error) {
         return <div>Error: {error.message}</div>;
     }
-
     const loginWithProvider = async (provider, providerName) => {
         try {
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
 
             // 사용자 정보를 Firestore에 저장합니다.
-            const user = auth.currentUser;
             const userDoc = doc(db, 'users', user.uid);
             const userData = {
                 displayName: user.displayName,
                 email: user.email,
+                photoURL: user.photoURL, // 사용자 프로필 사진 URL 추가
             };
-            await setDoc(userDoc, userData);
+            await setDoc(userDoc, userData, { merge: true }); // 기존 데이터를 유지하면서 업데이트
 
             // 로컬 스토리지에 사용자 정보를 저장합니다.
             localStorage.setItem('user', providerName);

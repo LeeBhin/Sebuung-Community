@@ -40,18 +40,39 @@
 }
 
 .info {
-    margin: .5rem 0 0 0.5rem
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+}
+
+.textInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 10px;
 }
 
 .projectTitle {
-    font-size: 20px;
-    padding-bottom: .3rem;
     font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.projectTitle,
+.projectAuthor {
+    margin: 0;
 }
 
 .projectStats {
+    margin-left: auto;
     display: flex;
     align-items: center;
+}
+
+.author-profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .projectStats span {

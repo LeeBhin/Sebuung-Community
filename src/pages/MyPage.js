@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { auth, db } from '../firebase';
+import { auth, db, storage } from '../firebase'; // storage 추가
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, updateDoc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { signOut, updateProfile } from 'firebase/auth';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'; // 추가
 import { useNavigate } from 'react-router-dom';
 import ProjectDetail from '../components/ProjectDetail';
 
@@ -42,25 +43,33 @@ const MyPage = () => {
 
     const updateDisplayName = async () => {
         if (user && newDisplayName) {
-            // Firebase Authentication의 사용자 프로필 업데이트
             await updateProfile(user, {
                 displayName: newDisplayName,
             }).then(() => {
-                // 성공적으로 업데이트 되었을 때
-                console.log("Profile updated successfully!");
-                // 사용자 인터페이스에 표시되는 displayName 업데이트
                 setDisplayName(newDisplayName);
             }).catch((error) => {
-                // 에러 핸들링
                 console.error("Error updating profile: ", error);
             });
 
-            // Firestore 내부의 사용자 문서 업데이트
             await updateDoc(doc(db, 'users', user.uid), { displayName: newDisplayName });
-
-            // 입력 필드 초기화
             setNewDisplayName('');
         }
+    };
+
+    const uploadProfileImage = async (event) => {
+        const file = event.target.files[0];
+        if (!user || !file) return;
+        const fileRef = storageRef(storage, `profilePictures/${user.uid}`);
+        await uploadBytes(fileRef, file).then(() => {
+            getDownloadURL(fileRef).then(async (url) => {
+                await updateProfile(user, { photoURL: url });
+                await updateDoc(doc(db, 'users', user.uid), { photoURL: url });
+                // 프로필 업데이트 후 UI 갱신을 위해 상태를 변경
+                setReloadTrigger(prev => !prev);
+            });
+        }).catch((error) => {
+            console.error("Error uploading profile picture: ", error);
+        });
     };
 
     const deleteAccount = async () => {
@@ -87,40 +96,52 @@ const MyPage = () => {
 
     return (
         <div className="myPage">
-            <h1>{displayName}님</h1>
-            {loginMethod && <p>{loginMethod}로 로그인됨</p>}
-            <div>
+            <div className="profile-section">
+                <div className="profile-info">
+                    <img src={user?.photoURL || 'defaultProfileImageURL'} alt="Profile" className="profile-image" />
+                    <div className="profile-name">{displayName}</div>
+                </div>
+                <div>
+                    <label htmlFor="profile-image-upload" className="myPageBtn">프로필 이미지 변경</label>
+                    <input id="profile-image-upload" type="file" onChange={uploadProfileImage} style={{ display: 'none' }} />
+                </div>
+            </div>
+
+            <div className="update-section">
                 <input
                     type="text"
                     placeholder="새로운 닉네임"
                     value={newDisplayName}
                     onChange={(e) => setNewDisplayName(e.target.value)}
                 />
-                <button className='myPageBtn' onClick={updateDisplayName}>닉네임 변경</button>
+                <button className="myPageBtn" onClick={updateDisplayName}>닉네임 변경</button>
             </div>
-            <button className='myPageBtn' onClick={logout} style={{ 'background': 'orangered' }}>로그아웃</button>
-            <div>
-                <button className='myPageBtn' onClick={deleteAccount} style={{ 'background': 'red' }}>계정 삭제</button>
+
+            <div className="actions-section">
+                <button className="myPageBtn" onClick={logout}>로그아웃</button>
+                <button className="myPageBtn" onClick={deleteAccount} style={{ background: 'red' }}>계정 삭제</button>
             </div>
-            <div>
+            {loginMethod && <p>{loginMethod}로 로그인됨</p>}
+
+            <div className="project-list">
                 <h2>나의 프로젝트</h2>
                 {myProjects.length > 0 ? (
-                    <ul>
-                        {myProjects.map((project) => (
-                            <li key={project.id} onClick={() => showProjectDetail(project.id)}>
-                                {project.title}
-                            </li>
-                        ))}
-                    </ul>
+                    myProjects.map((project) => (
+                        <div key={project.id} className="project-item" onClick={() => showProjectDetail(project.id)}>
+                            {project.title}
+                        </div>
+                    ))
                 ) : (
                     <p>프로젝트가 없습니다.</p>
                 )}
             </div>
+
             {showPopup && (
                 <ProjectDetail
                     projectId={selectedProject}
                     setShowPopup={setShowPopup}
-                    onPopupClose={() => setReloadTrigger(prev => !prev)} />
+                    onPopupClose={() => setReloadTrigger(prev => !prev)}
+                />
             )}
         </div>
     );
