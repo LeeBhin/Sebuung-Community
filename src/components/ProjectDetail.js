@@ -58,6 +58,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -179,11 +180,14 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     };
 
     const handleClosePopup = useCallback(() => {
-        setShowPopup(false);
-        if (location.pathname === '/bookmarks') {
-            OPCBookmarks();
-        }
-        onPopupClose();
+        setIsClosing(true); // 닫힘 애니메이션 시작
+        setTimeout(() => { // 애니메이션 지속 시간 후 실제로 팝업 닫기
+            setShowPopup(false);
+            if (location.pathname === '/bookmarks') {
+                OPCBookmarks();
+            }
+            onPopupClose();
+        }, 500); // 0.5초 후 실행 (애니메이션 시간과 일치)
     }, [setShowPopup, OPCBookmarks, onPopupClose, location.pathname]);
 
     useEffect(() => {
@@ -443,7 +447,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
 
     return (
         <div className="project-detail-overlay" onClick={handleClosePopup}>
-            <div className="project-detail-popup" onClick={handlePopupClick}>
+            <div className={`project-detail-popup ${isClosing ? 'closing' : ''}`} onClick={handlePopupClick}>
                 <button className="close-button" onClick={() => handleClosePopup()}><IoMdClose className='closeBtn' /></button>
                 <div className="project-detail-container">
                     <div className="project-content">
