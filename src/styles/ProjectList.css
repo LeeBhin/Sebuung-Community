@@ -73,6 +73,7 @@
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
+    margin-bottom: 20px;
 }
 
 .projectStats span {

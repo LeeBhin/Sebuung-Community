@@ -151,10 +151,11 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         const authorDocSnapshot = await getDoc(authorDocRef);
                         if (authorDocSnapshot.exists()) {
                             const authorInfo = authorDocSnapshot.data();
-                            // 이 부분에서 authorPhotoURL을 설정합니다.
                             projectInfo.authorPhotoURL = authorInfo.photoURL || "/path/to/default/profile/image.jpg";
+                            projectInfo.authorName = authorInfo.displayName || "알 수 없음";
                         } else {
                             projectInfo.authorPhotoURL = "/path/to/default/profile/image.jpg";
+                            projectInfo.authorName = "알 수 없음";
                         }
 
                         return projectInfo;
