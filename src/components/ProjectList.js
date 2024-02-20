@@ -208,7 +208,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
                     </div>
                     <div className='info'>
-                        <img src={project.authorPhotoURL || "/path/to/default/profile/image.jpg"} alt="Author" className="author-profile-image" />
+                        <img src={project.authorPhotoURL} alt="Author" className="author-profile-image" />
                         <div className="textInfo">
                             <div className="projectTitle">{project.title}</div>
                             <div className="projectAuthor">{project.authorName}</div>

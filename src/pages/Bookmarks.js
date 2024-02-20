@@ -38,9 +38,20 @@ async function fetchProjectsByIds(projectIds) {
         const projectSnapshot = await getDoc(projectRef);
         if (projectSnapshot.exists()) {
             const projectData = projectSnapshot.data();
+
+            // 사용자 문서 조회
+            const userRef = doc(db, "users", projectData.userId);
+            const userSnapshot = await getDoc(userRef);
+            let authorPhotoURL = "/path/to/default/profile/image.jpg"; // 기본 프로필 이미지
+            if (userSnapshot.exists()) {
+                const userData = userSnapshot.data();
+                authorPhotoURL = userData.photoURL || authorPhotoURL; // 사용자 문서에서 photoURL 가져오기
+            }
+
             projects.push({
                 id: projectSnapshot.id,
                 ...projectData,
+                authorPhotoURL, // 프로젝트 데이터에 authorPhotoURL 추가
                 relativeDate: timeAgo(projectData.createdAt.toDate()),
             });
         }
