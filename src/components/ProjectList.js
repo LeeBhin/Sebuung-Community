@@ -6,6 +6,7 @@ import '../styles/ProjectList.css'
 
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+const josh = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'
 
 function timeAgo(date) {
     const now = new Date();
@@ -151,10 +152,10 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         const authorDocSnapshot = await getDoc(authorDocRef);
                         if (authorDocSnapshot.exists()) {
                             const authorInfo = authorDocSnapshot.data();
-                            projectInfo.authorPhotoURL = authorInfo.photoURL || "/path/to/default/profile/image.jpg";
+                            projectInfo.authorPhotoURL = authorInfo.photoURL || josh;
                             projectInfo.authorName = authorInfo.displayName || "알 수 없음";
                         } else {
-                            projectInfo.authorPhotoURL = "/path/to/default/profile/image.jpg";
+                            projectInfo.authorPhotoURL = josh;
                             projectInfo.authorName = "알 수 없음";
                         }
 

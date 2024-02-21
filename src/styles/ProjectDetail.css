@@ -27,10 +27,12 @@
     0% {
         height: 90vh;
         width: 0;
+        opacity: 0;
     }
 
     100% {
         width: 80vw;
+        opacity: 1;
     }
 }
 
