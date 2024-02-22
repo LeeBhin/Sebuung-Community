@@ -41,7 +41,8 @@
 
 .info {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    /* 프로필 이미지와 텍스트를 상단 정렬 */
     margin: 0.5rem 0;
 }
 
@@ -50,11 +51,29 @@
     flex-direction: column;
     justify-content: center;
     margin-left: 10px;
+    overflow: hidden;
+    /* 텍스트가 넘칠 경우 숨김 처리 */
 }
 
 .projectTitle {
     font-weight: bold;
     font-size: 1.2rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    /* 제목의 최대 너비를 부모 요소에 맞춤 */
+}
+
+.author-profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    /* 이미지 크기가 flex 항목의 크기 조정으로 인해 변경되지 않도록 함 */
 }
 
 .projectTitle,
@@ -63,17 +82,8 @@
 }
 
 .projectStats {
-    margin-left: auto;
     display: flex;
     align-items: center;
-}
-
-.author-profile-image {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 20px;
 }
 
 .projectStats span {

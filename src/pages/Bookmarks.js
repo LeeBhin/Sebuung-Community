@@ -3,6 +3,8 @@ import ProjectList from '../components/ProjectList';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+const josh = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'
+
 function timeAgo(date) {
     const now = new Date();
     const seconds = Math.round((now - date) / 1000);
@@ -42,7 +44,7 @@ async function fetchProjectsByIds(projectIds) {
             // 사용자 문서 조회
             const userRef = doc(db, "users", projectData.userId);
             const userSnapshot = await getDoc(userRef);
-            let authorPhotoURL = "/path/to/default/profile/image.jpg"; // 기본 프로필 이미지
+            let authorPhotoURL = josh; // 기본 프로필 이미지
             if (userSnapshot.exists()) {
                 const userData = userSnapshot.data();
                 authorPhotoURL = userData.photoURL || authorPhotoURL; // 사용자 문서에서 photoURL 가져오기

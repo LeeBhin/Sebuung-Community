@@ -12,6 +12,8 @@ import { IoMdClose } from "react-icons/io";
 import { TbThumbUp, TbThumbUpFilled } from "react-icons/tb";
 import { LiaEditSolid } from "react-icons/lia";
 
+const josh = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'
+
 function ensureAbsoluteUrl(url) {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
         return `http://${url}`;
@@ -101,10 +103,10 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                     const authorInfo = authorDocSnapshot.data();
                     setAuthorName(authorInfo.displayName);
                     // 프로젝트 데이터에 작성자의 photoURL 추가
-                    setProjectData(prevData => ({ ...prevData, authorPhotoURL: authorInfo.photoURL || "/path/to/default/profile/image.jpg" }));
+                    setProjectData(prevData => ({ ...prevData, authorPhotoURL: authorInfo.photoURL || josh }));
                 } else {
                     setAuthorName("알 수 없는 사용자");
-                    setProjectData(prevData => ({ ...prevData, authorPhotoURL: "/path/to/default/profile/image.jpg" }));
+                    setProjectData(prevData => ({ ...prevData, authorPhotoURL: josh }));
                 }
 
                 if (auth.currentUser) {
@@ -283,14 +285,14 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                     ...commentData,
                     id: docSnapshot.id,
                     displayName: userData.displayName || "익명",
-                    photoURL: userData.photoURL || "/path/to/default/profile/image.jpg" // 기본 이미지 경로로 대체
+                    photoURL: userData.photoURL || josh // 기본 이미지 경로로 대체
                 });
             } else {
                 commentsWithUsernamesAndPhotos.push({
                     ...commentData,
                     id: docSnapshot.id,
                     displayName: "알 수 없음",
-                    photoURL: "/path/to/default/profile/image.jpg"
+                    photoURL: josh
                 });
             }
         }
@@ -488,7 +490,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                     </div>
                                     <div className="project-info-body">
                                         <div className="author-info">
-                                            <img src={projectData?.authorPhotoURL || "/path/to/default/profile/image.jpg"} alt="Author" className="author-profile-image" />
+                                            <img src={projectData?.authorPhotoURL || josh} alt="Author" className="author-profile-image" />
                                             <span className="project-author">{authorName}</span>
                                         </div>
                                         <div className="project-actions">

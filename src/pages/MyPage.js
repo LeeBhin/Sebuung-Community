@@ -98,9 +98,19 @@ const MyPage = () => {
 
     const deleteAccount = async () => {
         if (user) {
-            await deleteDoc(doc(db, 'users', user.uid));
-            await auth.currentUser.delete();
-            navigate('/');
+            // 사용자에게 계정 삭제를 확인하는 대화상자를 표시
+            const isConfirmed = window.confirm("계정을 정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+            // 사용자가 '확인'을 누른 경우에만 계정 삭제 진행
+            if (isConfirmed) {
+                await deleteDoc(doc(db, 'users', user.uid));
+                await auth.currentUser.delete().then(() => {
+                    navigate('/');
+                }).catch((error) => {
+                    console.error("계정 삭제 중 오류 발생:", error);
+                    alert("계정을 삭제하는 데 실패했습니다. 나중에 다시 시도해주세요.");
+                });
+            }
         }
     };
 
@@ -125,19 +135,19 @@ const MyPage = () => {
         if (seconds < 720000) {
             return `우리가 함께한 시간동안, 3분 카레 ${Math.floor(seconds / 180)}개를 만들 수 있었어요! 🍛`;
         } else if (seconds < 28854000) {
-            const trips = (seconds / 720000).toFixed(1);
+            const trips = (seconds / 720000).toFixed(0);
             return `우리가 함께한 시간으로 한라산에서 백두산까지 ${trips}번 갈 수 있었어요! ⛰️👣`;
         } else if (seconds < 553536000) {
-            const earthLaps = (seconds / 28854000).toFixed(1);
+            const earthLaps = (seconds / 28854000).toFixed(0);
             return `그리고 우리가 함께한 시간으로 지구를 ${earthLaps}바퀴나 돌 수 있었어요! 🌍👣`;
         } else if (seconds < 324000000000) {
-            const moonLaps = (seconds / 553536000).toFixed(1);
+            const moonLaps = (seconds / 553536000).toFixed(0);
             return `이제 우리는 함께 달까지 ${moonLaps}번 왕복할 수 있는 거리를 여행했어요! 🌍🌕🚶‍♂️`;
         } else if (seconds < 107712000000) {
-            const marsTrips = (seconds / 324000000000).toFixed(1);
+            const marsTrips = (seconds / 324000000000).toFixed(0);
             return `이제 우리는 함께 화성까지 ${marsTrips}번 갈 수 있는 거리를 여행했어요! 🔴🚶‍♂️`;
         } else {
-            const sunTrips = (seconds / 107712000000).toFixed(1);
+            const sunTrips = (seconds / 107712000000).toFixed(0);
             return `우리가 함께한 시간으로 태양까지 ${sunTrips}번 갈 수 있는 거리를 여행했어요! ☀️🚶‍♂️`;
         }
     };
@@ -199,7 +209,7 @@ const MyPage = () => {
 
             <button className="myPageBtn logout-btn" onClick={logout}><IoIosLogOut size={"15px"} /> 로그아웃</button>
             <button className="myPageBtn delete-account-btn" onClick={deleteAccount}><MdOutlineDeleteForever size={"15px"} /> 계정 삭제</button>
-            <ProjectList projectsData={myProjects} isBookmarkPage={false} />
+            <ProjectList projectsData={myProjects} isBookmarkPage={true} />
         </div>
     );
 };

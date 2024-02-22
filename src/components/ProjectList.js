@@ -35,12 +35,42 @@ function timeAgo(date) {
     }
 }
 
+async function fetchAuthorPhotoURLs(projectsData) {
+    const usersCache = {};
+    const projects = await Promise.all(projectsData.map(async project => {
+        if (!usersCache[project.userId]) {
+            const userRef = doc(db, "users", project.userId);
+            const userSnap = await getDoc(userRef);
+            usersCache[project.userId] = userSnap.exists() ? userSnap.data().photoURL : josh;
+        }
+        return { ...project, authorPhotoURL: usersCache[project.userId] };
+    }));
+    return projects;
+}
+
 function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '', searchOption = '', sortOption = '' }) {
 
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([]);
     const [reloadTrigger, setReloadTrigger] = useState(false);
+
+    useEffect(() => {
+        async function loadProjects() {
+            NProgress.start();
+            if (!isBookmarkPage) {
+                const q = query(collection(db, "projects"));
+                const snapshot = await getDocs(q);
+                const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), relativeDate: timeAgo(doc.data().createdAt.toDate()) }));
+                const projectsWithAuthors = await fetchAuthorPhotoURLs(projectsData);
+                setProjects(projectsWithAuthors);
+            } else {
+                setProjects(await fetchAuthorPhotoURLs(projectsData));
+            }
+            NProgress.done();
+        }
+        loadProjects();
+    }, [isBookmarkPage, projectsData, searchQuery, searchOption, sortOption]);
 
 
     const incrementViews = async (projectId) => {
@@ -83,6 +113,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             relativeDate: '방금 전',
             authorName: '불러오는 중...',
         }));
+
         setProjects(temporaryProjects);
 
         const sortProjects = (projects) => {
@@ -170,7 +201,8 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                     console.error("프로젝트 데이터 가져오기 에러:", error);
                 }
             } else {
-                setProjects(projectsData);
+                const updatedProjects = await fetchAuthorPhotoURLs(projectsData);
+                setProjects(updatedProjects);
             }
 
             NProgress.done();
@@ -178,7 +210,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
         loadProjects();
 
-    }, [isBookmarkPage, projectsData, reloadTrigger, searchQuery, searchOption, sortOption]);
+    }, [isBookmarkPage, projectsData, reloadTrigger, sortOption]);
 
     const filteredProjects = projects.filter(project => {
         const query = searchQuery.toLowerCase()
