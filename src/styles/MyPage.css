@@ -51,19 +51,33 @@
 .profile-name {
     font-size: 24px;
     font-weight: 600;
+    margin-top: -10px;
+    margin-bottom: 3px;
 }
 
-/* 닉네임 변경 및 로그아웃 섹션 */
-.update-section,
-.actions-section {
+.profile-name-section {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    gap: 10px;
+    /* 이름과 수정 아이콘 사이의 간격 */
+}
+
+.edit-icon {
+    margin: 10px 0 0 -10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007bff;
+    transition: color 0.3s ease;
+}
+
+.edit-icon:hover {
+    color: #0056b3;
 }
 
 .myPage input[type="text"],
 .myPageBtn {
+    cursor: pointer;
     padding: 10px 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -78,6 +92,8 @@
 
 .logout-btn {
     background-color: #007bff;
+    margin-right: 10px;
+    color: white;
     /* 로그아웃 버튼 색상 변경 */
 }
 
@@ -101,13 +117,15 @@
 /* 로그인 방식 표시 스타일 */
 .login-method {
     text-align: center;
-    margin-top: 20px;
-    font-size: 16px;
+    line-height: 10px;
     color: #6c757d;
-    padding: 10px;
+    width: 150px;
     background-color: #f8f9fa;
     border-radius: 5px;
     border: 1px solid #e9ecef;
+    font-size: 13px;
+    padding: -3px;
+    margin-top: 10px;
 }
 
 /* 입력 필드 및 버튼 반응형 개선 */

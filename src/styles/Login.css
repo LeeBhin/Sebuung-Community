@@ -1,0 +1,128 @@
+.login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 65vh;
+    width: 40vw;
+}
+
+.login p {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.login-form {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    align-items: center;
+    animation: fadeIn 1s;
+    /* 폼이 서서히 나타나는 효과 */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 20px;
+    /* 둥근 모서리 */
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-size: 16px;
+    transition: border-color 0.3s ease-in-out;
+    /* 테두리 색상 변화 효과 */
+}
+
+/* 입력란 포커스 애니메이션 */
+.login-form input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
+    /* 밝게 빛나는 효과 */
+}
+
+/* 버튼 호버 애니메이션 */
+.login button:hover {
+    transform: scale(1.1);
+    /* 버튼 확대 */
+    background-color: lighten(#0056b3, 10%);
+    /* 밝은 색으로 변경 */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    /* 그림자 효과 */
+    transition: all 0.3s ease;
+    /* 부드러운 전환 효과 */
+}
+
+/* 버튼 클릭 애니메이션 */
+.login button:active {
+    transform: scale(0.98);
+    /* 누름 효과 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* 클릭 시 그림자 조절 */
+}
+
+.login-form .login-button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    /* 배경색과 크기 변화 효과 */
+}
+
+.login-form .login-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    /* 버튼을 약간 위로 이동 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* 그림자 효과 */
+}
+
+.login button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+
+/* 소셜 로그인 버튼에 고유한 색상 적용 */
+.google {
+    background-color: #db4437;
+    color: white;
+}
+
+.github {
+    background-color: #333;
+    color: white;
+}
+
+.naver {
+    background-color: #03c75a;
+    color: white;
+}

@@ -4,6 +4,10 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, updateDoc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { signOut, updateProfile } from 'firebase/auth';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { AiOutlineUpload } from 'react-icons/ai';
+import { IoIosLogOut } from "react-icons/io";
+import { MdOutlineDeleteForever } from "react-icons/md";
+import { FaEdit } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ProjectList from '../components/ProjectList'; // 이 부분은 당신의 ProjectList 컴포넌트 경로에 맞게 조정하세요.
 
@@ -19,6 +23,7 @@ const MyPage = () => {
     const [loginMethod, setLoginMethod] = useState('');
     const navigate = useNavigate();
     const [secondsSinceJoined, setSecondsSinceJoined] = useState(0);
+    const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -33,7 +38,7 @@ const MyPage = () => {
                 setSecondsSinceJoined(seconds);
             };
 
-            updateSeconds(); // 컴포넌트 마운트 시 초기 실행
+            updateSeconds();
             const intervalId = setInterval(updateSeconds, 1000);
 
             switch (method) {
@@ -82,11 +87,10 @@ const MyPage = () => {
         const file = event.target.files[0];
         if (!user || !file) return;
         const fileRef = storageRef(storage, `profilePictures/${user.uid}`);
-        await uploadBytes(fileRef, file).then(() => {
-            getDownloadURL(fileRef).then(async (url) => {
-                await updateProfile(user, { photoURL: url });
-                await updateDoc(doc(db, 'users', user.uid), { photoURL: url });
-            });
+        await uploadBytes(fileRef, file).then(async () => {
+            const url = await getDownloadURL(fileRef);
+            await updateProfile(user, { photoURL: url });
+            await updateDoc(doc(db, 'users', user.uid), { photoURL: url });
         }).catch((error) => {
             console.error("Error uploading profile picture: ", error);
         });
@@ -121,20 +125,31 @@ const MyPage = () => {
         if (seconds < 720000) {
             return `우리가 함께한 시간동안, 3분 카레 ${Math.floor(seconds / 180)}개를 만들 수 있었어요! 🍛`;
         } else if (seconds < 28854000) {
-            const trips = (seconds / 720000).toFixed(2);
-            return `우리가 함께한 시간으로 한라산에서 백두산까지 걸어서 ${trips}번 갈 수 있었어요! ⛰️👣`;
+            const trips = (seconds / 720000).toFixed(1);
+            return `우리가 함께한 시간으로 한라산에서 백두산까지 ${trips}번 갈 수 있었어요! ⛰️👣`;
         } else if (seconds < 553536000) {
-            const earthLaps = (seconds / 28854000).toFixed(2);
-            return `그리고 우리가 함께한 시간으로 지구를 ${earthLaps}바퀴나 걸을 수 있었어요! 🌍👣`;
+            const earthLaps = (seconds / 28854000).toFixed(1);
+            return `그리고 우리가 함께한 시간으로 지구를 ${earthLaps}바퀴나 돌 수 있었어요! 🌍👣`;
         } else if (seconds < 324000000000) {
-            const moonLaps = (seconds / 553536000).toFixed(2);
-            return `이제 우리는 함께 달까지 걸어서 왕복 ${moonLaps}번 갈 수 있는 거리를 여행했어요! 🌍🌕🚶‍♂️`;
+            const moonLaps = (seconds / 553536000).toFixed(1);
+            return `이제 우리는 함께 달까지 ${moonLaps}번 왕복할 수 있는 거리를 여행했어요! 🌍🌕🚶‍♂️`;
         } else if (seconds < 107712000000) {
-            const marsTrips = (seconds / 324000000000).toFixed(2);
-            return `이제 우리는 함께 화성까지 걸어서 ${marsTrips}번 갈 수 있는 거리를 여행했어요! 🔴🚶‍♂️`;
+            const marsTrips = (seconds / 324000000000).toFixed(1);
+            return `이제 우리는 함께 화성까지 ${marsTrips}번 갈 수 있는 거리를 여행했어요! 🔴🚶‍♂️`;
         } else {
-            const sunTrips = (seconds / 107712000000).toFixed(2);
-            return `우리가 함께한 시간으로 태양까지 걸어서 ${sunTrips}번 갈 수 있는 거리를 여행했어요! ☀️🚶‍♂️`;
+            const sunTrips = (seconds / 107712000000).toFixed(1);
+            return `우리가 함께한 시간으로 태양까지 ${sunTrips}번 갈 수 있는 거리를 여행했어요! ☀️🚶‍♂️`;
+        }
+    };
+
+    const toggleEditMode = () => {
+        setEditMode(!editMode);
+    };
+
+    const handleDisplayNameChange = (e) => {
+        if (e.key === 'Enter' && newDisplayName.trim() !== '') { // 엔터 키를 누르면 변경 사항 적용
+            updateDisplayName(); // 닉네임 업데이트 함수 호출
+            setEditMode(false); // 수정 모드 종료
         }
     };
 
@@ -143,38 +158,48 @@ const MyPage = () => {
             <div className="profile-section">
                 <div className="profile-image-container">
                     <img src={user?.photoURL || josh} alt="Profile" className="profile-image" />
-                    <button className="change-profile-btn" htmlFor="profile-image-upload">변경</button>
-                    <input id="profile-image-upload" type="file" onChange={uploadProfileImage} style={{ display: 'none' }} />
+                    <label htmlFor="profile-image-upload" className="change-profile-btn"><AiOutlineUpload /></label>
+                    <input
+                        id="profile-image-upload"
+                        type="file"
+                        onChange={uploadProfileImage}
+                        style={{ display: 'none' }}
+                    />
                 </div>
                 <div>
-                    <div className="profile-name">{displayName}</div>
+                    <div className="profile-name-section">
+
+                        {!editMode ? (
+                            <>
+                                <div className="profile-name">{displayName}</div>
+                                <button className="edit-icon" onClick={toggleEditMode}>
+                                    <FaEdit size={"13px"} />
+                                </button>
+                            </>
+                        ) : (
+                            <input
+                                type="text"
+                                value={newDisplayName}
+                                onChange={(e) => setNewDisplayName(e.target.value)}
+                                onKeyDown={handleDisplayNameChange}
+                                autoFocus
+                            />
+                        )}
+                    </div>
                     <div className="membership-duration">
                         {getActivityMessage(secondsSinceJoined)}
+                        {loginMethod && (
+                            <div className="login-method">
+                                <p>{loginMethod}로 로그인됨</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+
+            <button className="myPageBtn logout-btn" onClick={logout}><IoIosLogOut size={"15px"} /> 로그아웃</button>
+            <button className="myPageBtn delete-account-btn" onClick={deleteAccount}><MdOutlineDeleteForever size={"15px"} /> 계정 삭제</button>
             <ProjectList projectsData={myProjects} isBookmarkPage={false} />
-
-            <div className="update-section">
-                <input
-                    type="text"
-                    placeholder="새로운 닉네임"
-                    value={newDisplayName}
-                    onChange={(e) => setNewDisplayName(e.target.value)}
-                />
-                <button className="myPageBtn" onClick={updateDisplayName}>닉네임 변경</button>
-            </div>
-
-            <div className="actions-section">
-                <button className="myPageBtn logout-btn" onClick={logout}>로그아웃</button>
-                <button className="myPageBtn delete-account-btn" onClick={deleteAccount}>계정 삭제</button>
-            </div>
-            {loginMethod && (
-                <div className="login-method">
-                    <p>{loginMethod}로 로그인됨</p>
-                </div>
-            )}
-
         </div>
     );
 };
