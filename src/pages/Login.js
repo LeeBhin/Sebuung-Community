@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { auth, googleProvider, githubProvider, db } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { signInWithPopup } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +29,20 @@ const Login = () => {
                 displayName: user.displayName,
                 email: user.email,
                 photoURL: user.photoURL,
+                creationDate: new Date(),
+                authMethod: providerName
             };
             await setDoc(userDoc, userData, { merge: true });
-            localStorage.setItem('user', providerName);
+
+            const authin = getAuth();
+            setPersistence(authin, browserLocalPersistence)
+                .then(() => {
+                    // 인증 상태 지속성이 LOCAL로 설정되었습니다.
+                    // 이제 사용자의 로그인 상태가 브라우저를 닫아도 유지됩니다.
+                })
+                .catch((error) => {
+                    console.error("인증 상태 지속성 설정 중 오류 발생:", error);
+                });
         } catch (error) {
             console.error("로그인 실패:", error);
         }

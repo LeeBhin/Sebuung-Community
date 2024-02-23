@@ -6,6 +6,7 @@ import '../styles/ProjectList.css'
 
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import { useNavigate } from 'react-router-dom';
 const josh = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'
 
 function timeAgo(date) {
@@ -54,6 +55,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([]);
     const [reloadTrigger, setReloadTrigger] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function loadProjects() {
@@ -61,7 +63,11 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             if (!isBookmarkPage) {
                 const q = query(collection(db, "projects"));
                 const snapshot = await getDocs(q);
-                const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), relativeDate: timeAgo(doc.data().createdAt.toDate()) }));
+                const projectsData = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    relativeDate: timeAgo(doc.data().createdAt.toDate())
+                }));
                 const projectsWithAuthors = await fetchAuthorPhotoURLs(projectsData);
                 setProjects(projectsWithAuthors);
             } else {
@@ -232,6 +238,12 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         incrementViews(projectId);
     };
 
+    const navigateToMyPage = (userId, event) => {
+        event.stopPropagation(); // 이벤트 버블링 방지
+        const encodedUserId = btoa(userId);
+        navigate(`/userProfile/${encodedUserId}`);
+    };
+
     return (
         <div className="projectList">
             {filteredProjects.map(project => (
@@ -241,7 +253,10 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                         <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
                     </div>
                     <div className='info'>
-                        <img src={project.authorPhotoURL} alt="Author" className="author-profile-image" />
+                        <img src={project.authorPhotoURL}
+                            onClick={(event) => navigateToMyPage(project.userId, event)}
+                            alt="Author"
+                            className="author-profile-image" />
                         <div className="textInfo">
                             <div className="projectTitle">{project.title}</div>
                             <div className="projectAuthor">{project.authorName}</div>

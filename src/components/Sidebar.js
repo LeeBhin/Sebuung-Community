@@ -12,10 +12,23 @@ function Sidebar() {
     const navigate = useNavigate();
 
     const getLinkClass = (path) => {
-        const isActive = location.pathname === path || (path === '/mypage' && location.pathname === '/login');
+        let isActive = location.pathname === path;
+    
+        if (path === '/mypage') {
+            // 현재 로그인한 사용자의 마이페이지인 경우
+            const myPagePath = user ? `/userProfile/${btoa(user.uid)}` : '/mypage';
+            isActive = isActive || location.pathname === myPagePath;
+    
+            // 다른 사용자의 마이페이지인 경우 (현재 로그인한 사용자가 아닌 경우)
+            if (!isActive && location.pathname.startsWith('/userProfile/')) {
+                const userIdInPath = location.pathname.split('/')[2];
+                const currentUserIdEncoded = user ? btoa(user.uid) : null;
+                isActive = userIdInPath === currentUserIdEncoded;
+            }
+        }
+    
         return `sidebar-item ${isActive ? 'active' : ''}`;
     };
-
     const handleLinkClick = (path) => {
         if (!user && (path === "/upload" || path === "/bookmarks")) {
             alert('로그인이 필요합니다')

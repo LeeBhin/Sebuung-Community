@@ -34,6 +34,7 @@ function App() {
         <Route path="/login" element={<Layout><Login /></Layout>} />
         <Route path="/upload" element={<Layout><ProjectUpload /></Layout>} />
         <Route path="/mypage" element={<Layout><MyPage /></Layout>} />
+        <Route path="/userProfile/:userid" element={<Layout><MyPage /></Layout>} />
         <Route path="/bookmarks" element={<Layout><Bookmarks /></Layout>} />
         <Route path="/edit/:projectId" element={<Layout><ProjectUpdate /></Layout>} />
       </Routes>
