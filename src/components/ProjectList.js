@@ -42,9 +42,24 @@ async function fetchAuthorPhotoURLs(projectsData) {
         if (!usersCache[project.userId]) {
             const userRef = doc(db, "users", project.userId);
             const userSnap = await getDoc(userRef);
-            usersCache[project.userId] = userSnap.exists() ? userSnap.data().photoURL : josh;
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                usersCache[project.userId] = {
+                    photoURL: userData.photoURL || josh,
+                    displayName: userData.displayName || "알 수 없음" // 작성자 이름 추가
+                };
+            } else {
+                usersCache[project.userId] = {
+                    photoURL: josh,
+                    displayName: "알 수 없음" // 기본 값 설정
+                };
+            }
         }
-        return { ...project, authorPhotoURL: usersCache[project.userId] };
+        return {
+            ...project,
+            authorPhotoURL: usersCache[project.userId].photoURL,
+            authorName: usersCache[project.userId].displayName // 프로젝트 객체에 작성자 이름 추가
+        };
     }));
     return projects;
 }

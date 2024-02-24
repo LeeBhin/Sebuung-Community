@@ -150,7 +150,10 @@ const MyPage = () => {
 
 
     const getActivityMessage = (seconds) => {
-        if (seconds < 180) {
+        if (seconds === 0) {
+            return `만나서 반가웠어요!`
+        }
+        if (seconds > 0 && seconds < 180) {
             return `만나서 반가워요, ${profileName}님!`;
         } else if (seconds < 720000) {
             return `우리가 함께한 시간동안, 3분 카레 ${Math.floor(seconds / 180)}개를 만들 수 있었어요! 🍛`;
@@ -207,16 +210,25 @@ const MyPage = () => {
         if (user && isCurrentUser) {
             const isConfirmed = window.confirm("계정을 정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
             if (isConfirmed) {
-                await deleteDoc(doc(db, 'users', user.uid));
-                await auth.currentUser.delete().then(() => {
-                    navigate('/');
-                }).catch((error) => {
-                    console.error("계정 삭제 중 오류 발생:", error);
-                    alert("계정을 삭제하는 데 실패했습니다. 나중에 다시 시도해주세요.");
-                });
+                // Firestore에서 사용자 문서 삭제
+                await deleteDoc(doc(db, 'users', user.uid))
+                    .then(async () => {
+                        // Firebase Authentication에서 사용자 삭제
+                        await auth.currentUser.delete().then(() => {
+                            navigate('/');
+                        }).catch((error) => {
+                            console.error("Firebase Authentication에서 계정 삭제 중 오류 발생:", error);
+                            alert("계정을 삭제하는 데 실패했습니다. 나중에 다시 시도해주세요.");
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Firestore에서 사용자 문서 삭제 중 오류 발생:", error);
+                        alert("계정을 삭제하는 데 실패했습니다. 나중에 다시 시도해주세요.");
+                    });
             }
         }
     };
+
 
     const logout = async () => {
         if (isCurrentUser) {

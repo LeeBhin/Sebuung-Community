@@ -447,6 +447,13 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         event.stopPropagation();
     };
 
+    const navigateToMyPage = (userId, event) => {
+        event.stopPropagation(); // 이벤트 버블링 방지
+        const encodedUserId = btoa(userId);
+        navigate(`/userProfile/${encodedUserId}`);
+        handleClosePopup()
+    };
+
     return (
         <div className="project-detail-overlay" onClick={handleClosePopup}>
             <div className={`project-detail-popup ${isClosing ? 'closing' : ''}`} onClick={handlePopupClick}>
@@ -490,7 +497,10 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                                     </div>
                                     <div className="project-info-body">
                                         <div className="author-info">
-                                            <img src={projectData?.authorPhotoURL || josh} alt="Author" className="author-profile-image" />
+                                            <img src={projectData?.authorPhotoURL || josh}
+                                                onClick={(event) => navigateToMyPage(projectData.userId, event)}
+                                                alt="Author"
+                                                className="author-profile-image" />
                                             <span className="project-author">{authorName}</span>
                                         </div>
                                         <div className="project-actions">
@@ -531,7 +541,10 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
                         <div className="comments-list">
                             {comments.map((comment, index) => (
                                 <div key={index} className="comment">
-                                    <img src={comment.photoURL} alt="Profile" className="comment-profile-image" />
+                                    <img src={comment.photoURL}
+                                        onClick={(event) => navigateToMyPage(comment.userId, event)}
+                                        alt="Profile"
+                                        className="comment-profile-image" />
                                     <div className="commentContent">
                                         <div className='namediv' >
                                             <strong>{comment.displayName}</strong>
