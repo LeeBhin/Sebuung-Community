@@ -79,11 +79,26 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             loadedProjectsData = projectsData;
         }
 
+        // 여기에 검색 필터링 로직 추가
+        if (searchQuery && searchQuery.trim() !== '') {
+            loadedProjectsData = loadedProjectsData.filter((project) => {
+                if (searchOption === 'title') {
+                    return project.title.toLowerCase().includes(searchQuery.toLowerCase());
+                } else if (searchOption === 'content') {
+                    return project.description.toLowerCase().includes(searchQuery.toLowerCase());
+                } else { // 'both' 또는 기타
+                    return project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        project.description.toLowerCase().includes(searchQuery.toLowerCase());
+                }
+            });
+        }
+
         const projectsWithAuthors = await fetchAuthorPhotoURLs(loadedProjectsData);
         const sortedProjects = sortProjects(projectsWithAuthors, sortOption);
         setProjects(sortedProjects);
         NProgress.done();
     };
+
 
     useEffect(() => {
         loadProjects(); // useEffect 내에서 loadProjects 함수를 호출합니다.
