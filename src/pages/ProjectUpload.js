@@ -27,6 +27,7 @@ function ProjectUpload() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [authorDisplayName, setAuthorDisplayName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -109,14 +110,24 @@ function ProjectUpload() {
     };
 
     const uploadFiles = async (files, folder) => {
-        const urls = [];
-        for (const file of files) {
-            const fileRef = ref(storage, `${folder}/${file.name}`);
-            await uploadBytes(fileRef, file);
-            const url = await getDownloadURL(fileRef);
-            urls.push(url);
+        setIsUploading(true);
+        setIsLoading(true);
+        try {
+            const urls = [];
+            for (const file of files) {
+                const fileRef = ref(storage, `${folder}/${file.name}`);
+                await uploadBytes(fileRef, file);
+                const url = await getDownloadURL(fileRef);
+                urls.push(url);
+            }
+            return urls;
+        } catch (error) {
+            console.error('업로드 중 오류 발생:', error);
+            alert('업로드에 실패했습니다.');
+        } finally {
+            setIsUploading(false);
+            setIsLoading(false);
         }
-        return urls;
     };
 
     const uploadFile = async (file, folder) => {
@@ -252,6 +263,11 @@ function ProjectUpload() {
 
     return (
         <div className="project-detail-popup-up">
+            {isLoading && (
+                <div className="loader-container">
+                    <div className="loader"></div>
+                </div>
+            )}
             <form>
                 <div className="project-detail-container">
                     <div className="project-content-up">

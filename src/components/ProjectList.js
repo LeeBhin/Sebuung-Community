@@ -80,7 +80,8 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         }
 
         const projectsWithAuthors = await fetchAuthorPhotoURLs(loadedProjectsData);
-        setProjects(projectsWithAuthors);
+        const sortedProjects = sortProjects(projectsWithAuthors, sortOption);
+        setProjects(sortedProjects);
         NProgress.done();
     };
 
@@ -96,13 +97,58 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         return () => unsubscribe();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    
+
     const onPopupClose = () => {
         setShowPopup(false); // 팝업 상태를 false로 설정합니다.
         loadProjects(); // 팝업이 닫힐 때 loadProjects 함수를 호출하여 데이터를 새로고침합니다.
     };
 
+    const sortProjects = (projects) => {
+        switch (sortOption) {
+            case 'popular':
+                const calculatePopularityScore = (item) => {
+                    const ratingAverageWeight = 4; // 별점 평균의 가중치
+                    const ratingCountWeight = 2.5; // 별점 개수의 가중치
+                    const viewsWeight = 4.5; // 조회수의 가중치
+                    const likesWeight = 3; // 좋아요 수의 가중치
 
+                    // 최소 가중치 팩터
+                    const minFactor = 0.01;
+
+                    // 각 값이 undefined일 경우 0으로 취급
+                    const ratingAverage = item.ratingAverage || 0;
+                    const ratingCount = item.ratingCount || 0;
+                    const views = item.views || 0;
+                    const likesCount = item.likesCount || 0;
+
+                    const adjustedRatingAverage = ratingAverage + minFactor;
+                    const ratingScore = adjustedRatingAverage * ratingAverageWeight;
+                    const ratingCountScore = Math.log(1 + ratingCount + minFactor) * ratingCountWeight;
+                    const viewsScore = Math.log(1 + views + minFactor) * viewsWeight;
+                    const likesScore = Math.log(1 + likesCount + minFactor) * likesWeight;
+
+                    const popularityScore = ratingScore + ratingCountScore + viewsScore + likesScore;
+
+                    return popularityScore;
+                };
+
+                return projects.sort((a, b) => calculatePopularityScore(b) - calculatePopularityScore(a));
+            case 'latest':
+                // 최신순
+                return projects.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+            case 'views':
+                // 조회수순
+                return projects.sort((a, b) => b.views - a.views);
+            case 'likes':
+                // 추천순
+                return projects.sort((a, b) => b.likesCount - a.likesCount);
+            case 'oldest':
+                // 오래된 순
+                return projects.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate());
+            default:
+                return projects;
+        }
+    };
 
     const incrementViews = async (projectId) => {
         const userId = auth.currentUser ? auth.currentUser.uid : null;

@@ -32,6 +32,7 @@ function ProjectUpdate() {
     const [toDeleteFile, setToDeleteFile] = useState(null);
     const [createdAt, setCreatedAt] = useState('');
     const [authorDisplayName, setAuthorDisplayName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate()
 
@@ -204,7 +205,7 @@ function ProjectUpdate() {
 
     const uploadToFirebase = async () => {
         setIsUploading(true); // 업로드 상태를 true로 설정
-
+        setIsLoading(true); // 로딩 시작
         const userId = auth.currentUser ? auth.currentUser.uid : null;
         if (!userId) {
             alert('로그인이 필요합니다.');
@@ -235,6 +236,7 @@ function ProjectUpdate() {
             console.error('업로드 중 오류 발생:', error);
             alert('업로드에 실패했습니다.');
         } finally {
+            setIsLoading(false); // 로딩 종료
             setIsUploading(false); // 업로드 상태를 false로 설정
         }
     };
@@ -330,6 +332,11 @@ function ProjectUpdate() {
 
     return (
         <div className="project-detail-popup-up">
+            {isLoading && (
+                <div className="loader-container">
+                    <div className="loader"></div>
+                </div>
+            )}
             <form>
                 <div className="project-detail-container">
                     <div className="project-content-up">
