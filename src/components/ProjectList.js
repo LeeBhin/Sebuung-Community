@@ -197,34 +197,42 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
     return (
         <div className="projectList">
-            {projects.map(project => (
-                <div key={project.id} className={`projectDiv ${project.id.startsWith('temp') ? 'temp' : ''}`}
-                    onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
-                    <div className="projectThumbnail">
-                        <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
-                    </div>
-                    <div className='info'>
-                        <img src={project.authorPhotoURL}
-                            onClick={(event) => navigateToMyPage(project.userId, event)}
-                            alt="Author"
-                            className="author-profile-image" />
-                        <div className="textInfo">
-                            <div className="projectTitle">{project.title}</div>
-                            <div className="projectAuthor">{project.authorName}</div>
-                            <div className="projectStats">
-                                <span className="projectViews">조회수 {project.views}회&nbsp;</span>
-                                <span className="projectCreatedAt"> • {project.relativeDate}</span>
+            {projects.length > 0 ? (
+                <>
+                    {projects.map(project => (
+                        <div key={project.id} className={`projectDiv ${project.id.startsWith('temp') ? 'temp' : ''}`}
+                            onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
+                            <div className="projectThumbnail">
+                                <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
+                            </div>
+                            <div className='info'>
+                                <img src={project.authorPhotoURL}
+                                    onClick={(event) => navigateToMyPage(project.userId, event)}
+                                    alt="Author"
+                                    className="author-profile-image" />
+                                <div className="textInfo">
+                                    <div className="projectTitle">{project.title}</div>
+                                    <div className="projectAuthor">{project.authorName}</div>
+                                    <div className="projectStats">
+                                        <span className="projectViews">조회수 {project.views}회&nbsp;</span>
+                                        <span className="projectCreatedAt"> • {project.relativeDate}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            ))}
-            {showPopup && (
-                <ProjectDetail
-                    projectId={selectedProject}
-                    setShowPopup={setShowPopup}
-                    onPopupClose={onPopupClose}
-                />
+                    ))}
+                    {showPopup && (
+                        <ProjectDetail
+                            projectId={selectedProject}
+                            setShowPopup={setShowPopup}
+                            onPopupClose={onPopupClose}
+                        />
+                    )}
+                </>
+            ) : (
+                <>
+                    <div className="no-results">검색 결과가 없습니다.</div>
+                </>
             )}
         </div>
     );

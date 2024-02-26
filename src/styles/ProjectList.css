@@ -14,7 +14,7 @@
     transition: transform 0.3s ease-in-out;
 }
 
-.projectThumbnail:hover {
+.projectDiv:hover .projectThumbnail {
     transform: scaleY(0.95) translateY(-3%);
     border-radius: 0;
 }
@@ -105,4 +105,8 @@
 
 .project-actions>button:hover {
     background-color: rgba(100, 100, 255, 0.5);
+}
+
+.no-results {
+    margin: 3rem;
 }
