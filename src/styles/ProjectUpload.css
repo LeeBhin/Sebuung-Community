@@ -181,4 +181,16 @@ img {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 9999;
   }
+
+  .submitBtn.disabled {
+    background-color: rgba(200, 200, 200, 0.5); /* 비활성화 상태의 배경색 */
+    color: rgb(150, 150, 150); /* 비활성화 상태의 텍스트 색상 */
+    cursor: not-allowed; /* 커서를 not-allowed로 변경 */
+}
+
+.submitBtn:not(.disabled):hover {
+    font-weight: bold;
+    background-color: rgba(100, 100, 255, .5); /* 호버 상태의 배경색 변경 */
+}
+
   

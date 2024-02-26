@@ -16,4 +16,5 @@
     margin-right: 10px;
     border-radius: 100px;
     cursor: pointer;
+    transition: .3s ease-in-out;
 }

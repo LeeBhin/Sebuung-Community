@@ -11,13 +11,17 @@
     margin-top: 3vh;
     cursor: pointer;
     padding: .5rem;
-    transition: transform 0.5s ease-in-out;
+    transition: transform 0.3s ease-in-out;
 }
 
-.projectDiv:hover .projectThumbnail {
-    border-radius: 0%;
-    position: relative;
-    transform: translateY(-8px);
+.projectThumbnail:hover {
+    transform: scaleY(0.95) translateY(-3%);
+    border-radius: 0;
+}
+
+.projectDiv:hover .projectThumbnail img {
+    transform: translate(-50%, -55%);
+    /* 이미지를 살짝 위로 이동 */
 }
 
 .projectThumbnail {
@@ -37,6 +41,7 @@
     transform: translate(-50%, -50%);
     max-width: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease-in-out;
 }
 
 .info {

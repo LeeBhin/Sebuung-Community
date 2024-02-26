@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import '../styles/ProjectDetail.css';
+import '../styles/ProjectUpload.css'
 
 import { BsBookmark } from 'react-icons/bs';
 import { BiSolidDownload } from "react-icons/bi";
@@ -210,8 +211,7 @@ function ProjectUpload() {
 
         // 필수 요소 검증
         if (!title.trim() || !description.trim() || images.length === 0) {
-            alert('제목, 설명, 이미지는 모두 필수 요소입니다.');
-            return; // 검증 실패 시, 여기서 함수 실행 종료
+            return;
         }
 
         // 모든 검증을 통과했을 경우, 업로드 로직 실행
@@ -365,12 +365,13 @@ function ProjectUpload() {
                         </DragDropContext>
                         <button
                             type="submit"
-                            className='submitBtn'
+                            className={`submitBtn ${isUploading || !title.trim() || !description.trim() || images.length === 0 ? 'disabled' : ''}`}
                             onClick={handleSubmit}
                             disabled={isUploading || !title.trim() || !description.trim() || images.length === 0}
                         >
                             업로드
                         </button>
+
                     </div>
                 </div>
             </form>
