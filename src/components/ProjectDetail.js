@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { auth, db } from '../firebase';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import '../styles/ProjectDetail.css';
 
@@ -15,10 +15,8 @@ import { LiaEditSolid } from "react-icons/lia";
 const josh = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'
 
 function ensureAbsoluteUrl(url) {
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        return `http://${url}`;
-    }
-    return url;
+    // URL이 절대경로인지 확인하고 아닌 경우 http://를 붙여줍니다.
+    return url.startsWith('http://') || url.startsWith('https://') ? url : `http://${url}`;
 }
 
 function timeAgo(date) {
@@ -48,7 +46,7 @@ function timeAgo(date) {
     }
 }
 
-function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) {
+function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
     const [projectData, setProjectData] = useState(null);
     const [authorName, setAuthorName] = useState(null);
     const [isBookmarked, setIsBookmarked] = useState(false);
@@ -63,7 +61,6 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
     const [isClosing, setIsClosing] = useState(false);
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     const popupRef = useRef();
 
@@ -185,12 +182,9 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, OPCBookmarks }) 
         setIsClosing(true); // 닫힘 애니메이션 시작
         setTimeout(() => { // 애니메이션 지속 시간 후 실제로 팝업 닫기
             setShowPopup(false);
-            if (location.pathname === '/bookmarks') {
-                OPCBookmarks();
-            }
             onPopupClose();
         }, 500); // 0.5초 후 실행 (애니메이션 시간과 일치)
-    }, [setShowPopup, OPCBookmarks, onPopupClose, location.pathname]);
+    }, [setShowPopup, onPopupClose]);
 
     useEffect(() => {
         function handleClickOutside(event) {

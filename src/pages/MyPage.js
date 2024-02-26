@@ -61,56 +61,41 @@ const MyPage = () => {
     const targetUserId = decodedUserId || user?.uid;
     const isCurrentUser = user?.uid === targetUserId;
 
+
     useEffect(() => {
-        if (loading) return; // 사용자 정보가 로딩 중이면 아무것도 하지 않습니다.
+        // 사용자 정보 및 프로젝트 목록을 가져오는 로직
+        if (loading) return;
+        if (!user && !userid) navigate('/login');
 
-        if (!user && !decodedUserId) {
-            navigate('/login');
-            return;
-        }
         const fetchUserData = async () => {
-            if (targetUserId) {
-                const userRef = doc(db, "users", targetUserId);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    setUserInfo(userData);
-                    setDisplayName(userData.displayName || userData.email || "No name");
-
-                    let targetCreationTime
-                    if (decodedUserId) {
-                        targetCreationTime = new Date(userData.creationDate.toDate());
-                    } else {
-                        // 여기서 user.metadata.creationTime 대신 users 문서에서 creationDate를 찾습니다.
-                        const currentUserRef = doc(db, "users", user.uid); // 현재 로그인한 사용자의 문서 참조를 가져옵니다.
-                        const currentUserSnap = await getDoc(currentUserRef); // 문서 스냅샷을 가져옵니다.
-                        if (currentUserSnap.exists()) {
-                            const currentUserData = currentUserSnap.data(); // 문서 데이터를 가져옵니다.
-                            // 사용자의 creationDate를 Date 객체로 변환합니다.
-                            targetCreationTime = new Date(currentUserData.creationDate.toDate());
-                        }
-                    }
-                    if (!userid) {
-                        // user 객체의 uid를 사용하여 해당 사용자의 문서에서 authMethod 항목을 가져옵니다.
-                        const currentUserRef = doc(db, "users", user.uid);
-                        const currentUserSnap = await getDoc(currentUserRef);
-                        if (currentUserSnap.exists()) {
-                            const currentUserData = currentUserSnap.data();
-                            setLoginMethod(currentUserData.authMethod);
-                        }
-                    } else {
-                        setLoginMethod(userData.authMethod);
-                    }
-
-                    setSecondsSinceJoined(calculateSecondsSinceJoined(targetCreationTime));
-                } else {
-                }
+            const userRef = doc(db, "users", targetUserId);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                setUserInfo(userData);
+                setDisplayName(userData.displayName || "알 수 없음");
+                setLoginMethod(userData.authMethod);
+                const creationDate = userData.creationDate.toDate();
+                setSecondsSinceJoined((new Date() - creationDate) / 1000);
             }
-
         };
 
         fetchUserData();
-    }, [userid, user, loading, navigate, targetUserId, decodedUserId]);
+
+        const fetchProjects = async () => {
+            const q = query(collection(db, 'projects'), where('userId', '==', targetUserId));
+            onSnapshot(q, (snapshot) => {
+                const projects = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    relativeDate: timeAgo(doc.data().createdAt.toDate())
+                }));
+                setMyProjects(projects);
+            });
+        };
+
+        fetchProjects();
+    }, [user, loading, userid, navigate, targetUserId]);
 
     useEffect(() => {
         if (targetUserId) {
@@ -134,13 +119,6 @@ const MyPage = () => {
             return () => unsubscribe();
         }
     }, [targetUserId]);
-
-    const calculateSecondsSinceJoined = (creationTime) => {
-        const creationDate = new Date(creationTime);
-        const currentDate = new Date();
-        const timeDiff = currentDate - creationDate;
-        return Math.floor(timeDiff / 1000);
-    };
 
     useEffect(() => {
         // 컴포넌트가 마운트된 후에 profile-name 클래스의 내용을 가져옵니다.

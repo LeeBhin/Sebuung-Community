@@ -31,65 +31,63 @@ function timeAgo(date) {
         return `${years}년 전`;
     }
 }
-
 async function fetchProjectsByIds(projectIds) {
-    const projects = [];
-
-    for (const projectId of projectIds) {
+    const projectPromises = projectIds.map(async projectId => {
         const projectRef = doc(db, "projects", projectId);
         const projectSnapshot = await getDoc(projectRef);
-        if (projectSnapshot.exists()) {
-            const projectData = projectSnapshot.data();
-
-            // 사용자 문서 조회
-            const userRef = doc(db, "users", projectData.userId);
-            const userSnapshot = await getDoc(userRef);
-            let authorPhotoURL = josh; // 기본 프로필 이미지
-            if (userSnapshot.exists()) {
-                const userData = userSnapshot.data();
-                authorPhotoURL = userData.photoURL || authorPhotoURL; // 사용자 문서에서 photoURL 가져오기
-            }
-
-            projects.push({
-                id: projectSnapshot.id,
-                ...projectData,
-                authorPhotoURL, // 프로젝트 데이터에 authorPhotoURL 추가
-                relativeDate: timeAgo(projectData.createdAt.toDate()),
-            });
+        if (!projectSnapshot.exists()) {
+            return null;
         }
-    }
+        const projectData = projectSnapshot.data();
 
-    return projects;
+        const userRef = doc(db, "users", projectData.userId);
+        const userSnapshot = await getDoc(userRef);
+        const authorPhotoURL = userSnapshot.exists() ? (userSnapshot.data().photoURL || josh) : josh;
+
+        return {
+            id: projectSnapshot.id,
+            ...projectData,
+            authorPhotoURL,
+            relativeDate: timeAgo(projectData.createdAt.toDate()),
+        };
+    });
+
+    const projects = await Promise.all(projectPromises);
+    return projects.filter(project => project !== null); // null 값 제거
 }
 
 function Bookmarks() {
     const [bookmarkedProjects, setBookmarkedProjects] = useState([]);
     const [displayName, setDisplayName] = useState("");
-    const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+    const fetchBookmarkedProjects = async () => {
+        if (auth.currentUser) {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const projects = await fetchProjectsByIds(userData.bookmarks || []);
+                setBookmarkedProjects(projects);
+                setDisplayName(userData.displayName || "");
+            }
+        }
+    };
 
     useEffect(() => {
-        const fetchBookmarkedProjects = async () => {
-            if (auth.currentUser) {
-                const userRef = doc(db, "users", auth.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    const projects = await fetchProjectsByIds(userData.bookmarks || []);
-                    setBookmarkedProjects(projects);
-                    setDisplayName(userData.displayName || "");
-                }
-            }
-        };
+        fetchBookmarkedProjects();
+    }, []);
 
-        auth.onAuthStateChanged((user) => {
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(() => {
             fetchBookmarkedProjects();
         });
-    }, [refreshTrigger]);
+        return () => unsubscribe();
+    }, []);
 
     return (
         <div>
-            <h2>{displayName && `${displayName}님의 북마크`}</h2>
-            <ProjectList projectsData={bookmarkedProjects} isBookmarkPage={true} setRefreshTrigger={setRefreshTrigger} />
+            <h2>{`${displayName}님의 북마크`}</h2>
+            <ProjectList projectsData={bookmarkedProjects} isBookmarkPage={true} />
         </div>
     );
 }
