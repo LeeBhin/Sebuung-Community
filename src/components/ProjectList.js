@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProjectDetail from './ProjectDetail';
 import { auth, db } from '../firebase';
-import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, orderBy, startAfter, limit } from 'firebase/firestore';
+import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, orderBy, startAfter, limit, where } from 'firebase/firestore';
 import '../styles/ProjectList.css';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
@@ -53,22 +53,25 @@ async function fetchAuthorPhotoURLs(projectsData) {
 function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '', searchOption = '', sortOption = '' }) {
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
-    const [projects, setProjects] = useState(Array(5).fill().map((_, index) => ({
-        id: `temp-${index}`,
-        title: '불러오는 중...',
-        thumbnailUrl: defaultProfileImageUrl,
-        authorPhotoURL: defaultProfileImageUrl,
-        authorName: '로딩 중',
-        views: '로딩 중',
-        relativeDate: '방금 전',
-    })));
+    const [projects, setProjects] = useState([])
+    // const [projects, setProjects] = useState(Array(5).fill().map((_, index) => ({
+    //     id: `temp-${index}`,
+    //     title: '불러오는 중...',
+    //     thumbnailUrl: defaultProfileImageUrl,
+    //     authorPhotoURL: defaultProfileImageUrl,
+    //     authorName: '로딩 중',
+    //     views: '로딩 중',
+    //     relativeDate: '방금 전',
+    // })));
     const navigate = useNavigate();
 
-    const initialProjectsLimit = 50; // 한 번에 불러올 초기 프로젝트 수
-    const additionalProjectsLimit = 10; // 스크롤할 때마다 추가로 불러올 프로젝트 수
-    let projectsLimit = initialProjectsLimit; // 현재 불러올 프로젝트 수
+    console.log('a', sortOption)
 
+    const initialProjectsLimit = 10; // 한 번에 불러올 초기 프로젝트 수
+    const additionalProjectsLimit = 5; // 스크롤할 때마다 추가로 불러올 프로젝트 수
+    let projectsLimit = initialProjectsLimit; // 현재 불러올 프로젝트 수
     const loadProjects = async () => {
+        console.log('b', sortOption)
         NProgress.start();
         let loadedProjectsData = [];
 
@@ -77,6 +80,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
             // 사용자가 선택한 정렬 옵션에 따라 동적으로 쿼리를 생성
             let q;
+            console.log('c', sortOption)
             switch (sortOption) {
                 case 'star':
                     q = query(projectsRef, orderBy("ratingAverage", "desc"), limit(projectsLimit));
@@ -91,7 +95,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                     q = query(projectsRef, orderBy("views", "desc"), limit(projectsLimit));
                     break;
                 case 'likes':
-                    q = query(projectsRef, orderBy("likes", "desc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("likesCount", "desc"), limit(projectsLimit));
                     break;
             }
 
@@ -106,21 +110,81 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         }
 
         if (searchQuery && searchQuery.trim() !== '') {
-            loadedProjectsData = loadedProjectsData.filter((project) => {
-                if (searchOption === 'title') {
-                    return project.title.toLowerCase().includes(searchQuery.toLowerCase());
-                } else if (searchOption === 'content') {
-                    return project.description.toLowerCase().includes(searchQuery.toLowerCase());
-                } else { // 'both' 또는 기타
-                    return project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        project.description.toLowerCase().includes(searchQuery.toLowerCase());
-                }
-            });
+            // Firestore에서 검색 쿼리 실행
+            const searchResults = await searchProjects(searchQuery, searchOption);
+            loadedProjectsData = searchResults;
         }
 
+        // fetchAuthorPhotoURLs 함수를 호출하여 작성자의 프로필 사진 URL을 가져옴
         const projectsWithAuthors = await fetchAuthorPhotoURLs(loadedProjectsData);
-        setProjects(projectsWithAuthors);
+
+        // 이전에 불러온 프로젝트 데이터와 새로 불러온 데이터를 결합
+        const allProjectsData = [...projects, ...projectsWithAuthors];
+
+        // 중복된 데이터 제거
+        const uniqueProjectsData = allProjectsData.filter((project, index, self) =>
+            index === self.findIndex(p => p.id === project.id)
+        );
+
+        console.log(uniqueProjectsData)
+        // 결합된 데이터를 현재 정렬 옵션에 따라 다시 정렬
+        let sortedProjectsData = [];
+        console.log(sortOption)
+        switch (sortOption) {
+            case 'star':
+                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.ratingAverage - a.ratingAverage);
+                break;
+            case 'latest':
+                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.createdAt - a.createdAt);
+                break;
+            case 'oldest':
+                sortedProjectsData = uniqueProjectsData.sort((a, b) => a.createdAt - b.createdAt);
+                break;
+            case 'views':
+                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.views - a.views);
+                break;
+            case 'likes':
+                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.likesCount - a.likesCount);
+                break;
+            default:
+                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.views - a.views);
+        }
+        console.log(sortedProjectsData)
+
+        // 정렬된 데이터를 상태에 설정
+        setProjects(sortedProjectsData);
         NProgress.done();
+    };
+
+
+    const searchProjects = async (searchQuery, searchOption) => {
+        let loadedProjectsData = [];
+
+        // Firestore 쿼리 생성
+        const projectsRef = collection(db, "projects");
+
+        // 검색 옵션에 따라 쿼리 필드를 선택하여 조건 추가
+        if (searchQuery && searchQuery.trim() !== '') {
+            if (searchOption === 'title') {
+                // title 필드를 기준으로 검색 쿼리 생성
+                const q = query(projectsRef, where('title', '>=', searchQuery), where('title', '<=', searchQuery + '\uf8ff'));
+                const snapshot = await getDocs(q);
+                loadedProjectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } else if (searchOption === 'content') {
+                // content 필드를 기준으로 검색 쿼리 생성
+                const q = query(projectsRef, where('description', '>=', searchQuery), where('description', '<=', searchQuery + '\uf8ff'));
+                const snapshot = await getDocs(q);
+                loadedProjectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } else { // 'both' 또는 기타
+                // title과 description 필드를 모두 검색 쿼리 생성
+                const q = query(projectsRef, where('title', '>=', searchQuery), where('title', '<=', searchQuery + '\uf8ff'),
+                    where('description', '>=', searchQuery), where('description', '<=', searchQuery + '\uf8ff'));
+                const snapshot = await getDocs(q);
+                loadedProjectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+        }
+
+        return loadedProjectsData;
     };
 
     useEffect(() => {
@@ -159,7 +223,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         };
     }, [projectsLimit]);
 
-    // 처음 렌더링될 때 프로젝트 로드
     useEffect(() => {
         loadProjects();
         // eslint-disable-next-line react-hooks/exhaustive-deps
