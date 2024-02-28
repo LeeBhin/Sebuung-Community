@@ -97,6 +97,9 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                 case 'likes':
                     q = query(projectsRef, orderBy("likesCount", "desc"), limit(projectsLimit));
                     break;
+                default:
+                    q = query(projectsRef, orderBy("views", "desc"), limit(projectsLimit));
+                    break;
             }
 
             const snapshot = await getDocs(q);
