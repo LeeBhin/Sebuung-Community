@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProjectDetail from './ProjectDetail';
 import { auth, db } from '../firebase';
-import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, orderBy, startAfter, limit, where } from 'firebase/firestore';
+import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, orderBy, limit, where } from 'firebase/firestore';
 import '../styles/ProjectList.css';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
