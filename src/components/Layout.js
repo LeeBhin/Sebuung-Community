@@ -7,7 +7,7 @@ import '../styles/Layout.css'
 function Layout({ children }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchOption, setSearchOption] = useState('title');
-    const [sortOption, setSortOption] = useState('popular');
+    const [sortOption, setSortOption] = useState('views');
 
     const updatedChildren = React.cloneElement(children, { searchQuery, searchOption, sortOption });
     const isHome = children.type.displayName === 'Home';
@@ -28,10 +28,10 @@ function Layout({ children }) {
                 <main style={{ flexGrow: 1 }}>
                     {isHome && (
                         <div className='sortBtns'>
-                            <button style={getButtonStyle('popular')} onClick={() => handleSortChange('popular')}>인기순</button>
-                            <button style={getButtonStyle('latest')} onClick={() => handleSortChange('latest')}>최신순</button>
                             <button style={getButtonStyle('views')} onClick={() => handleSortChange('views')}>조회수순</button>
+                            <button style={getButtonStyle('star')} onClick={() => handleSortChange('star')}>별점순</button>
                             <button style={getButtonStyle('likes')} onClick={() => handleSortChange('likes')}>추천순</button>
+                            <button style={getButtonStyle('latest')} onClick={() => handleSortChange('latest')}>최신순</button>
                             <button style={getButtonStyle('oldest')} onClick={() => handleSortChange('oldest')}>오래된 순</button>
                         </div>
                     )}

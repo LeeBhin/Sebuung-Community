@@ -409,3 +409,37 @@
     padding: 5px;
     align-self: flex-start;
 }
+
+.comment-likes {
+    justify-content: right;
+}
+
+.like-comment-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.comment-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.commentContent,
+.comment-likes {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.comment-text-and-delete {
+    position: relative;
+}
+
+.comment-likes {
+    bottom: 10px;
+    right: 0px;
+    position: absolute;
+}

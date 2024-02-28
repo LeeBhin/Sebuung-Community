@@ -195,11 +195,11 @@ function ProjectUpdate() {
 
         try {
             await updateDoc(projectRef, projectData);
-            alert('프로젝트 업데이트 완료');
+            alert('작품 업데이트 완료');
             navigate('/');
         } catch (error) {
-            console.error('프로젝트 업데이트 에러:', error);
-            alert('프로젝트 업데이트 실패');
+            console.error('작품 업데이트 에러:', error);
+            alert('작품 업데이트 실패');
         }
     };
 
@@ -229,7 +229,7 @@ function ProjectUpdate() {
         }
 
         try {
-            // 프로젝트 데이터 저장, 썸네일 이미지 URL 포함하여 전달
+            // 작품 데이터 저장, 썸네일 이미지 URL 포함하여 전달
             await saveProjectData(userId, title, description, link, allImageUrls, thumbnailUrl, fileUrl);
             navigate('/'); // 성공적으로 업로드 후 리다이렉션
         } catch (error) {
@@ -342,7 +342,7 @@ function ProjectUpdate() {
                     <div className="project-content-up">
                         <div className="project-image-slider" id='slider-up'>
                             {images.length > 0 && (
-                                <img src={images[currentImageIndex].url || URL.createObjectURL(images[currentImageIndex].file)} alt={`프로젝트 이미지 ${currentImageIndex + 1}`} />
+                                <img src={images[currentImageIndex].url || URL.createObjectURL(images[currentImageIndex].file)} alt={`작품 이미지 ${currentImageIndex + 1}`} />
                             )}
                             <div className="image-index-overlay">
                                 {images.length > 0 ? `${currentImageIndex + 1}/${images.length}` : "0/0"}
@@ -355,7 +355,7 @@ function ProjectUpdate() {
                         <div className="project-info">
                             <div className="project-info-header">
                                 <h2 className="project-title">
-                                    <input type="text" placeholder='프로젝트 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
+                                    <input type="text" placeholder='작품 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
                                 </h2>
                                 <div className="project-date-views">
                                     <span className="project-date">{createdAt}</span>
@@ -380,7 +380,7 @@ function ProjectUpdate() {
                                     value={description}
                                     onChange={handleDescriptionChange}
                                     rows="7"
-                                    placeholder="프로젝트에 대한 설명을 작성하세요"
+                                    placeholder="작품에 대한 설명을 작성하세요"
                                 >
                                 </textarea>
                                 <p>({description.length}/{maxDescriptionLength})</p>

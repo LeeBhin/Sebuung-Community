@@ -150,7 +150,9 @@ function ProjectUpload() {
                 thumbnailUrl,
                 fileUrl,
                 views: 0,
+                likesCount: 0,
                 createdAt: new Date(),
+                ratingAverage: 0
             };
 
             if (fileUrl) {
@@ -179,7 +181,6 @@ function ProjectUpload() {
         const userId = auth.currentUser ? auth.currentUser.uid : null;
         if (userId) {
             try {
-                // 프로젝트 데이터 저장, 여기서 thumbnailImageUrl은 이미지 URL 중 썸네일로 지정된 것
                 // fileUrl은 실제 파일의 URL
                 await saveProjectData(userId, title, description, link, imageUrls, fileUrl);
 
@@ -273,7 +274,7 @@ function ProjectUpload() {
                     <div className="project-content-up">
                         <div className="project-image-slider" id='slider-up'>
                             {images.length > 0 && (
-                                <img src={URL.createObjectURL(images[currentImageIndex])} alt={`프로젝트 이미지 ${currentImageIndex + 1}`} />
+                                <img src={URL.createObjectURL(images[currentImageIndex])} alt={`작품 이미지 ${currentImageIndex + 1}`} />
                             )}
                             <div className="image-index-overlay">
                                 {images.length > 0 ? `${currentImageIndex + 1}/${images.length}` : "0/0"}
@@ -286,7 +287,7 @@ function ProjectUpload() {
                         <div className="project-info">
                             <div className="project-info-header">
                                 <h2 className="project-title">
-                                    <input type="text" placeholder='프로젝트 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
+                                    <input type="text" placeholder='작품 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
                                 </h2>
                                 <div className="project-date-views">
                                     <span className="project-date">{currentTime.toLocaleString()}</span>
@@ -311,7 +312,7 @@ function ProjectUpload() {
                                     value={description}
                                     onChange={handleDescriptionChange}
                                     rows="7"
-                                    placeholder="프로젝트에 대한 설명을 작성하세요"
+                                    placeholder="작품에 대한 설명을 작성하세요"
                                 >
                                 </textarea>
                                 <p>({description.length}/{maxDescriptionLength})</p>

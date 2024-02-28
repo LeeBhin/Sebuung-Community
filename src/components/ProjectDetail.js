@@ -82,7 +82,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
 
                 setProjectData(projectInfo);
 
-                // 좋아요한 작품인지 확인
+                // 추천한 작품인지 확인
                 const user = auth.currentUser;
                 if (user) {
                     const userLikes = projectInfo.likes || [];
@@ -242,6 +242,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
             comment: comment.trim(),
             rating,
             createdAt: new Date(),
+            likes: []
         };
 
         try {
@@ -264,7 +265,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
     }, []);
 
     const fetchComments = async () => {
-        const q = query(collection(db, "comments"), where("projectId", "==", projectId), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "comments"), where("projectId", "==", projectId), orderBy("likes", "desc"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         const commentsWithUsernamesAndPhotos = [];
 
@@ -448,6 +449,27 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
         handleClosePopup()
     };
 
+    const handleLikeComment = async (commentId) => {
+        const commentRef = doc(db, "comments", commentId);
+        const commentSnap = await getDoc(commentRef);
+        const commentData = commentSnap.data();
+        const userId = auth.currentUser.uid; // 현재 로그인한 사용자 ID
+
+        let updatedLikes = commentData.likes || [];
+        if (updatedLikes.includes(userId)) {
+            // 사용자 ID가 이미 있으면 좋아요 취소
+            updatedLikes = updatedLikes.filter(id => id !== userId);
+        } else {
+            // 사용자 ID가 없으면 좋아요 추가
+            updatedLikes.push(userId);
+        }
+
+        // Firestore에 업데이트
+        await updateDoc(commentRef, { likes: updatedLikes });
+        // 댓글 목록을 다시 불러오거나 상태를 업데이트하여 UI를 새로고침
+        fetchComments();
+    };
+
     return (
         <div className="project-detail-overlay" onClick={handleClosePopup}>
             <div className={`project-detail-popup ${isClosing ? 'closing' : ''}`} onClick={handlePopupClick}>
@@ -498,7 +520,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
                                             <span className="project-author">{authorName}</span>
                                         </div>
                                         <div className="project-actions">
-                                            <button className="like-button" onClick={toggleLike} title='좋아요'>
+                                            <button className="like-button" onClick={toggleLike} title='추천'>
                                                 {isLiked ? <TbThumbUpFilled size={"20px"} /> : <TbThumbUp size={"20px"} />}
                                                 <span className="likes-count">{likesCount}</span>
                                             </button>
@@ -539,17 +561,27 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
                                         onClick={(event) => navigateToMyPage(comment.userId, event)}
                                         alt="Profile"
                                         className="comment-profile-image" />
-                                    <div className="commentContent">
-                                        <div className='namediv' >
-                                            <strong>{comment.displayName}</strong>
+                                    <div className="comment-body"> {/* Flex 컨테이너 추가 */}
+                                        <div className="commentContent">
+                                            <div className='namediv' >
+                                                <strong>{comment.displayName}</strong>
+                                            </div>
+                                            <StarDisplay rating={comment.rating} />
+                                            <p>{comment.comment}</p>
+                                            <p className="comment-date">{timeAgo(comment.createdAt.toDate())}</p>
                                         </div>
-                                        <StarDisplay rating={comment.rating} />
-                                        <p>{comment.comment}</p>
-                                        <p className="comment-date">{timeAgo(comment.createdAt.toDate())}</p>
                                     </div>
-                                    {auth.currentUser && auth.currentUser.uid === comment.userId && (
-                                        <button className='deleteComment' onClick={() => handleDeleteComment(comment.id)}><MdDeleteOutline size={'20px'} /></button>
-                                    )}
+                                    <div className='comment-text-and-delete'>
+                                        {auth.currentUser && auth.currentUser.uid === comment.userId && (
+                                            <button className='deleteComment' onClick={() => handleDeleteComment(comment.id)}><MdDeleteOutline size={'20px'} /></button>
+                                        )}
+                                        <div className="comment-likes">
+                                            <button className="like-comment-button" onClick={() => handleLikeComment(comment.id)}>
+                                                {comment.likes && comment.likes.includes(auth.currentUser.uid) ? <TbThumbUpFilled size={"20px"} /> : <TbThumbUp size={"20px"} />}
+                                                <span>{comment.likes ? comment.likes.length : 0}</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
