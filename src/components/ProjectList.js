@@ -72,8 +72,8 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         sortOptionRef.current = sortOption;
     }, [sortOption]);
 
-    const initialProjectsLimit = 10; // 한 번에 불러올 초기 프로젝트 수
-    const additionalProjectsLimit = 5; // 스크롤할 때마다 추가로 불러올 프로젝트 수
+    const initialProjectsLimit = 20; // 한 번에 불러올 초기 프로젝트 수
+    const additionalProjectsLimit = 10; // 스크롤할 때마다 추가로 불러올 프로젝트 수
     let projectsLimit = initialProjectsLimit; // 현재 불러올 프로젝트 수
 
     const loadProjects = async () => {
@@ -115,9 +115,11 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         } else {
             loadedProjectsData = projectsData;
         }
-
-        // 이전에 불러온 프로젝트 데이터와 새로 불러온 데이터를 결합
-        const allProjectsData = [...projects, ...loadedProjectsData];
+        const allProjectsData = loadedProjectsData
+        if (sortOptionRef.current !== sortOption) {
+            // 이전에 불러온 프로젝트 데이터와 새로 불러온 데이터를 결합
+            const allProjectsData = [...projects, ...loadedProjectsData];
+        }
 
         // 중복된 데이터 제거
         let uniqueProjectsData = allProjectsData.filter((project, index, self) =>
