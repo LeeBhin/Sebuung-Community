@@ -116,44 +116,50 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             loadedProjectsData = projectsData;
         }
 
+        // 이전에 불러온 프로젝트 데이터와 새로 불러온 데이터를 결합
+        const allProjectsData = [...projects, ...loadedProjectsData];
+
+        // 중복된 데이터 제거
+        let uniqueProjectsData = allProjectsData.filter((project, index, self) =>
+            index === self.findIndex(p => p.id === project.id)
+        );
+
         if (searchQuery && searchQuery.trim() !== '') {
             // Firestore에서 검색 쿼리 실행
             const searchResults = await searchProjects(searchQuery, searchOption);
-            loadedProjectsData = searchResults;
+            uniqueProjectsData = searchResults;
         }
 
         // fetchAuthorPhotoURLs 함수를 호출하여 작성자의 프로필 사진 URL을 가져옴
-        const projectsWithAuthors = await fetchAuthorPhotoURLs(loadedProjectsData);
-
-        // 이전에 불러온 프로젝트 데이터와 새로 불러온 데이터를 결합
-        const allProjectsData = [...projects, ...projectsWithAuthors];
-
-        // 중복된 데이터 제거
-        const uniqueProjectsData = allProjectsData.filter((project, index, self) =>
-            index === self.findIndex(p => p.id === project.id)
-        );
+        const projectsWithAuthors = await fetchAuthorPhotoURLs(uniqueProjectsData);
 
         // 결합된 데이터를 현재 정렬 옵션에 따라 다시 정렬
         let sortedProjectsData = [];
         switch (sortOptionRef.current) {
             case 'star':
-                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.ratingAverage - a.ratingAverage);
+                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.ratingAverage - a.ratingAverage);
                 break;
             case 'latest':
-                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.createdAt - a.createdAt);
+                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.createdAt - a.createdAt);
                 break;
             case 'oldest':
-                sortedProjectsData = uniqueProjectsData.sort((a, b) => a.createdAt - b.createdAt);
+                sortedProjectsData = projectsWithAuthors.sort((a, b) => a.createdAt - b.createdAt);
                 break;
             case 'views':
-                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.views - a.views);
+                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.views - a.views);
                 break;
             case 'likes':
-                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.likesCount - a.likesCount);
+                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.likesCount - a.likesCount);
                 break;
             default:
-                sortedProjectsData = uniqueProjectsData.sort((a, b) => b.views - a.views);
+                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.views - a.views);
         }
+        sortedProjectsData = sortedProjectsData.map(project => ({
+            ...project,
+            relativeDate: timeAgo(project.createdAt.toDate())
+        }));
+
+
 
         // 정렬된 데이터를 상태에 설정
         setProjects(sortedProjectsData);
@@ -169,27 +175,46 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
         // 검색 옵션에 따라 쿼리 필드를 선택하여 조건 추가
         if (searchQuery && searchQuery.trim() !== '') {
+            let docs = []; // 문서를 저장할 배열
             if (searchOption === 'title') {
                 // title 필드를 기준으로 검색 쿼리 생성
-                const q = query(projectsRef, where('title', '>=', searchQuery), where('title', '<=', searchQuery + '\uf8ff'));
+                const q = query(projectsRef, where('title', '>=', searchQuery), where('title', '<', searchQuery + '\uf8ff'));
                 const snapshot = await getDocs(q);
-                loadedProjectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                docs = snapshot.docs;
             } else if (searchOption === 'content') {
                 // content 필드를 기준으로 검색 쿼리 생성
-                const q = query(projectsRef, where('description', '>=', searchQuery), where('description', '<=', searchQuery + '\uf8ff'));
+                const q = query(projectsRef, where('description', '>=', searchQuery), where('description', '<', searchQuery + '\uf8ff'));
                 const snapshot = await getDocs(q);
-                loadedProjectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } else { // 'both' 또는 기타
-                // title과 description 필드를 모두 검색 쿼리 생성
-                const q = query(projectsRef, where('title', '>=', searchQuery), where('title', '<=', searchQuery + '\uf8ff'),
-                    where('description', '>=', searchQuery), where('description', '<=', searchQuery + '\uf8ff'));
-                const snapshot = await getDocs(q);
-                loadedProjectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                docs = snapshot.docs;
+            } else {
+                // 'both' 옵션 선택 시, title과 description 필드 각각에 대해 쿼리를 실행하고 결과를 합침
+                const qTitle = query(projectsRef, where('title', '>=', searchQuery), where('title', '<', searchQuery + '\uf8ff'));
+                const qDescription = query(projectsRef, where('description', '>=', searchQuery), where('description', '<', searchQuery + '\uf8ff'));
+                const snapshotTitle = await getDocs(qTitle);
+                const snapshotDescription = await getDocs(qDescription);
+                // 두 결과를 합침
+                docs = [...snapshotTitle.docs, ...snapshotDescription.docs];
             }
+
+            // ID를 기준으로 중복 제거
+            const uniqueIds = new Set();
+            docs = docs.filter(doc => {
+                const isDuplicate = uniqueIds.has(doc.id);
+                uniqueIds.add(doc.id);
+                return !isDuplicate;
+            });
+
+            // 문서 데이터 추출
+            loadedProjectsData = docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
         }
 
         return loadedProjectsData;
     };
+
+
 
     useEffect(() => {
         let loading = false; // 데이터를 로드하는 중 여부를 나타내는 변수
@@ -356,7 +381,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                 </>
             ) : (
                 <>
-                    <div className="no-results">검색 결과가 없습니다.</div>
+                    <div className="no-results">இ௰இ</div>
                 </>
             )}
         </div>
