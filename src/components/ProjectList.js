@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ProjectDetail from './ProjectDetail';
 import { auth, db } from '../firebase';
 import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, orderBy, limit, where } from 'firebase/firestore';
@@ -50,6 +50,7 @@ async function fetchAuthorPhotoURLs(projectsData) {
     }));
     return projects;
 }
+
 function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '', searchOption = '', sortOption = '' }) {
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -65,13 +66,17 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     // })));
     const navigate = useNavigate();
 
-    console.log('a', sortOption)
+    const sortOptionRef = useRef(sortOption);
+
+    useEffect(() => {
+        sortOptionRef.current = sortOption;
+    }, [sortOption]);
 
     const initialProjectsLimit = 10; // 한 번에 불러올 초기 프로젝트 수
     const additionalProjectsLimit = 5; // 스크롤할 때마다 추가로 불러올 프로젝트 수
     let projectsLimit = initialProjectsLimit; // 현재 불러올 프로젝트 수
+
     const loadProjects = async () => {
-        console.log('b', sortOption)
         NProgress.start();
         let loadedProjectsData = [];
 
@@ -80,8 +85,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
             // 사용자가 선택한 정렬 옵션에 따라 동적으로 쿼리를 생성
             let q;
-            console.log('c', sortOption)
-            switch (sortOption) {
+            switch (sortOptionRef.current) {
                 case 'star':
                     q = query(projectsRef, orderBy("ratingAverage", "desc"), limit(projectsLimit));
                     break;
@@ -129,11 +133,9 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             index === self.findIndex(p => p.id === project.id)
         );
 
-        console.log(uniqueProjectsData)
         // 결합된 데이터를 현재 정렬 옵션에 따라 다시 정렬
         let sortedProjectsData = [];
-        console.log(sortOption)
-        switch (sortOption) {
+        switch (sortOptionRef.current) {
             case 'star':
                 sortedProjectsData = uniqueProjectsData.sort((a, b) => b.ratingAverage - a.ratingAverage);
                 break;
@@ -152,7 +154,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             default:
                 sortedProjectsData = uniqueProjectsData.sort((a, b) => b.views - a.views);
         }
-        console.log(sortedProjectsData)
 
         // 정렬된 데이터를 상태에 설정
         setProjects(sortedProjectsData);

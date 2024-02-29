@@ -14,6 +14,7 @@ function Layout({ children }) {
 
     const handleSortChange = (option) => {
         setSortOption(option);
+        console.log('layout', sortOption)
     };
 
     const getButtonStyle = (option) => {
