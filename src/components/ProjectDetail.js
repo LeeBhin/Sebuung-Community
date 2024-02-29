@@ -577,7 +577,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
                                         )}
                                         <div className="comment-likes">
                                             <button className="like-comment-button" onClick={() => handleLikeComment(comment.id)}>
-                                                {comment.likes && comment.likes.includes(auth.currentUser.uid) ? <TbThumbUpFilled size={"20px"} /> : <TbThumbUp size={"20px"} />}
+                                                {comment.likes && comment.likes.includes(auth.currentUser?.uid) ? <TbThumbUpFilled size={"20px"} /> : <TbThumbUp size={"20px"} />}
                                                 <span>{comment.likes ? comment.likes.length : 0}</span>
                                             </button>
                                         </div>
