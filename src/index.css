@@ -36,3 +36,24 @@ input:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.scroll_container {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scroll_container::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  /* Remove scrollbar space */
+  height: 0;
+  background: transparent;
+  /* Optional: just make scrollbar invisible */
+  -webkit-appearance: none;
+}
+
+#root {
+  overflow: hidden;
+}

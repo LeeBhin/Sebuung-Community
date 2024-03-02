@@ -18,3 +18,10 @@
     cursor: pointer;
     transition: .3s ease-in-out;
 }
+
+@media (max-width: 476px) {
+    .sortBtns>button {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+}

@@ -70,7 +70,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     const [lastVisible, setLastVisible] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [prevSort, setPrevSort] = useState('views');
-    const [projectsLimit, setProjectsLimit] = useState(25); // 상태 변수로 변환
+    const [projectsLimit, setProjectsLimit] = useState(20); // 상태 변수로 변환
 
     useEffect(() => {
         sortOptionRef.current = sortOption;
@@ -80,13 +80,12 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             setLastVisible(null);
             setPrevSort(sortOption);
             setIsLoading(true);
-            setProjectsLimit(25); // 초기 프로젝트 불러올 때의 limit 설정
+            setProjectsLimit(20); // 초기 프로젝트 불러올 때의 limit 설정
         }
     }, [sortOption, prevSort]);
 
     const loadProjects = async () => {
         if (isLoading) return; // 이미 로딩 중이라면 함수 실행을 중단
-        console.log('loadprojects')
         setIsLoading(true)
         NProgress.start();
         let loadedProjectsData = [];
@@ -100,7 +99,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             let q;
             switch (sortOptionRef.current) {
                 case 'star':
-                    q = query(projectsRef, orderBy("ratingAverage", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("ratingAverage", "desc"), orderBy("createdAt", "desc"), limit(projectsLimit));
                     break;
                 case 'latest':
                     q = query(projectsRef, orderBy("createdAt", "desc"), limit(projectsLimit));
@@ -109,13 +108,13 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                     q = query(projectsRef, orderBy("createdAt", "asc"), limit(projectsLimit));
                     break;
                 case 'views':
-                    q = query(projectsRef, orderBy("views", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("views", "desc"), orderBy("createdAt", "desc"), limit(projectsLimit));
                     break;
                 case 'likes':
-                    q = query(projectsRef, orderBy("likesCount", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("likesCount", "desc"), orderBy("createdAt", "desc"), limit(projectsLimit));
                     break;
                 default:
-                    q = query(projectsRef, orderBy("views", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("views", "desc"), orderBy("createdAt", "desc"), limit(projectsLimit));
                     break;
             }
 
@@ -138,8 +137,8 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
             setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
 
-            if (projectsLimit === 25) {
-                setProjectsLimit(10); // 두 번째 로드부터 적용될 limit
+            if (projectsLimit === 20) {
+                setProjectsLimit(13); // 두 번째 로드부터 적용될 limit
             }
         } else {
             loadedProjectsData = projectsData;
@@ -228,28 +227,40 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
         return loadedProjectsData;
     };
+
     const [lastScrollTop, setLastScrollTop] = useState(0); // 이전 스크롤 위치 저장
 
     useEffect(() => {
-        const handleScroll = () => {
-            const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-            const isScrollingDown = scrollTop > lastScrollTop; // 현재 스크롤 위치가 이전 위치보다 큰 경우, 아래로 스크롤
+        const projectListElement = document.querySelector('.projectList'); // projectList 클래스를 가진 요소 선택
 
-            // 스크롤을 아래로 내리고, 페이지의 바닥에 도달했으며, 현재 로딩 중이 아닐 때
-            if (isScrollingDown && !isLoading && scrollTop + clientHeight >= scrollHeight - 60) {
-                setIsLoading(true); // 로딩 시작
+        const handleScroll = () => {
+            if (!projectListElement) return;
+
+            const { scrollTop, clientHeight, scrollHeight } = projectListElement; // 선택한 요소의 스크롤 속성 사용
+            const isScrollingDown = scrollTop > lastScrollTop;
+
+            // 스크롤을 아래로 내리고, 요소의 바닥에 도달했으며, 현재 로딩 중이 아닐 때
+            if (isScrollingDown && !isLoading && scrollTop + clientHeight >= scrollHeight - 50) {
+                setIsLoading(true);
                 loadProjects().then(() => {
-                    setIsLoading(false); // 로딩 완료
+                    setIsLoading(false);
                 });
             }
-            setLastScrollTop(scrollTop); // 현재 스크롤 위치를 lastScrollTop 상태에 저장
+
+            setLastScrollTop(scrollTop);
         };
 
-        window.addEventListener('scroll', handleScroll);
+        if (projectListElement) {
+            projectListElement.addEventListener('scroll', handleScroll); // 선택한 요소에 스크롤 이벤트 리스너 추가
+        }
+
         return () => {
-            window.removeEventListener('scroll', handleScroll);
+            if (projectListElement) {
+                projectListElement.removeEventListener('scroll', handleScroll); // 컴포넌트 언마운트 시 이벤트 리스너 제거
+            }
         };
-    });
+    }, [lastScrollTop, isLoading]); // 의존성 배열에 lastScrollTop, isLoading 추가
+
 
     useEffect(() => {
         loadProjects();

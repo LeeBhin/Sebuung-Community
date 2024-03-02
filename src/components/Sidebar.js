@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AiFillHome, AiOutlineHome } from 'react-icons/ai';
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
@@ -13,6 +13,11 @@ function Sidebar() {
     const [user] = useAuthState(auth);
     const location = useLocation();
     const navigate = useNavigate();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
 
     const getLinkClass = (path) => {
         let isActive = location.pathname === path;

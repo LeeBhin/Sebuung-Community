@@ -1,4 +1,8 @@
 .contents {
-    width: 80vw;
-    height: 79vh;
+    width: 88vw;
+    height: 80vh;
+}
+
+body {
+    overflow: hidden;
 }

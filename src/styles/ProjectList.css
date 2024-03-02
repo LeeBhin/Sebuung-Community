@@ -2,6 +2,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: .5rem;
+    margin-top: 1rem;
+    height: 83vh;
+    width: 100%;
+    overflow-y: scroll;
 }
 
 .projectDiv {
@@ -120,4 +124,16 @@
 
 .no-results {
     margin: 3rem;
+}
+
+@media (max-width: 750px) {
+    .projectList {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: .5rem;
+        margin-top: 1rem;
+        height: 83vh;
+        width: 97%;
+        overflow-y: scroll;
+    }
 }
