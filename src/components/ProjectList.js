@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ProjectDetail from './ProjectDetail';
 import { auth, db } from '../firebase';
-import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, orderBy, limit, where } from 'firebase/firestore';
+import { collection, query, getDocs, doc, getDoc, updateDoc, increment, arrayUnion, setDoc, orderBy, limit, where, startAfter } from 'firebase/firestore';
 import '../styles/ProjectList.css';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
@@ -67,18 +67,31 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     const navigate = useNavigate();
 
     const sortOptionRef = useRef(sortOption);
+    const [lastVisible, setLastVisible] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [prevSort, setPrevSort] = useState('views');
+    const [projectsLimit, setProjectsLimit] = useState(25); // 상태 변수로 변환
 
     useEffect(() => {
         sortOptionRef.current = sortOption;
-    }, [sortOption]);
-
-    const initialProjectsLimit = 20; // 한 번에 불러올 초기 프로젝트 수
-    const additionalProjectsLimit = 10; // 스크롤할 때마다 추가로 불러올 프로젝트 수
-    let projectsLimit = initialProjectsLimit; // 현재 불러올 프로젝트 수
+        // 정렬 옵션이 변경되었을 때 초기화
+        if (prevSort !== sortOption) {
+            setProjects([]);
+            setLastVisible(null);
+            setPrevSort(sortOption);
+            setIsLoading(true);
+            setProjectsLimit(25); // 초기 프로젝트 불러올 때의 limit 설정
+        }
+    }, [sortOption, prevSort]);
 
     const loadProjects = async () => {
+        if (isLoading) return; // 이미 로딩 중이라면 함수 실행을 중단
+        console.log('loadprojects')
+        setIsLoading(true)
         NProgress.start();
         let loadedProjectsData = [];
+
+        let hap = false;
 
         if (!isBookmarkPage) {
             const projectsRef = collection(db, "projects");
@@ -87,7 +100,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             let q;
             switch (sortOptionRef.current) {
                 case 'star':
-                    q = query(projectsRef, orderBy("ratingAverage", "desc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("ratingAverage", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
                     break;
                 case 'latest':
                     q = query(projectsRef, orderBy("createdAt", "desc"), limit(projectsLimit));
@@ -96,29 +109,52 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                     q = query(projectsRef, orderBy("createdAt", "asc"), limit(projectsLimit));
                     break;
                 case 'views':
-                    q = query(projectsRef, orderBy("views", "desc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("views", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
                     break;
                 case 'likes':
-                    q = query(projectsRef, orderBy("likesCount", "desc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("likesCount", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
                     break;
                 default:
-                    q = query(projectsRef, orderBy("views", "desc"), limit(projectsLimit));
+                    q = query(projectsRef, orderBy("views", "desc"), orderBy("createdAt", "asc"), limit(projectsLimit));
                     break;
             }
 
+            if (prevSort === sortOption) {
+                if (lastVisible) {
+                    hap = true;
+                    q = query(q, startAfter(lastVisible));
+                }
+            } else {
+                setLastVisible(null)
+            }
+
             const snapshot = await getDocs(q);
+
             loadedProjectsData = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
                 relativeDate: timeAgo(doc.data().createdAt.toDate())
             }));
+
+            setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
+
+            if (projectsLimit === 25) {
+                setProjectsLimit(10); // 두 번째 로드부터 적용될 limit
+            }
         } else {
             loadedProjectsData = projectsData;
         }
-        const allProjectsData = loadedProjectsData
-        if (sortOptionRef.current !== sortOption) {
-            // 이전에 불러온 프로젝트 데이터와 새로 불러온 데이터를 결합
-            const allProjectsData = [...projects, ...loadedProjectsData];
+        let allProjectsData = loadedProjectsData
+
+        // 첫 번째 데이터가 이전에 불러온 데이터의 첫 번째 요소와 동일한지 확인
+        if ((prevSort === sortOption) && loadedProjectsData.length > 0 && projects.length > 0 && loadedProjectsData[0].id === projects[0].id) {
+            setIsLoading(false);
+            NProgress.done();
+            return; // 더 이상 데이터를 불러오지 않음
+        }
+
+        if (hap) {
+            allProjectsData = [...projects, ...loadedProjectsData];
         }
 
         // 중복된 데이터 제거
@@ -135,39 +171,16 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         // fetchAuthorPhotoURLs 함수를 호출하여 작성자의 프로필 사진 URL을 가져옴
         const projectsWithAuthors = await fetchAuthorPhotoURLs(uniqueProjectsData);
 
-        // 결합된 데이터를 현재 정렬 옵션에 따라 다시 정렬
-        let sortedProjectsData = [];
-        switch (sortOptionRef.current) {
-            case 'star':
-                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.ratingAverage - a.ratingAverage);
-                break;
-            case 'latest':
-                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.createdAt - a.createdAt);
-                break;
-            case 'oldest':
-                sortedProjectsData = projectsWithAuthors.sort((a, b) => a.createdAt - b.createdAt);
-                break;
-            case 'views':
-                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.views - a.views);
-                break;
-            case 'likes':
-                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.likesCount - a.likesCount);
-                break;
-            default:
-                sortedProjectsData = projectsWithAuthors.sort((a, b) => b.views - a.views);
-        }
-        sortedProjectsData = sortedProjectsData.map(project => ({
+        const datedProjectsData = projectsWithAuthors.map(project => ({
             ...project,
             relativeDate: timeAgo(project.createdAt.toDate())
         }));
 
-
-
         // 정렬된 데이터를 상태에 설정
-        setProjects(sortedProjectsData);
+        setProjects(datedProjectsData);
+        setIsLoading(false); // 함수 마지막에서 로딩 상태를 false로 설정
         NProgress.done();
     };
-
 
     const searchProjects = async (searchQuery, searchOption) => {
         let loadedProjectsData = [];
@@ -215,44 +228,28 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
         return loadedProjectsData;
     };
-
-
+    const [lastScrollTop, setLastScrollTop] = useState(0); // 이전 스크롤 위치 저장
 
     useEffect(() => {
-        let loading = false; // 데이터를 로드하는 중 여부를 나타내는 변수
-
         const handleScroll = () => {
-            if (!isBookmarkPage) {
-                if (loading) return; // 데이터를 로드하는 중인 경우 더 이상 호출하지 않음
+            const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+            const isScrollingDown = scrollTop > lastScrollTop; // 현재 스크롤 위치가 이전 위치보다 큰 경우, 아래로 스크롤
 
-                const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-                if (scrollTop + clientHeight >= scrollHeight - 50 && projects.length < projectsLimit) {
-                    if (projects.length < initialProjectsLimit) {
-                        // 초기 프로젝트 수만큼 불러오는 경우
-                        projectsLimit += additionalProjectsLimit; // 추가로 불러올 프로젝트 수 증가
-                    } else {
-                        // 두 번째 이후에는 한 번에 모든 프로젝트를 불러옵니다.
-                        projectsLimit = projects.length + additionalProjectsLimit; // 다음 불러올 프로젝트 수 설정
-                    }
-                    loading = true; // 데이터를 로드하는 중임을 표시
-                    loadProjects() // 프로젝트 불러오기 함수 호출
-                        .then(() => {
-                            loading = false; // 데이터 로딩이 끝났음을 표시
-                        })
-                        .catch((error) => {
-                            console.error('Error loading projects:', error);
-                            loading = false; // 데이터 로딩이 실패했음을 표시
-                        });
-                }
+            // 스크롤을 아래로 내리고, 페이지의 바닥에 도달했으며, 현재 로딩 중이 아닐 때
+            if (isScrollingDown && !isLoading && scrollTop + clientHeight >= scrollHeight - 60) {
+                setIsLoading(true); // 로딩 시작
+                loadProjects().then(() => {
+                    setIsLoading(false); // 로딩 완료
+                });
             }
+            setLastScrollTop(scrollTop); // 현재 스크롤 위치를 lastScrollTop 상태에 저장
         };
 
-        window.addEventListener('scroll', handleScroll); // 스크롤 이벤트 리스너 등록
-
+        window.addEventListener('scroll', handleScroll);
         return () => {
-            window.removeEventListener('scroll', handleScroll); // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
+            window.removeEventListener('scroll', handleScroll);
         };
-    }, [projectsLimit]);
+    });
 
     useEffect(() => {
         loadProjects();
@@ -264,53 +261,6 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         setShowPopup(false); // 팝업 상태를 false로 설정합니다.
         loadProjects(); // 팝업이 닫힐 때 loadProjects 함수를 호출하여 데이터를 새로고침합니다.
     };
-
-    // const sortProjects = (projects) => {
-    //     switch (sortOption) {
-    //         case 'popular':
-    //             const calculatePopularityScore = (item) => {
-    //                 const ratingAverageWeight = 4; // 별점 평균의 가중치
-    //                 const ratingCountWeight = 2.5; // 별점 개수의 가중치
-    //                 const viewsWeight = 4.5; // 조회수의 가중치
-    //                 const likesWeight = 3; // 좋아요 수의 가중치
-
-    //                 // 최소 가중치 팩터
-    //                 const minFactor = 0.01;
-
-    //                 // 각 값이 undefined일 경우 0으로 취급
-    //                 const ratingAverage = item.ratingAverage || 0;
-    //                 const ratingCount = item.ratingCount || 0;
-    //                 const views = item.views || 0;
-    //                 const likesCount = item.likesCount || 0;
-
-    //                 const adjustedRatingAverage = ratingAverage + minFactor;
-    //                 const ratingScore = adjustedRatingAverage * ratingAverageWeight;
-    //                 const ratingCountScore = Math.log(1 + ratingCount + minFactor) * ratingCountWeight;
-    //                 const viewsScore = Math.log(1 + views + minFactor) * viewsWeight;
-    //                 const likesScore = Math.log(1 + likesCount + minFactor) * likesWeight;
-
-    //                 const popularityScore = ratingScore + ratingCountScore + viewsScore + likesScore;
-
-    //                 return popularityScore;
-    //             };
-
-    //             return projects.sort((a, b) => calculatePopularityScore(b) - calculatePopularityScore(a));
-    //         case 'latest':
-    //             // 최신순
-    //             return projects.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
-    //         case 'views':
-    //             // 조회수순
-    //             return projects.sort((a, b) => b.views - a.views);
-    //         case 'likes':
-    //             // 추천순
-    //             return projects.sort((a, b) => b.likesCount - a.likesCount);
-    //         case 'oldest':
-    //             // 오래된 순
-    //             return projects.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate());
-    //         default:
-    //             return projects;
-    //     }
-    // };
 
     const incrementViews = async (projectId) => {
         const userId = auth.currentUser ? auth.currentUser.uid : null;
