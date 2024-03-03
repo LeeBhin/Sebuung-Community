@@ -21,6 +21,8 @@
     overflow: hidden;
     box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.089);
     animation: popupAnimation 0.3s forwards;
+    overflow-y: auto;
+    /* 내용이 넘칠 경우 스크롤 표시 */
 }
 
 @keyframes popupAnimation {
@@ -64,6 +66,11 @@
     display: flex;
     width: 100%;
     height: 95%;
+    height: auto;
+}
+
+.project-image-slider img {
+    max-height: 300px;
 }
 
 .project-content-up {
@@ -71,7 +78,7 @@
     flex: 2;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .project-content {
@@ -79,20 +86,21 @@
     flex: 3;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .project-image-slider {
     overflow: hidden;
     display: flex;
     width: 100%;
-    height: 500px;
     position: relative;
 }
 
 .project-images-container {
-    min-width: 100%;
     display: flex;
+    width: 100%;
+    display: flex;
+    align-items: center;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -114,9 +122,13 @@
 
 .project-image-slider img {
     flex-shrink: 0;
+    /* 이미지 축소 방지 */
     width: 100%;
-    height: 100%;
+    /* 슬라이더 너비에 맞게 이미지 너비 설정 */
+    height: auto;
+    /* 이미지 높이를 자동으로 조정하여 비율 유지 */
     object-fit: contain;
+    /* 이미지 비율 유지 */
 }
 
 .slider-button {
@@ -174,12 +186,6 @@
     margin: 0;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
-}
-
-.project-info-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .project-date-views {
@@ -357,7 +363,8 @@
 
 .project-description {
     margin-top: 20px;
-    white-space: pre-line;
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .rating-input-section {
@@ -402,6 +409,10 @@
     margin-right: 10px;
 }
 
+.project-images-container {
+    min-height: 100px;
+}
+
 .deleteComment {
     background: none;
     border: none;
@@ -442,4 +453,133 @@
     bottom: 10px;
     right: 0px;
     position: absolute;
+}
+
+@media screen and (max-width: 768px) {
+    .project-detail-popup {
+        width: 95vw;
+        padding: 5px;
+    }
+
+    .project-images-container img {
+        max-height: 200px;
+    }
+
+    .project-detail-container {
+        flex-direction: column;
+    }
+
+    .project-comments-section {
+        padding: 5px;
+    }
+
+    .author-info img,
+    .comment-profile-image {
+        width: 30px;
+        height: 30px;
+    }
+
+    .project-info,
+    .comment-input-section input,
+    .comment-input-section button {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+
+    .slider-button,
+    .like-button,
+    .bookmark-button,
+    .edit-button,
+    .delete-button,
+    .share-button,
+    .download-button {
+        padding: 5px;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+
+    .project-title,
+    .project-author,
+    .comment p,
+    .comment-date {
+        font-size: 0.7rem;
+    }
+
+    .project-description,
+    .comments-list {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+}
+
+@media screen and (max-width: 1029px) {
+
+    .project-date-views span {
+        font-size: 12px;
+    }
+
+    body,
+    button,
+    input,
+    textarea {
+        font-size: 14px;
+        /* 작은 화면에서의 폰트 크기 조정 */
+    }
+
+    .slider-button,
+    .like-button,
+    .bookmark-button,
+    .edit-button,
+    .delete-button,
+    .share-button,
+    .download-button {
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+    }
+
+    .project-date-views {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 870px) {
+
+    .project-date-views {
+        flex-direction: row;
+    }
+
+    .project-info-body,
+    .project-info-header {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .project-actions button {
+        margin: 3px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+
+    body,
+    button,
+    input,
+    textarea {
+        font-size: 12px;
+        /* 더 작은 화면에서의 폰트 크기 조정 */
+    }
+
+    .project-info-body,
+    .project-info-header {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .project-actions button {
+        margin-left: 3px;
+    }
 }

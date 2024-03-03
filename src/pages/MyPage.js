@@ -252,7 +252,7 @@ const MyPage = () => {
                                 )}
                             </>
                         ) : (
-                            <input type="text" value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} onKeyDown={handleDisplayNameChange} autoFocus />
+                            <input className='changeName' type="text" value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} onKeyDown={handleDisplayNameChange} autoFocus />
                         )}
                     </div>
                     <div className="membership-duration">

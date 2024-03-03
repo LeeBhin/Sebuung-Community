@@ -131,9 +131,13 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: .5rem;
-        margin-top: 1rem;
+        margin-top: .5rem;
         height: 83vh;
         width: 97%;
         overflow-y: scroll;
+    }
+
+    .projectDiv {
+        margin-top: 1vh;
     }
 }

@@ -137,7 +137,7 @@
     }
 
     .myPageBtn,
-    input[type="text"] {
+    .changeName {
         width: 100%;
         /* 모바일 화면에서 너비를 100%로 조정 */
         margin-top: 10px;
@@ -173,7 +173,7 @@
     }
 
     .myPageBtn,
-    input[type="text"] {
+    .changeName {
         width: 100%;
         margin-top: 10px;
     }

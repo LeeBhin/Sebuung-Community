@@ -13,11 +13,6 @@ function Sidebar() {
     const [user] = useAuthState(auth);
     const location = useLocation();
     const navigate = useNavigate();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
 
     const getLinkClass = (path) => {
         let isActive = location.pathname === path;
