@@ -7,6 +7,9 @@ import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import { useNavigate } from 'react-router-dom';
 
+import { PiEye } from "react-icons/pi";
+import { TbThumbUp } from "react-icons/tb";
+
 const defaultProfileImageUrl = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg';
 
 function timeAgo(date) {
@@ -312,22 +315,23 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                             onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
                             <div className="projectThumbnail">
                                 <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
+                                <img src={project.authorPhotoURL}
+                                    onClick={(event) => navigateToMyPage(project.userId, event)}
+                                    alt="Author"
+                                    className="author-profile-image" />
                             </div>
                             <div className='info'>
-                                <div className="authorContainer">
-                                    <img src={project.authorPhotoURL}
-                                        onClick={(event) => navigateToMyPage(project.userId, event)}
-                                        alt="Author"
-                                        className="author-profile-image" />
-                                    <div className="projectAuthor">{project.authorName}</div>
-                                </div>
                                 <div className="textInfo">
                                     <div className="projectTitle">{project.title}</div>
+                                    <div className="authorContainer">
+                                        <div className="projectAuthor">{project.authorName}&nbsp;</div>
+                                        <span className="projectCreatedAt">• {project.relativeDate}</span>
+                                    </div>
                                     <div className="projectStats">
-                                        <span className="projectViews">
-                                            {project.views > 0 ? `조회수 ${project.views}회` : '아무도 안 봄'}
-                                        </span>
-                                        <span className="projectCreatedAt">{project.relativeDate}</span>
+                                        <span className='statsSvg'><PiEye size={"16px"} /></span>
+                                        <span>{project.views}&nbsp;&nbsp;</span>
+                                        <span className='statsSvg'><TbThumbUp size={"16px"} /></span>
+                                        <span>{project.likesCount}</span>
                                     </div>
 
                                 </div>
@@ -346,8 +350,9 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                 <>
                     <div className="no-results">இ௰இ</div>
                 </>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }
 
