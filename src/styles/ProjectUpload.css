@@ -3,8 +3,6 @@
 }
 
 .project-detail-popup-up {
-    position: relative;
-    margin: 0 auto;
     background-color: white;
     padding: 10px;
     width: 88%;
@@ -13,7 +11,6 @@
     flex-direction: column;
     border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.189);
     overflow-y: auto;
 }
 

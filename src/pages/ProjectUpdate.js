@@ -366,7 +366,7 @@ function ProjectUpdate() {
                                 <div className="project-info-body">
                                     <span className="project-author">{authorDisplayName || '알 수 없음'}</span>
                                     <div className="project-actions">
-                                        <button className="like-button" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />99</span></button>
+                                        <button className="like-button" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />0</span></button>
                                         <button className="bookmark-button" type='button'><BsBookmark size={"20px"} /></button>
                                         <button className="share-button" type='button' ><FaRegShareSquare size={'20px'} /> </button>
                                         <button className="download-button" type='button' ><BiSolidDownload size={"20px"} /></button>
