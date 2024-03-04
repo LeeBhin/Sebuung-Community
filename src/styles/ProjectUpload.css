@@ -1,12 +1,13 @@
 .uploadWrap {
     width: 88vw;
+    height: 85vh;
 }
 
 .project-detail-popup-up {
     background-color: white;
     padding: 10px;
     width: 88%;
-    height: 83vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     border-radius: 5px;
