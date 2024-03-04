@@ -331,110 +331,112 @@ function ProjectUpdate() {
     }
 
     return (
-        <div className="project-detail-popup-up">
-            {isLoading && (
-                <div className="loader-container">
-                    <div className="loader"></div>
-                </div>
-            )}
-            <form>
-                <div className="project-detail-container">
-                    <div className="project-content-up">
-                        <div className="project-image-slider" id='slider-up'>
-                            {images.length > 0 && (
-                                <img src={images[currentImageIndex].url || URL.createObjectURL(images[currentImageIndex].file)} alt={`작품 이미지 ${currentImageIndex + 1}`} />
-                            )}
-                            <div className="image-index-overlay">
-                                {images.length > 0 ? `${currentImageIndex + 1}/${images.length}` : "0/0"}
-                            </div>
-                            <div>
-                                <button type="button" className="slider-button prev-button" onClick={handlePrevImage}><MdArrowBackIosNew size={'20px'} /></button>
-                                <button type="button" className="slider-button next-button" onClick={handleNextImage}><MdArrowForwardIos size={'20px'} /></button>
-                            </div>
-                        </div>
-                        <div className="project-info">
-                            <div className="project-info-header">
-                                <h2 className="project-title">
-                                    <input type="text" placeholder='작품 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
-                                </h2>
-                                <div className="project-date-views">
-                                    <span className="project-date">{createdAt}</span>
-                                    <span className="project-views">조회수 100회</span>
-                                </div>
-                            </div>
-                            <div className="project-info-body">
-                                <span className="project-author">{authorDisplayName || '알 수 없음'}</span>
-                                <div className="project-actions">
-                                    <button className="like-button" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />99</span></button>
-                                    <button className="bookmark-button" type='button'><BsBookmark size={"20px"} /></button>
-                                    <button className="share-button" type='button' ><FaRegShareSquare size={'20px'} /> </button>
-                                    <button className="download-button" type='button' ><BiSolidDownload size={"20px"} /></button>
-                                    <button className="edit-button" type='button'><LiaEditSolid size={"20px"} /></button>
-                                    <button className="delete-button" type='button' ><MdDeleteOutline size={"20px"} /></button>
-                                </div>
-                            </div>
-                            <input type="text" className='project-url' value={link} placeholder='https://example.com' onChange={(e) => setLink(e.target.value)} />
-                            <div className="project-description">
-                                <textarea
-                                    className='up-texta'
-                                    value={description}
-                                    onChange={handleDescriptionChange}
-                                    rows="7"
-                                    placeholder="작품에 대한 설명을 작성하세요"
-                                >
-                                </textarea>
-                                <p>({description.length}/{maxDescriptionLength})</p>
-                            </div>
-                            {fileName && (
-                                <div>
-                                    <p className='nowfile'>현재 파일: <a href={existingFileUrl} target="_blank" rel="noopener noreferrer"> {fileName}</a></p>
-                                    <button type="button" className='deleteFile' onClick={handleDeleteFile}><MdDeleteOutline size={"20px"} /></button>
-                                </div>
-                            )}
-                            <div className='newFile'>새 파일 업로드 (기존 파일 대체):</div>
-                            <input type="file" onChange={handleFileChange} />
-                        </div>
+        <div className='uploadWrap'>
+            <div className="project-detail-popup-up">
+                {isLoading && (
+                    <div className="loader-container">
+                        <div className="loader"></div>
                     </div>
-                    <div className="project-comments-section-up">
-                        <p>이미지 (최대 5개)</p>
-                        <p style={{ fontSize: '13px', fontWeight: 'normal' }}>클릭해서 썸네일 지정</p>
-                        <input type="file" multiple onChange={handleImageChange} ref={fileInputRef} />
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            <Droppable droppableId="droppable-images" direction="horizontal">
-                                {(provided, snapshot) => (
-                                    <div ref={provided.innerRef} {...provided.droppableProps} className="image-preview">
-                                        {images.map((image, index) => (
-                                            <Draggable key={index} draggableId={`image-${index}`} index={index}>
-                                                {(provided) => (
-                                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
-                                                        className={`preview-item ${index === thumbnailIndex ? 'thumbnail-selected' : ''}`}
-                                                        onClick={() => handleImageClick(index)}>
-                                                        <img src={image.url} alt={`이미지 ${index + 1}`} />
-                                                        {index === thumbnailIndex && <div className="thumbnail-text">썸네일</div>}
-                                                        <button type="button" className="delete-img" onClick={(e) => { e.stopPropagation(); removeImage(index); }}>
-                                                            <MdDeleteOutline size={"20px"} />
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-
-                                        {provided.placeholder}
+                )}
+                <form>
+                    <div className="project-detail-container">
+                        <div className="project-content-up">
+                            <div className="project-image-slider" id='slider-up'>
+                                {images.length > 0 && (
+                                    <img src={images[currentImageIndex].url || URL.createObjectURL(images[currentImageIndex].file)} alt={`작품 이미지 ${currentImageIndex + 1}`} />
+                                )}
+                                <div className="image-index-overlay">
+                                    {images.length > 0 ? `${currentImageIndex + 1}/${images.length}` : "0/0"}
+                                </div>
+                                <div>
+                                    <button type="button" className="slider-button prev-button" onClick={handlePrevImage}><MdArrowBackIosNew size={'20px'} /></button>
+                                    <button type="button" className="slider-button next-button" onClick={handleNextImage}><MdArrowForwardIos size={'20px'} /></button>
+                                </div>
+                            </div>
+                            <div className="project-info">
+                                <div className="project-info-header">
+                                    <h2 className="project-title">
+                                        <input type="text" placeholder='작품 제목' value={title} onChange={(e) => setTitle(e.target.value)} />
+                                    </h2>
+                                    <div className="project-date-views">
+                                        <span className="project-date">{createdAt}</span>
+                                        <span className="project-views">조회수 100회</span>
+                                    </div>
+                                </div>
+                                <div className="project-info-body">
+                                    <span className="project-author">{authorDisplayName || '알 수 없음'}</span>
+                                    <div className="project-actions">
+                                        <button className="like-button" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />99</span></button>
+                                        <button className="bookmark-button" type='button'><BsBookmark size={"20px"} /></button>
+                                        <button className="share-button" type='button' ><FaRegShareSquare size={'20px'} /> </button>
+                                        <button className="download-button" type='button' ><BiSolidDownload size={"20px"} /></button>
+                                        <button className="edit-button" type='button'><LiaEditSolid size={"20px"} /></button>
+                                        <button className="delete-button" type='button' ><MdDeleteOutline size={"20px"} /></button>
+                                    </div>
+                                </div>
+                                <input type="text" className='project-url' value={link} placeholder='https://example.com' onChange={(e) => setLink(e.target.value)} />
+                                <div className="project-description">
+                                    <textarea
+                                        className='up-texta'
+                                        value={description}
+                                        onChange={handleDescriptionChange}
+                                        rows="7"
+                                        placeholder="작품에 대한 설명을 작성하세요"
+                                    >
+                                    </textarea>
+                                    <p>({description.length}/{maxDescriptionLength})</p>
+                                </div>
+                                {fileName && (
+                                    <div>
+                                        <p className='nowfile'>현재 파일: <a href={existingFileUrl} target="_blank" rel="noopener noreferrer"> {fileName}</a></p>
+                                        <button type="button" className='deleteFile' onClick={handleDeleteFile}><MdDeleteOutline size={"20px"} /></button>
                                     </div>
                                 )}
-                            </Droppable>
-                        </DragDropContext>
-                        <button
-                            type="submit"
-                            className='submitBtn'
-                            onClick={handleSubmit}
-                            disabled={isUploading || !title.trim() || !description.trim() || images.length === 0}
-                        >
-                            수정
-                        </button>
+                                <div className='newFile'>새 파일 업로드 (기존 파일 대체):</div>
+                                <input type="file" onChange={handleFileChange} />
+                            </div>
+                        </div>
+                        <div className="project-comments-section-up">
+                            <p>이미지 (최대 5개)</p>
+                            <p style={{ fontSize: '13px', fontWeight: 'normal' }}>클릭해서 썸네일 지정</p>
+                            <input type="file" multiple onChange={handleImageChange} ref={fileInputRef} />
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                <Droppable droppableId="droppable-images" direction="horizontal">
+                                    {(provided, snapshot) => (
+                                        <div ref={provided.innerRef} {...provided.droppableProps} className="image-preview">
+                                            {images.map((image, index) => (
+                                                <Draggable key={index} draggableId={`image-${index}`} index={index}>
+                                                    {(provided) => (
+                                                        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
+                                                            className={`preview-item ${index === thumbnailIndex ? 'thumbnail-selected' : ''}`}
+                                                            onClick={() => handleImageClick(index)}>
+                                                            <img src={image.url} alt={`이미지 ${index + 1}`} />
+                                                            {index === thumbnailIndex && <div className="thumbnail-text">썸네일</div>}
+                                                            <button type="button" className="delete-img" onClick={(e) => { e.stopPropagation(); removeImage(index); }}>
+                                                                <MdDeleteOutline size={"20px"} />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+                            <button
+                                type="submit"
+                                className='submitBtn'
+                                onClick={handleSubmit}
+                                disabled={isUploading || !title.trim() || !description.trim() || images.length === 0}
+                            >
+                                수정
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div >
         </div >
     );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AiFillHome, AiOutlineHome } from 'react-icons/ai';
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";

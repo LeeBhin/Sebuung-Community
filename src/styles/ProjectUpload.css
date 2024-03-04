@@ -1,15 +1,20 @@
+.uploadWrap {
+    width: 88vw;
+}
+
 .project-detail-popup-up {
     position: relative;
-    margin-top: 2rem;
+    margin: 0 auto;
     background-color: white;
     padding: 10px;
-    width: 80vw;
+    width: 88%;
     height: 83vh;
     display: flex;
     flex-direction: column;
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.189);
+    overflow-y: auto;
 }
 
 .project-content-up {
@@ -100,7 +105,7 @@
     font-weight: bold;
 }
 
-.newFile{
+.newFile {
     margin-top: 5rem;
 }
 
@@ -120,8 +125,8 @@
     height: 40px;
 }
 
-.deleteFile:hover{
-    background-color: rgba(100, 100, 255, .5);    
+.deleteFile:hover {
+    background-color: rgba(100, 100, 255, .5);
 }
 
 .submitBtn {
@@ -156,20 +161,27 @@ img {
 }
 
 .loader {
-    border: 6px solid #f3f3f3; /* Light grey */
-    border-top: 6px solid #3498db; /* Blue */
+    border: 6px solid #f3f3f3;
+    /* Light grey */
+    border-top: 6px solid #3498db;
+    /* Blue */
     border-radius: 50%;
     width: 50px;
     height: 50px;
     animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  .loader-container {
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loader-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -180,17 +192,26 @@ img {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 9999;
-  }
+}
 
-  .submitBtn.disabled {
-    background-color: rgba(200, 200, 200, 0.5); /* 비활성화 상태의 배경색 */
-    color: rgb(150, 150, 150); /* 비활성화 상태의 텍스트 색상 */
-    cursor: not-allowed; /* 커서를 not-allowed로 변경 */
+.submitBtn.disabled {
+    background-color: rgba(200, 200, 200, 0.5);
+    /* 비활성화 상태의 배경색 */
+    color: rgb(150, 150, 150);
+    /* 비활성화 상태의 텍스트 색상 */
+    cursor: not-allowed;
+    /* 커서를 not-allowed로 변경 */
 }
 
 .submitBtn:not(.disabled):hover {
     font-weight: bold;
-    background-color: rgba(100, 100, 255, .5); /* 호버 상태의 배경색 변경 */
+    background-color: rgba(100, 100, 255, .5);
+    /* 호버 상태의 배경색 변경 */
 }
 
-  
+@media screen and (max-width: 1459px) {
+    .project-info-header {
+        align-items: start;
+        flex-direction: column;
+    }
+}

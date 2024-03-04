@@ -1,7 +1,10 @@
+.myWrap {
+    width: 88vw;
+}
+
 .myPage {
-    width: 90%;
-    max-width: 960px;
-    margin: 40px;
+    width: 80%;
+    margin: 10px;
     padding: 20px;
 }
 

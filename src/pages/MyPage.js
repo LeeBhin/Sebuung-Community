@@ -227,51 +227,53 @@ const MyPage = () => {
     }
 
     return (
-        <div className="myPage">
-            <div className="profile-section">
-                <div className="profile-image-container">
-                    <img src={userInfo?.photoURL || josh} alt="Profile" className="profile-image" />
-                    {isCurrentUser && (
-                        <>
-                            <label htmlFor="profile-image-upload" className="change-profile-btn">
-                                <AiOutlineUpload />
-                            </label>
-                            <input id="profile-image-upload" type="file" onChange={uploadProfileImage} style={{ display: 'none' }} />
-                        </>
-                    )}
-                </div>
-                <div>
-                    <div className="profile-name-section">
-                        {!editMode ? (
+        <div className='myWrap'>
+            <div className="myPage">
+                <div className="profile-section">
+                    <div className="profile-image-container">
+                        <img src={userInfo?.photoURL || josh} alt="Profile" className="profile-image" />
+                        {isCurrentUser && (
                             <>
-                                <div className="profile-name">{displayName}</div>
-                                {isCurrentUser && (
-                                    <button className="edit-icon" onClick={() => setEditMode(true)}>
-                                        <FaEdit size={"13px"} />
-                                    </button>
-                                )}
+                                <label htmlFor="profile-image-upload" className="change-profile-btn">
+                                    <AiOutlineUpload />
+                                </label>
+                                <input id="profile-image-upload" type="file" onChange={uploadProfileImage} style={{ display: 'none' }} />
                             </>
-                        ) : (
-                            <input className='changeName' type="text" value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} onKeyDown={handleDisplayNameChange} autoFocus />
                         )}
                     </div>
-                    <div className="membership-duration">
-                        {getActivityMessage(secondsSinceJoined)}
-                        {loginMethod && (
-                            <div className="login-method">
-                                <p>{loginMethod}로 로그인됨</p>
-                            </div>
-                        )}
+                    <div>
+                        <div className="profile-name-section">
+                            {!editMode ? (
+                                <>
+                                    <div className="profile-name">{displayName}</div>
+                                    {isCurrentUser && (
+                                        <button className="edit-icon" onClick={() => setEditMode(true)}>
+                                            <FaEdit size={"13px"} />
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                <input className='changeName' type="text" value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} onKeyDown={handleDisplayNameChange} autoFocus />
+                            )}
+                        </div>
+                        <div className="membership-duration">
+                            {getActivityMessage(secondsSinceJoined)}
+                            {loginMethod && (
+                                <div className="login-method">
+                                    <p>{loginMethod}로 로그인됨</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
+                {isCurrentUser && (
+                    <>
+                        <button className="myPageBtn logout-btn" onClick={logout}><IoIosLogOut size={"15px"} /> 로그아웃</button>
+                        <button className="myPageBtn delete-account-btn" onClick={deleteAccount}><MdOutlineDeleteForever size={"15px"} /> 계정 삭제</button>
+                    </>
+                )}
+                <ProjectList projectsData={myProjects} isBookmarkPage={true} />
             </div>
-            {isCurrentUser && (
-                <>
-                    <button className="myPageBtn logout-btn" onClick={logout}><IoIosLogOut size={"15px"} /> 로그아웃</button>
-                    <button className="myPageBtn delete-account-btn" onClick={deleteAccount}><MdOutlineDeleteForever size={"15px"} /> 계정 삭제</button>
-                </>
-            )}
-            <ProjectList projectsData={myProjects} isBookmarkPage={true} />
         </div>
     );
 };

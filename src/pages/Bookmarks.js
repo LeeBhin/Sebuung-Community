@@ -3,6 +3,8 @@ import ProjectList from '../components/ProjectList';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+import '../styles/Bookmarks.css'
+
 const josh = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'
 
 function timeAgo(date) {
@@ -85,7 +87,7 @@ function Bookmarks() {
     }, []);
 
     return (
-        <div>
+        <div className='bookmarks'>
             <h2>{`${displayName}님의 북마크`}</h2>
             <ProjectList projectsData={bookmarkedProjects} isBookmarkPage={true} />
         </div>
