@@ -242,7 +242,8 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
             comment: comment.trim(),
             rating,
             createdAt: new Date(),
-            likes: []
+            likes: [],
+            commentLikesCount: 0
         };
 
         try {
@@ -265,7 +266,7 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
     }, []);
 
     const fetchComments = async () => {
-        const q = query(collection(db, "comments"), where("projectId", "==", projectId), orderBy("likes", "desc"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "comments"), where("projectId", "==", projectId), orderBy("commentLikesCount", "desc"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         const commentsWithUsernamesAndPhotos = [];
 
@@ -464,8 +465,17 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
             updatedLikes.push(userId);
         }
 
+        // 좋아요를 토글할 때마다 commentLikesCount를 업데이트합니다.
+        const updatedCommentLikesCount = updatedLikes.length;
+
+        // Firestore에 업데이트할 데이터
+        const updatedData = {
+            likes: updatedLikes,
+            commentLikesCount: updatedCommentLikesCount
+        };
+
         // Firestore에 업데이트
-        await updateDoc(commentRef, { likes: updatedLikes });
+        await updateDoc(commentRef, updatedData);
         // 댓글 목록을 다시 불러오거나 상태를 업데이트하여 UI를 새로고침
         fetchComments();
     };
