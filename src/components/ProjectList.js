@@ -73,7 +73,29 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     const [lastVisible, setLastVisible] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [prevSort, setPrevSort] = useState('views');
-    const [projectsLimit, setProjectsLimit] = useState(20); // 상태 변수로 변환
+
+    const calculateProjectsPerRow = () => {
+        const projectWidth = 300; // 프로젝트 div의 대략적인 너비 (CSS와 일치시켜야 함)
+        const windowWidth = window.innerWidth;
+        return Math.floor(windowWidth / projectWidth);
+    };
+
+    // 두 줄 분량의 프로젝트 수를 계산하는 함수
+    const calculateProjectsForTwoRows = () => {
+        const projectsPerRow = calculateProjectsPerRow();
+        return projectsPerRow * 3; // 두 줄에 걸쳐서 표시할 총 프로젝트 수
+    };
+
+    const loadMoreProjects = () => {
+        // 스크롤 시 추가로 불러올 프로젝트 수 동적 조정
+        const additionalProjectsToLoad = calculateProjectsForTwoRows() + calculateProjectsPerRow();
+        setProjectsLimit(additionalProjectsToLoad);
+    };
+
+    const [projectsLimit, setProjectsLimit] = useState(() => {
+        const initialProjectsToLoad = calculateProjectsForTwoRows() + calculateProjectsPerRow();
+        return initialProjectsToLoad;
+    });
 
     useEffect(() => {
         sortOptionRef.current = sortOption;
@@ -83,8 +105,8 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             setLastVisible(null);
             setPrevSort(sortOption);
             setIsLoading(true);
-            setProjectsLimit(20); // 초기 프로젝트 불러올 때의 limit 설정
         }
+        loadProjects()
     }, [sortOption, prevSort]);
 
     const loadProjects = async () => {
@@ -140,9 +162,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
 
             setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
 
-            if (projectsLimit === 20) {
-                setProjectsLimit(13); // 두 번째 로드부터 적용될 limit
-            }
+            loadMoreProjects();
         } else {
             loadedProjectsData = projectsData;
         }
@@ -268,7 +288,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
     useEffect(() => {
         loadProjects();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isBookmarkPage, projectsData, searchQuery, searchOption, sortOption]);
+    }, [isBookmarkPage, projectsData, searchQuery, searchOption]);
 
 
     const onPopupClose = () => {
@@ -324,7 +344,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                                 <div className="textInfo">
                                     <div className="projectTitle">{project.title}</div>
                                     <div className="authorContainer">
-                                        <div className="projectAuthor">{project.authorName}&nbsp;</div>
+                                        <span className="projectAuthor">{project.authorName}&nbsp;</span>
                                         <span className="projectCreatedAt">• {project.relativeDate}</span>
                                     </div>
                                     <div className="projectStats">

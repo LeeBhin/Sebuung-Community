@@ -26,6 +26,7 @@
 
 .logo {
     width: 10vw;
+    max-width: 200px;
     height: 60px;
     background-color: lightblue;
 }

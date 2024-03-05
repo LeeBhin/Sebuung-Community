@@ -128,7 +128,7 @@ const MyPage = () => {
 
 
     const getActivityMessage = (seconds) => {
-        if (seconds === 0) {
+        if (!seconds) {
             return `만나서 반가웠어요!`
         }
         if (seconds > 0 && seconds < 180) {

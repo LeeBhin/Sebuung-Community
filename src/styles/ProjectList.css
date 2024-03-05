@@ -11,7 +11,7 @@
     aspect-ratio: 16 / 9;
     display: flex;
     flex-direction: column;
-    margin-top: 3vh;
+    margin-top: 1vh;
     cursor: pointer;
     padding: .5rem;
     transition: transform 0.3s ease-in-out;
@@ -109,9 +109,7 @@
 
 .projectAuthor {
     margin: 0;
-}
-
-.projectAuthor {
+    color: #777777;
     font-size: 14px;
     text-align: start;
     display: -webkit-box;
@@ -119,7 +117,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 50%;
+    max-width: 70%;
 }
 
 .projectStats {
