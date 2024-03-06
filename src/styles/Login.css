@@ -1,11 +1,15 @@
+.loginWrap {
+    height: 90vh;
+    width: 88vw;
+    overflow-y: scroll;
+}
+
 .login {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: start;
     justify-content: center;
-    height: 65vh;
-    width: 40vw;
-    margin-top: 10vh;
+    margin: 1rem;
 }
 
 .login p {
@@ -123,23 +127,22 @@
     color: white;
 }
 
-.naver {
-    background-color: #03c75a;
-    color: white;
-}
-
 .agree {
-    margin: 2.5rem;
+    margin: 1rem;
+    width: 80%;
 }
 
 .privacy,
 .use {
+    margin: 1rem;
     overflow-y: scroll;
-    height: 30vh;
-    margin-top: 10px;
+    height: 100px;
+    margin-top: 1rem;
+    border-bottom: solid 1px;
+    width: 80%;
 }
 
 .privacy p,
 .use p {
-    font-size: 14px;
+    font-size: 13px;
 }
