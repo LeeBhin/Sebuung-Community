@@ -64,8 +64,8 @@ const MyPage = () => {
 
     useEffect(() => {
         // 사용자 정보 및 프로젝트 목록을 가져오는 로직
-        if (loading) return;
         if (!user && !userid) navigate('/login');
+        if (loading || !user) return;
 
         const fetchUserData = async () => {
             const userRef = doc(db, "users", targetUserId);

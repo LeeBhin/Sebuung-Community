@@ -5,6 +5,7 @@
     justify-content: center;
     height: 65vh;
     width: 40vw;
+    margin-top: 10vh;
 }
 
 .login p {
@@ -125,4 +126,20 @@
 .naver {
     background-color: #03c75a;
     color: white;
+}
+
+.agree {
+    margin: 2.5rem;
+}
+
+.privacy,
+.use {
+    overflow-y: scroll;
+    height: 30vh;
+    margin-top: 10px;
+}
+
+.privacy p,
+.use p {
+    font-size: 14px;
 }

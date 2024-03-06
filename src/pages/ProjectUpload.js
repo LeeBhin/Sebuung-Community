@@ -373,7 +373,7 @@ function ProjectUpload() {
                             >
                                 업로드
                             </button>
-
+                            <p>※ 제목, 내용, 이미지는 필수입니다</p>
                         </div>
                     </div>
                 </form>
