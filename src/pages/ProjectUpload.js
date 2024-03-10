@@ -29,6 +29,7 @@ function ProjectUpload() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [authorDisplayName, setAuthorDisplayName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [hashtags, setHashtags] = useState(['#이거보세요']);
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -140,6 +141,8 @@ function ProjectUpload() {
     const saveProjectData = async (userId, title, description, link, imageUrls, fileUrl) => {
         const thumbnailUrl = imageUrls[thumbnailIndex];
 
+        const filteredHashtags = hashtags.filter(tag => tag.trim() !== '#');
+
         try {
             const projectData = {
                 userId,
@@ -149,6 +152,7 @@ function ProjectUpload() {
                 imageUrls,
                 thumbnailUrl,
                 fileUrl,
+                hashtags: filteredHashtags,
                 views: 0,
                 likesCount: 0,
                 createdAt: new Date(),
@@ -262,6 +266,40 @@ function ProjectUpload() {
         setThumbnailIndex(newThumbnailIndex);
     };
 
+    const handleHashtagChange = (value, index) => {
+        if (!value.startsWith('#')) {
+            value = '#' + value; // '#' 추가
+        }
+
+        const newHashtags = [...hashtags];
+        newHashtags[index] = value;
+
+        // 빈 문자열인 요소 제거
+        const filteredHashtags = newHashtags.filter(tag => tag.trim() !== '#');
+
+        setHashtags(filteredHashtags);
+        console.log(hashtags)
+    };
+
+
+    const handleKeyDown = (e, index) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // 엔터 키 입력 방지
+            addHashtagInput();
+        }
+    };
+
+    const addHashtagInput = () => {
+        if (hashtags.length < 5) { // 최대 5개까지만 추가
+            setHashtags([...hashtags, '#']); // 빈 문자열 추가
+            setTimeout(() => { // 비동기 처리를 위해 setTimeout 사용
+                const inputs = document.querySelectorAll('.hashtag-input input');
+                const lastInput = inputs[inputs.length - 1];
+                lastInput.focus(); // 마지막 입력란에 포커스 이동
+            }, 0);
+        }
+    };
+
     return (
         <div className='uploadWrap'>
             <div className="project-detail-popup-up">
@@ -298,12 +336,12 @@ function ProjectUpload() {
                                 <div className="project-info-body">
                                     <span className="project-author">{authorDisplayName || '알 수 없음'}</span>
                                     <div className="project-actions">
-                                        <button className="like-button" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />0</span></button>
-                                        <button className="bookmark-button" type='button'><BsBookmark size={"20px"} /></button>
-                                        <button className="share-button" type='button' ><FaRegShareSquare size={'20px'} /> </button>
-                                        <button className="download-button" type='button' ><BiSolidDownload size={"20px"} /></button>
-                                        <button className="edit-button" type='button'><LiaEditSolid size={"20px"} /></button>
-                                        <button className="delete-button" type='button' ><MdDeleteOutline size={"20px"} /></button>
+                                        <button className="like-button" tabIndex="-1" type='button'><span className="likes-count"><TbThumbUp size={"20px"} />0</span></button>
+                                        <button className="bookmark-button" tabIndex="-1" type='button'><BsBookmark size={"20px"} /></button>
+                                        <button className="share-button" tabIndex="-1" type='button' ><FaRegShareSquare size={'20px'} /> </button>
+                                        <button className="download-button" tabIndex="-1" type='button' ><BiSolidDownload size={"20px"} /></button>
+                                        <button className="edit-button" tabIndex="-1" type='button'><LiaEditSolid size={"20px"} /></button>
+                                        <button className="delete-button" tabIndex="-1" type='button' ><MdDeleteOutline size={"20px"} /></button>
                                     </div>
                                 </div>
                                 <input type="text" className='project-url' value={link} placeholder='https://example.com' onChange={(e) => setLink(e.target.value)} />
@@ -365,6 +403,22 @@ function ProjectUpload() {
                                     )}
                                 </Droppable>
                             </DragDropContext>
+
+                            <p>#카테고리</p>
+                            <div className="hashtag-inputs">
+                                {hashtags.map((tag, index) => (
+                                    <div key={index} className="hashtag-input">
+                                        <input
+                                            type="text"
+                                            placeholder={`#${index + 1}`}
+                                            value={tag}
+                                            onChange={(e) => handleHashtagChange(e.target.value, index)}
+                                            onKeyDown={(e) => handleKeyDown(e, index)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
                             <button
                                 type="submit"
                                 className={`submitBtn ${isUploading || !title.trim() || !description.trim() || images.length === 0 ? 'disabled' : ''}`}

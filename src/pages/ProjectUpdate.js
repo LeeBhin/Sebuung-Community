@@ -33,6 +33,8 @@ function ProjectUpdate() {
     const [createdAt, setCreatedAt] = useState('');
     const [authorDisplayName, setAuthorDisplayName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [hashtags, setHashtags] = useState([]);
+
 
     const navigate = useNavigate()
 
@@ -69,6 +71,8 @@ function ProjectUpdate() {
                 const loadedImages = data.imageUrls.map(url => ({ file: null, url: url }));
                 setImages(loadedImages);
 
+                setHashtags(data.hashtags)
+
                 const thumbnailUrl = data.thumbnailUrl;
                 const thumbnailIndex = loadedImages.findIndex(image => image.url === thumbnailUrl);
                 setThumbnailIndex(thumbnailIndex >= 0 ? thumbnailIndex : 0);
@@ -87,6 +91,39 @@ function ProjectUpdate() {
 
         fetchProjectData();
     }, [projectId, navigate]);
+
+    const handleHashtagChange = (value, index) => {
+        if (!value.startsWith('#')) {
+            value = '#' + value; // '#' 추가
+        }
+
+        const newHashtags = [...hashtags];
+        newHashtags[index] = value;
+
+        // 빈 문자열인 요소 제거
+        const filteredHashtags = newHashtags.filter(tag => tag.trim() !== '#');
+
+        setHashtags(filteredHashtags);
+        console.log(hashtags)
+    };
+
+    const handleKeyDown = (e, index) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // 엔터 키 입력 방지
+            addHashtagInput();
+        }
+    };
+
+    const addHashtagInput = () => {
+        if (hashtags.length < 5) { // 최대 5개까지만 추가
+            setHashtags([...hashtags, '#']); // 빈 문자열 추가
+            setTimeout(() => { // 비동기 처리를 위해 setTimeout 사용
+                const inputs = document.querySelectorAll('.hashtag-input input');
+                const lastInput = inputs[inputs.length - 1];
+                lastInput.focus(); // 마지막 입력란에 포커스 이동
+            }, 0);
+        }
+    };
 
     const handleImageChange = (e) => {
         if (e.target.files) {
@@ -180,7 +217,11 @@ function ProjectUpdate() {
         setFileName(''); // 파일 이름 초기화
         setFile(null); // 새 파일 상태 초기화
     };
+
     const saveProjectData = async (userId, title, description, link, imageUrls, thumbnailUrl, fileUrl) => {
+
+        const filteredHashtags = hashtags.filter(tag => tag.trim() !== '#');
+
         const projectRef = doc(db, 'projects', projectId);
         const projectData = {
             userId,
@@ -188,6 +229,7 @@ function ProjectUpdate() {
             description,
             link,
             imageUrls,
+            hashtags: filteredHashtags,
             thumbnailUrl, // 썸네일 URL 추가
             ...(file ? { fileUrl: fileUrl } : existingFileUrl ? {} : { fileUrl: deleteField() }),
             updatedAt: new Date(),
@@ -425,6 +467,22 @@ function ProjectUpdate() {
                                     )}
                                 </Droppable>
                             </DragDropContext>
+
+                            <p>#카테고리</p>
+                            <div className="hashtag-inputs">
+                                {hashtags.map((tag, index) => (
+                                    <div key={index} className="hashtag-input">
+                                        <input
+                                            type="text"
+                                            placeholder={`#${index + 1}`}
+                                            value={tag}
+                                            onChange={(e) => handleHashtagChange(e.target.value, index)}
+                                            onKeyDown={(e) => handleKeyDown(e, index)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
                             <button
                                 type="submit"
                                 className='submitBtn'

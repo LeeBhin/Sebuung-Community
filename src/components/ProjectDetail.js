@@ -46,7 +46,7 @@ function timeAgo(date) {
     }
 }
 
-function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
+function ProjectDetail({ projectId, setShowPopup, onPopupClose, onTagClick }) {
     const [projectData, setProjectData] = useState(null);
     const [authorName, setAuthorName] = useState(null);
     const [isBookmarked, setIsBookmarked] = useState(false);
@@ -480,6 +480,10 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
         fetchComments();
     };
 
+    const handleTagClick = (tag) => {
+        onTagClick(tag); // 부모 컴포넌트로 태그 클릭 이벤트 전달
+    };
+
     return (
         <div className="project-detail-overlay" onClick={handleClosePopup}>
             <div className={`project-detail-popup ${isClosing ? 'closing' : ''}`} onClick={handlePopupClick}>
@@ -555,6 +559,15 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, }) {
                                         target="_blank"
                                         rel="noopener noreferrer">{projectData.link}</a>
                                     <p className="project-description">{projectData.description}</p>
+                                    <p className='project-hashtags'>
+                                        {Array.isArray(projectData.hashtags) ? (
+                                            projectData.hashtags.map(tag => (
+                                                <span key={tag} onClick={() => handleTagClick(tag)}>{tag}</span>
+                                            ))
+                                        ) : (
+                                            <span onClick={() => handleTagClick(projectData.hashtags)}>{projectData.hashtags}</span>
+                                        )}
+                                    </p>
                                 </div>
                             </>
                         )}

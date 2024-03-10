@@ -65,14 +65,17 @@
     display: flex;
     width: 100%;
     height: 95%;
-    height: auto;
 }
 
 .project-images-container img {
-    width: 100%; /* 컨테이너 너비에 맞게 이미지 너비 조정 */
-    max-height: 100%; /* 컨테이너 높이에 맞게 이미지 높이 조정 */
-    object-fit: contain; /* 컨테이너 내에서 이미지 비율을 유지하면서 전체 이미지 보여줌 */
-    object-position: center; /* 이미지가 컨테이너 중앙에 위치하도록 조정 */
+    width: 100%;
+    /* 컨테이너 너비에 맞게 이미지 너비 조정 */
+    max-height: 100%;
+    /* 컨테이너 높이에 맞게 이미지 높이 조정 */
+    object-fit: contain;
+    /* 컨테이너 내에서 이미지 비율을 유지하면서 전체 이미지 보여줌 */
+    object-position: center;
+    /* 이미지가 컨테이너 중앙에 위치하도록 조정 */
 }
 
 .project-content-up {
@@ -84,11 +87,16 @@
 }
 
 .project-content {
-    height: 760px;
+    min-height: 100px;
     flex: 3;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+}
+
+.project-hashtags span {
+    margin-right: 5px;
+    cursor: pointer;
 }
 
 .project-image-slider {
@@ -518,7 +526,6 @@
     .project-description,
     .comments-list {
         max-height: 150px;
-        overflow-y: auto;
     }
 }
 

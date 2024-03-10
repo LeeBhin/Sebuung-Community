@@ -54,10 +54,11 @@ async function fetchAuthorPhotoURLs(projectsData) {
     return projects;
 }
 
-function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQuery = '', searchOption = '', sortOption = '' }) {
+function ProjectList({ isBookmarkPage, projectsData, searchQuery = '', searchOption = '', sortOption = '' }) {
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([])
+    const [selectedTag, setSelectedTag] = useState('');
     // const [projects, setProjects] = useState(Array(5).fill().map((_, index) => ({
     //     id: `temp-${index}`,
     //     title: '불러오는 중...',
@@ -184,10 +185,11 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
             index === self.findIndex(p => p.id === project.id)
         );
 
-        if (searchQuery && searchQuery.trim() !== '') {
+        if (searchQuery) {
             // Firestore에서 검색 쿼리 실행
             const searchResults = await searchProjects(searchQuery, searchOption);
             uniqueProjectsData = searchResults;
+            searchQuery = ''
         }
 
         // fetchAuthorPhotoURLs 함수를 호출하여 작성자의 프로필 사진 URL을 가져옴
@@ -284,12 +286,15 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         };
     }, [lastScrollTop, isLoading]); // 의존성 배열에 lastScrollTop, isLoading 추가
 
-
     useEffect(() => {
         loadProjects();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isBookmarkPage, projectsData, searchQuery, searchOption]);
+    }, [isBookmarkPage, projectsData, searchQuery, searchOption, selectedTag]);
 
+    useEffect(() => {
+        onPopupClose(false)
+        loadProjects();
+    }, [selectedTag]);
 
     const onPopupClose = () => {
         setShowPopup(false); // 팝업 상태를 false로 설정합니다.
@@ -326,42 +331,50 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
         navigate(`/userProfile/${btoa(userId)}`);
     };
 
+    const handleTagClick = (tag) => {
+        setSelectedTag(tag);
+    };
+
     return (
         <div className="projectList">
             {projects.length > 0 ? (
                 <>
                     {projects.map(project => (
-                        <div key={project.id} className={`projectDiv ${project.id.startsWith('temp') ? 'temp' : ''}`}
-                            onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
-                            <div className="projectThumbnail">
-                                <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
-                                <img src={project.authorPhotoURL}
-                                    onClick={(event) => navigateToMyPage(project.userId, event)}
-                                    alt="Author"
-                                    className="author-profile-image" />
-                            </div>
-                            <div className='info'>
-                                <div className="textInfo">
-                                    <div className="projectTitle">{project.title}</div>
-                                    <div className="authorContainer">
-                                        <span className="projectAuthor">{project.authorName}&nbsp;</span>
-                                        <span className="projectCreatedAt">• {project.relativeDate}</span>
+                        // 선택된 태그와 관련된 프로젝트만 렌더링
+                        selectedTag && !project.hashtags.includes(selectedTag) ? null : (
+                            <div key={project.id} className={`projectDiv ${project.id.startsWith('temp') ? 'temp' : ''}`}
+                                onClick={() => !project.id.startsWith('temp') && showProjectDetail(project.id)}>
+                                <div className="projectThumbnail">
+                                    <img src={project.thumbnailUrl} alt={`${project.title} 프로젝트 썸네일`} />
+                                    <img src={project.authorPhotoURL}
+                                        onClick={(event) => navigateToMyPage(project.userId, event)}
+                                        alt="Author"
+                                        className="author-profile-image" />
+                                </div>
+                                <div className='info'>
+                                    <div className="textInfo">
+                                        <div className="projectTitle">{project.title}</div>
+                                        <div className="authorContainer">
+                                            <span className="projectAuthor">{project.authorName}&nbsp;</span>
+                                            <span className="projectCreatedAt">• {project.relativeDate}</span>
+                                        </div>
+                                        <div className="projectStats">
+                                            <span className='statsSvg'><PiEye size={"16px"} /></span>
+                                            <span>{project.views}&nbsp;&nbsp;</span>
+                                            <span className='statsSvg'><TbThumbUp size={"16px"} /></span>
+                                            <span>{project.likesCount}</span>
+                                        </div>
+                                        <span className='hashtags'>{project.hashtags}</span>
                                     </div>
-                                    <div className="projectStats">
-                                        <span className='statsSvg'><PiEye size={"16px"} /></span>
-                                        <span>{project.views}&nbsp;&nbsp;</span>
-                                        <span className='statsSvg'><TbThumbUp size={"16px"} /></span>
-                                        <span>{project.likesCount}</span>
-                                    </div>
-
                                 </div>
                             </div>
-                        </div>
+                        )
                     ))}
                     {showPopup && (
                         <ProjectDetail
                             projectId={selectedProject}
                             setShowPopup={setShowPopup}
+                            onTagClick={handleTagClick}
                             onPopupClose={onPopupClose}
                         />
                     )}
@@ -370,8 +383,7 @@ function ProjectList({ isBookmarkPage, projectsData, setRefreshTrigger, searchQu
                 <>
                     <div className="no-results">இ௰இ</div>
                 </>
-            )
-            }
+            )}
         </div >
     );
 }

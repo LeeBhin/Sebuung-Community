@@ -6,7 +6,6 @@ import { signInWithPopup } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { SiNaver } from "react-icons/si";
 import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 import '../styles/Login.css'; // CSS 파일 임포트
 
