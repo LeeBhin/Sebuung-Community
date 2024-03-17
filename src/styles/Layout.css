@@ -4,9 +4,10 @@
 }
 
 .sortBtns>button {
-    background-color: rgba(100, 100, 255, 0.1);
+    background-color: #ffe9ca;
     border: none;
     padding: 8px 13px;
+    font-size: 14px;
     margin-right: 10px;
     border-radius: 100px;
     cursor: pointer;

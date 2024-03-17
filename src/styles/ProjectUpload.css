@@ -122,8 +122,8 @@
 .deleteFile {
     float: left;
     margin-left: 1rem;
-    background-color: rgba(100, 100, 255, 0.2);
-    color: rgb(100, 100, 255);
+    background-color: #ffe9ca;
+    color: #E1B77C;
     border: none;
     padding: 10px;
     cursor: pointer;
@@ -136,15 +136,15 @@
 }
 
 .deleteFile:hover {
-    background-color: rgba(100, 100, 255, .5);
+    background-color: #f8d39e;
 }
 
 .submitBtn {
     font-size: 1rem;
     padding: 1rem 0 1rem 0;
     cursor: pointer;
-    background-color: rgba(100, 100, 255, 0.2);
-    color: rgb(100, 100, 255);
+    background-color: #ffe9ca;
+    color: #BE8634;
     border: none;
     padding: 10px;
     margin-left: 10px;
@@ -153,11 +153,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.submitBtn:hover {
-    font-weight: bold;
-    background-color: rgba(100, 100, 255, .5);
 }
 
 img {
@@ -171,9 +166,9 @@ img {
 }
 
 .loader {
-    border: 6px solid #f3f3f3;
+    border: 6px solid #BE8634;
     /* Light grey */
-    border-top: 6px solid #3498db;
+    border-top: 6px solid #E1B77C;
     /* Blue */
     border-radius: 50%;
     width: 50px;
@@ -215,7 +210,8 @@ img {
 
 .submitBtn:not(.disabled):hover {
     font-weight: bold;
-    background-color: rgba(100, 100, 255, .5);
+    background-color: #E1B77C;
+    ;
     /* 호버 상태의 배경색 변경 */
 }
 

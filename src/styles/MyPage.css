@@ -62,7 +62,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    /* 이름과 수정 아이콘 사이의 간격 */
 }
 
 .edit-icon {
@@ -70,7 +69,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #007bff;
+    color: #E1B77C;
     transition: color 0.3s ease;
 }
 
@@ -88,44 +87,38 @@
 }
 
 .myPageBtn {
-    /* 기본 스타일 유지 */
     margin: 5px 0;
-    /* 버튼 사이의 간격 조정 */
 }
 
 .logout-btn {
-    background-color: #007bff;
+    background-color: #E1B77C;
+    border: solid 1px #BE8634;
     margin-right: 10px;
     color: white;
-    /* 로그아웃 버튼 색상 변경 */
 }
 
 .logout-btn:hover {
     background-color: #0056b3;
-    /* 로그아웃 버튼 호버 색상 */
 }
 
 .delete-account-btn {
     background-color: #dc3545;
-    /* 계정 삭제 버튼 색상 변경 */
+    border: solid 1px #BE8634;
     color: white;
-    /* 텍스트 색상을 흰색으로 변경 */
 }
 
 .delete-account-btn:hover {
     background-color: #c82333;
-    /* 계정 삭제 버튼 호버 색상 */
 }
 
-/* 로그인 방식 표시 스타일 */
 .login-method {
     text-align: center;
     line-height: 10px;
     color: #6c757d;
     width: 150px;
-    background-color: #f8f9fa;
+    background-color: #ffe9ca;
     border-radius: 5px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #BE8634;
     font-size: 13px;
     padding: -3px;
     margin-top: 10px;

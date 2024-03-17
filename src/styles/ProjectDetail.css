@@ -190,13 +190,13 @@
     padding: 10px;
     display: flex;
     flex-direction: column;
-    border-left: solid 1px #eee;
+    border-left: solid 1px #ffe9ca;
 }
 
 .comments-header h3 {
     margin: 0;
     padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ffe9ca;
 }
 
 .project-date-views {
@@ -217,7 +217,7 @@
 
 .comment {
     padding: 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ffe9ca;
 }
 
 .comment-author {
@@ -262,7 +262,7 @@
 .comment-input-section {
     display: flex;
     margin-top: 10px;
-    border-top: solid 1px #eee;
+    border-top: solid 1px #ffe9ca;
     padding: 10px;
 }
 
@@ -275,7 +275,7 @@
 
 .comment-input-section button {
     background: none;
-    color: rgb(100, 100, 255);
+    color: #E1B77C;
     font-size: 15px;
     font-weight: bold;
     border: none;
@@ -337,8 +337,8 @@
 }
 
 .like-button {
-    background-color: rgba(100, 100, 255, 0.15);
-    color: rgb(100, 100, 255);
+    background-color: #ffe9ca;
+    color: #BE8634;
     border: none;
     padding: 10px;
     margin-left: 10px;
@@ -358,8 +358,8 @@
 .edit-button,
 .delete-button,
 .share-button {
-    background-color: rgba(100, 100, 255, 0.15);
-    color: rgb(100, 100, 255);
+    background-color: #ffe9ca;
+    color: #BE8634;
     border: none;
     padding: 10px;
     margin-left: 10px;
@@ -373,7 +373,7 @@
 }
 
 .project-actions>button:hover {
-    background-color: rgba(100, 100, 255, 0.3);
+    background-color: #f8d39e;
 }
 
 .project-description {
@@ -416,7 +416,7 @@
     align-items: flex-startD;
     padding: 10px;
     margin-bottom: 5px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ffe9ca;
 }
 
 .commentContent {

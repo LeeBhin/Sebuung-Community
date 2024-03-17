@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { auth, db } from '../firebase';
+import { auth, db, storage } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import '../styles/ProjectDetail.css';
@@ -12,7 +12,8 @@ import { IoMdClose } from "react-icons/io";
 import { TbThumbUp, TbThumbUpFilled } from "react-icons/tb";
 import { LiaEditSolid } from "react-icons/lia";
 
-const defaultProfileImageUrl = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg';
+import defaultProfileImageUrl from '../fish.png'
+import { deleteObject, getDownloadURL, ref } from 'firebase/storage';
 
 function ensureAbsoluteUrl(url) {
     // URL이 절대경로인지 확인하고 아닌 경우 http://를 붙여줍니다.
@@ -133,12 +134,56 @@ function ProjectDetail({ projectId, setShowPopup, onPopupClose, onTagClick }) {
         const isConfirmed = window.confirm('이 프로젝트를 삭제하시겠습니까?');
         if (isConfirmed) {
             try {
+                // 프로젝트의 댓글을 먼저 삭제합니다.
+                const commentsQuerySnapshot = await getDocs(query(collection(db, "comments"), where("projectId", "==", projectId)));
+                const deleteCommentsPromises = commentsQuerySnapshot.docs.map(async (commentDoc) => {
+                    await deleteDoc(doc(db, "comments", commentDoc.id));
+                });
+                await Promise.all(deleteCommentsPromises);
+
+                // 프로젝트의 이미지를 삭제합니다.
+                const imageUrls = projectData.imageUrls || [];
+                const deleteImagePromises = imageUrls.map(async (imageUrl) => {
+                    // 이미지 URL을 파싱하여 이미지의 전체 경로를 추출합니다.
+                    const imagePath = imageUrl.split('?')[0]; // 이미지 URL에서 쿼리 파라미터 제거
+                    const imageRef = ref(storage, imagePath); // 이미지 경로에 해당하는 Reference 객체 생성
+
+                    // 이미지가 존재할 때만 삭제를 시도합니다.
+                    try {
+                        await getDownloadURL(imageRef); // 이미지가 존재하는지 확인
+                        await deleteObject(imageRef); // 이미지 삭제
+                    } catch (error) {
+                    }
+                });
+
+                await Promise.all(deleteImagePromises);
+
+                // 프로젝트를 삭제합니다.
                 await deleteDoc(doc(db, "projects", projectId));
+
+                // 사용자 조회 기록에서 삭제된 프로젝트를 제거합니다.
+                await removeDeletedProjectFromUserViews(projectId);
+
+                // 페이지를 새로고침합니다.
                 window.location.reload();
             } catch (error) {
                 console.error("프로젝트 삭제 중 오류 발생:", error);
                 alert('프로젝트 삭제에 실패했습니다.', error);
             }
+        }
+    };
+
+    const removeDeletedProjectFromUserViews = async (projectId) => {
+        const userId = auth.currentUser ? auth.currentUser.uid : null;
+        if (!userId) return;
+
+        const userViewsRef = doc(db, "userViews", userId);
+        const userViewsDoc = await getDoc(userViewsRef);
+
+        if (userViewsDoc.exists()) {
+            const viewedProjects = userViewsDoc.data().viewedProjects || [];
+            const updatedViewedProjects = viewedProjects.filter(id => id !== projectId);
+            await updateDoc(userViewsRef, { viewedProjects: updatedViewedProjects });
         }
     };
 

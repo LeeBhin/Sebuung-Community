@@ -17,7 +17,7 @@ function Layout({ children }) {
     };
 
     const getButtonStyle = (option) => {
-        return sortOption === option ? { backgroundColor: 'rgb(100,100,255)', color: 'white', fontWeight: 'bold' } : {};
+        return sortOption === option ? { backgroundColor: '#BE8634', color: 'white' } : {};
     };
 
     return (

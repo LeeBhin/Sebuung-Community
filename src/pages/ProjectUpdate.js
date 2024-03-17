@@ -103,8 +103,12 @@ function ProjectUpdate() {
         // 빈 문자열인 요소 제거
         const filteredHashtags = newHashtags.filter(tag => tag.trim() !== '#');
 
-        setHashtags(filteredHashtags);
-        console.log(hashtags)
+        // 첫 번째 요소는 삭제되지 않도록
+        if (index !== 0) {
+            setHashtags(filteredHashtags);
+        } else {
+            setHashtags([filteredHashtags[0], ...filteredHashtags.slice(2)]);
+        }
     };
 
     const handleKeyDown = (e, index) => {
@@ -474,7 +478,7 @@ function ProjectUpdate() {
                                     <div key={index} className="hashtag-input">
                                         <input
                                             type="text"
-                                            placeholder={`#${index + 1}`}
+                                            placeholder={`#세붕이`}
                                             value={tag}
                                             onChange={(e) => handleHashtagChange(e.target.value, index)}
                                             onKeyDown={(e) => handleKeyDown(e, index)}

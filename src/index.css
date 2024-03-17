@@ -23,19 +23,19 @@ input:focus {
 
 /* 스크롤바 트랙 (바탕) */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #ffe9ca;
   border-radius: 5px;
 }
 
 /* 스크롤바 핸들 */
 ::-webkit-scrollbar-thumb {
-  background: #888888a9;
+  background: #f8d39e;
   border-radius: 100px;
 }
 
 /* 스크롤바 핸들 호버 시 */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #E1B77C;
 }
 
 .scroll_container {

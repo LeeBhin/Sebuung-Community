@@ -41,7 +41,7 @@
     overflow: hidden;
     border-radius: 10px;
     transition: .5s;
-    border: solid 1px rgba(100, 100, 255, 0.1);
+    border: solid 1px #ffe9ca;
 }
 
 .projectThumbnail img {
@@ -63,11 +63,7 @@
 .authorContainer {
     display: flex;
     align-items: center;
-    margin-bottom: 3px;
     margin-right: 10px;
-}
-
-.projectCreatedAt {
     color: #777777;
     font-size: 14px;
 }
@@ -120,9 +116,12 @@
 
 .projectStats {
     display: flex;
-    /* 세로 방향으로 스택 */
-    align-items: flex-start;
-    /* 왼쪽 정렬 */
+    align-items: center;
+    margin-top: -5px;
+}
+
+.statsSvg {
+    margin-top: 5px;
 }
 
 .projectStats span,

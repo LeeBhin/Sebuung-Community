@@ -29,7 +29,7 @@ function ProjectUpload() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [authorDisplayName, setAuthorDisplayName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [hashtags, setHashtags] = useState(['#이거보세요']);
+    const [hashtags, setHashtags] = useState(['#세붕이']);
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -277,10 +277,13 @@ function ProjectUpload() {
         // 빈 문자열인 요소 제거
         const filteredHashtags = newHashtags.filter(tag => tag.trim() !== '#');
 
-        setHashtags(filteredHashtags);
-        console.log(hashtags)
+        // 첫 번째 요소는 삭제되지 않도록
+        if (index !== 0) {
+            setHashtags(filteredHashtags);
+        } else {
+            setHashtags([filteredHashtags[0], ...filteredHashtags.slice(2)]);
+        }
     };
-
 
     const handleKeyDown = (e, index) => {
         if (e.key === 'Enter') {
@@ -410,7 +413,7 @@ function ProjectUpload() {
                                     <div key={index} className="hashtag-input">
                                         <input
                                             type="text"
-                                            placeholder={`#${index + 1}`}
+                                            placeholder={`#세붕이`}
                                             value={tag}
                                             onChange={(e) => handleHashtagChange(e.target.value, index)}
                                             onKeyDown={(e) => handleKeyDown(e, index)}

@@ -1,7 +1,19 @@
+@font-face {
+    font-family: 'BMJUA';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMJUA.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: 'BMJUA';
+}
+
+
 .header {
     display: flex;
     align-items: flex-start;
-    padding: 2vh 0 0 2vh;
+    padding: 1vh 0 1vh 2vh;
 }
 
 .search-container {
@@ -12,7 +24,7 @@
 .searchBar {
     padding: .8rem 1rem .8rem 1rem;
     width: 30vw;
-    border: solid 1px rgba(100, 100, 255);
+    border: solid 1px #c29964;
     border-radius: 0 100px 100px 0;
 }
 
@@ -21,23 +33,34 @@
     right: 0;
     padding: .6rem 1.2rem;
     cursor: pointer;
-    color: rgb(100, 100, 255);
+    color: #c29964;
 }
 
 .logo {
     width: 10vw;
     max-width: 200px;
-    height: 60px;
-    background-color: lightblue;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logoTxt {
+    font-size: 25px;
+}
+
+.logo img {
+    width: 60px;
+    height: 50px;
 }
 
 .search-dropdown {
     float: left;
     width: auto;
-    height: 43px;
+    height: 41px;
     border-radius: 100px 0 0 100px;
     text-align: center;
-    border: solid 1px rgb(100, 100, 255);
+    border: solid 1px #c29964;
     margin-right: .2rem;
     appearance: none;
     padding: 0 1.5rem 0 .6rem;
@@ -51,18 +74,46 @@
     float: left;
 }
 
+@media (max-width: 1400px) {
+    .logoTxt {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 1029px) {
+    .searchBar {
+        padding: .8rem 1rem .65rem 1rem;
+    }
+}
+
+@media (max-width: 1400px) {
+    .logoTxt {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 1240px) {
+    .logoTxt {
+        display: none;
+    }
+}
+
 @media (max-width: 770px) {
 
     .logo {
         width: 40px;
         height: 40px;
-        background-color: lightblue;
+    }
+
+    .logo img {
+        width: 40px;
+        height: 30px;
     }
 
     .searchBar {
         margin-top: .7rem;
         padding: .3rem 1rem .3rem .3rem;
-        border: solid 1px rgba(100, 100, 255);
+        border: solid 1px #c29964;
         border-radius: 0 100px 100px 0;
     }
 
@@ -82,7 +133,7 @@
         height: 27px;
         border-radius: 100px 0 0 100px;
         text-align: center;
-        border: solid 1px rgb(100, 100, 255);
+        border: solid 1px #c29964;
         appearance: none;
         padding: 0;
         background-image: url('data:image/svg+xml;utf8,<svg fill="%23666666" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M7 10l5 5 5-5z"/></svg>');

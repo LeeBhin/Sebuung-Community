@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { PiEye } from "react-icons/pi";
 import { TbThumbUp } from "react-icons/tb";
 
-const defaultProfileImageUrl = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg';
+import defaultProfileImageUrl from '../fish.png'
 
 function timeAgo(date) {
     const now = new Date();
@@ -57,17 +57,18 @@ async function fetchAuthorPhotoURLs(projectsData) {
 function ProjectList({ isBookmarkPage, projectsData, searchQuery = '', searchOption = '', sortOption = '' }) {
     const [showPopup, setShowPopup] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
-    const [projects, setProjects] = useState([])
+    // const [projects, setProjects] = useState([])
     const [selectedTag, setSelectedTag] = useState('');
-    // const [projects, setProjects] = useState(Array(5).fill().map((_, index) => ({
-    //     id: `temp-${index}`,
-    //     title: '불러오는 중...',
-    //     thumbnailUrl: defaultProfileImageUrl,
-    //     authorPhotoURL: defaultProfileImageUrl,
-    //     authorName: '로딩 중',
-    //     views: '로딩 중',
-    //     relativeDate: '방금 전',
-    // })));
+    const [projects, setProjects] = useState(Array(50).fill().map((_, index) => ({
+        id: ``,
+        title: '세붕 커뮤니티',
+        thumbnailUrl: defaultProfileImageUrl,
+        authorPhotoURL: defaultProfileImageUrl,
+        authorName: '세붕이',
+        views: '999,999',
+        relativeDate: '방금 전',
+        likesCount: '999,999'
+    })));
     const navigate = useNavigate();
 
     const sortOptionRef = useRef(sortOption);
@@ -355,8 +356,9 @@ function ProjectList({ isBookmarkPage, projectsData, searchQuery = '', searchOpt
                                     <div className="textInfo">
                                         <div className="projectTitle">{project.title}</div>
                                         <div className="authorContainer">
-                                            <span className="projectAuthor">{project.authorName}&nbsp;</span>
-                                            <span className="projectCreatedAt">• {project.relativeDate}</span>
+                                            <span className="projectAuthor">{project.authorName}</span>
+                                            <span>&nbsp;•&nbsp;</span>
+                                            <span className="projectCreatedAt">{project.relativeDate}</span>
                                         </div>
                                         <div className="projectStats">
                                             <span className='statsSvg'><PiEye size={"16px"} /></span>

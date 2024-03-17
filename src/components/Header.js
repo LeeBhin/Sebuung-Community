@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { IoIosSearch } from "react-icons/io";
 import '../styles/Header.css';
 
+import logo from '../fish.png'
+
 function Header({ setSearchQuery, setSearchOption }) {
     const [searchOption, setSearchOptionLocal] = useState('title');
     const [inputValue, setInputValue] = useState('');
@@ -25,7 +27,8 @@ function Header({ setSearchQuery, setSearchOption }) {
     return (
         <div className="header">
             <div className='logo'>
-                <img src='' alt='로고'></img>
+                <img src={logo} alt='로고'></img>
+                <span className='logoTxt'>SeBuung</span>
             </div>
             <div className="search-container">
                 <select onChange={handleSearchOptionChange} value={searchOption} className="search-dropdown">

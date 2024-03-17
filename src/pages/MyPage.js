@@ -14,7 +14,7 @@ import ProjectList from '../components/ProjectList';
 
 import '../styles/MyPage.css';
 
-const josh = 'https://cdn.vox-cdn.com/thumbor/PzidjXAPw5kMOXygTMEuhb634MM=/11x17:1898x1056/1200x800/filters:focal(807x387:1113x693)/cdn.vox-cdn.com/uploads/chorus_image/image/72921759/vlcsnap_2023_12_01_10h37m31s394.0.jpg'
+import defaultProfileImageUrl from '../fish.png'
 
 function timeAgo(date) {
     const now = new Date();
@@ -231,7 +231,7 @@ const MyPage = () => {
             <div className="myPage">
                 <div className="profile-section">
                     <div className="profile-image-container">
-                        <img src={userInfo?.photoURL || josh} alt="Profile" className="profile-image" />
+                        <img src={userInfo?.photoURL || defaultProfileImageUrl} alt="Profile" className="profile-image" />
                         {isCurrentUser && (
                             <>
                                 <label htmlFor="profile-image-upload" className="change-profile-btn">
