@@ -1,1 +1,1 @@
-https://sebunngcm.netlify.app/
+https://sebuungcm.netlify.app/
