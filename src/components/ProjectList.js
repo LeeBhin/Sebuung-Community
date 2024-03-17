@@ -60,7 +60,7 @@ function ProjectList({ isBookmarkPage, projectsData, searchQuery = '', searchOpt
     // const [projects, setProjects] = useState([])
     const [selectedTag, setSelectedTag] = useState('');
     const [projects, setProjects] = useState(Array(50).fill().map((_, index) => ({
-        id: ``,
+        id: `temp-${index}`,
         title: '세붕 커뮤니티',
         thumbnailUrl: defaultProfileImageUrl,
         authorPhotoURL: defaultProfileImageUrl,
