@@ -26,8 +26,9 @@
 
 - **구현**: React
 - **데이터베이스**: Firebase
-- **호스팅**: Netlify
+
 
 ## 프로젝트 정보
 
 - 웹사이트: [세붕 동아리 커뮤니티](https://sebuungcm.netlify.app/)
+- 호스팅: Netlify
