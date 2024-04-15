@@ -19,33 +19,46 @@ const Login = () => {
         }
     }, [user, navigate]);
 
-    const loginWithProvider = async (provider, providerName) => {
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            const userDoc = doc(db, 'users', user.uid);
-            const userData = {
-                displayName: user.displayName,
-                email: user.email,
-                photoURL: user.photoURL,
-                creationDate: new Date(),
-                authMethod: providerName
-            };
-            await setDoc(userDoc, userData, { merge: true });
-
-            const authin = getAuth();
-            setPersistence(authin, browserLocalPersistence)
-                .then(() => {
-                    // 인증 상태 지속성이 LOCAL로 설정되었습니다.
-                    // 이제 사용자의 로그인 상태가 브라우저를 닫아도 유지됩니다.
-                })
-                .catch((error) => {
-                    console.error("인증 상태 지속성 설정 중 오류 발생:", error);
-                });
-        } catch (error) {
-            console.error("로그인 실패:", error);
+const loginWithProvider = async (provider, providerName) => {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const userDoc = doc(db, 'users', user.uid);
+        
+        // Firestore에서 사용자 데이터 가져오기
+        const userSnapshot = await getDoc(userDoc);
+        const userData = userSnapshot.data();
+        
+        // creationDate 필드가 비어 있는지 확인하고, 비어 있으면 현재 날짜 할당
+        if (!userData.creationDate) {
+            userData.creationDate = new Date();
         }
-    };
+        
+        // 새로운 데이터와 기존 사용자 데이터 병합
+        const updatedUserData = {
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+            creationDate: userData.creationDate, // 기존 또는 새로 할당된 날짜 사용
+            authMethod: providerName
+        };
+
+        await setDoc(userDoc, updatedUserData, { merge: true });
+
+        const authin = getAuth();
+        setPersistence(authin, browserLocalPersistence)
+            .then(() => {
+                // 인증 상태 지속성이 LOCAL로 설정되었습니다.
+                // 이제 사용자의 로그인 상태가 브라우저를 닫아도 유지됩니다.
+            })
+            .catch((error) => {
+                console.error("인증 상태 지속성 설정 중 오류 발생:", error);
+            });
+    } catch (error) {
+        console.error("로그인 실패:", error);
+    }
+};
+
 
     const loginWithGoogle = () => loginWithProvider(googleProvider, '구글');
     const loginWithGitHub = () => loginWithProvider(githubProvider, '깃허브');
