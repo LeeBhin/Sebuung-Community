@@ -3,7 +3,7 @@ import { auth, googleProvider, githubProvider, db } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { signInWithPopup } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
