@@ -27,11 +27,19 @@ const loginWithProvider = async (provider, providerName) => {
         
         // Firestore에서 사용자 데이터 가져오기
         const userSnapshot = await getDoc(userDoc);
-        const userData = userSnapshot.data();
+
+        let userData = userSnapshot.data();
         
-        // creationDate 필드가 비어 있는지 확인하고, 비어 있으면 현재 날짜 할당
-        if (!userData.creationDate) {
-            userData.creationDate = new Date();
+        // 사용자 문서가 Firestore에 존재하지 않는 경우 초기 데이터 구조를 생성합니다.
+        if (!userSnapshot.exists()) {
+            userData = {
+                creationDate: new Date()  // 문서가 없을 때 초기 생성 날짜 할당
+            };
+        } else {
+            // creationDate 필드가 비어 있는지 확인하고, 비어 있으면 현재 날짜 할당
+            if (!userData.creationDate) {
+                userData.creationDate = new Date();
+            }
         }
         
         // 새로운 데이터와 기존 사용자 데이터 병합
