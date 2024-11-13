@@ -76,7 +76,7 @@ function Sidebar() {
                 {getIcon("/bookmarks")}
                 <span>북마크</span>
             </div>
-            <div className={getLinkClass("/description")} onClick={() => alert(`2세대 세붕이 여러분 환영합니다!`)}>
+            <div className={getLinkClass("/description")} onClick={() => alert(`공지사항입니다`)}>
                 {getIcon("/HiOutlineSpeakerphone")}
                 <span>공지사항</span>
             </div>
